@@ -1,0 +1,25 @@
+{
+  "title": "CCEI Tild",
+  "config": {
+    "step": {
+      "user": {
+        "description": "Please configure the connection with your CCEI Tild box.",
+        "data": {
+          "host": "Tild box IP address (or hostname)",
+          "refresh_rate": "Refresh rate (in minutes)"
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "init": {
+        "description": "Please reconfigure the connection with your CCEI Tild box.",
+        "data": {
+          "host": "Tild box IP address (or hostname)",
+          "refresh_rate": "Refresh rate (in minutes)"
+        }
+      }
+    }
+  }
+}

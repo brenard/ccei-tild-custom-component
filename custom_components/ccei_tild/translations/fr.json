@@ -1,0 +1,25 @@
+{
+  "title": "CCEI Tild",
+  "config": {
+    "step": {
+      "user": {
+        "description": "Merci de configurer la connexion à votre boitier CCEI Tild.",
+        "data": {
+          "host": "Adresse IP (ou nom d'hôte) de votre boitier Tild",
+          "refresh_rate": "Fréquence de rafraîchissement (en minutes)"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Merci de reconfigurer la connexion à votre boitier CCEI Tild.",
+        "data": {
+          "host": "Adresse IP (ou nom d'hôte) de votre boitier Tild",
+          "refresh_rate": "Fréquence de rafraîchissement (en minutes)"
+        }
+      }
+    }
+  }
+}

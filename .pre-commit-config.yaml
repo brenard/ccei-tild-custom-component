@@ -1,0 +1,37 @@
+# Pre-commit hooks to run tests and ensure code is cleaned.
+# See https://pre-commit.com for more information
+repos:
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v3.3.1
+    hooks:
+    - id: pyupgrade
+      args: ['--keep-percent-format', '--py37-plus']
+-   repo: https://github.com/psf/black
+    rev: 22.12.0
+    hooks:
+    - id: black
+      args: ['--target-version', 'py37', '--line-length', '100']
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.11.5
+    hooks:
+    - id: isort
+      args: ['--profile', 'black', '--line-length', '100']
+-   repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
+    hooks:
+    - id: flake8
+      args: ['--max-line-length=100']
+-   repo: local
+    hooks:
+    - id: pylint
+      name: pylint
+      entry: pylint
+      language: system
+      types: [python]
+      require_serial: true
+-   repo: https://github.com/Lucas-C/pre-commit-hooks-bandit
+    rev: v1.0.5
+    hooks:
+    - id: python-bandit-vulnerability-check
+      name: bandit
+      args: [--skip, "B101", --recursive, mylib]

@@ -1,0 +1,50 @@
+#!/bin/bash
+
+SRC_DIR=$( dirname "$(realpath $0)" )
+
+NAME=homeassistant
+
+case $1 in
+
+	create)
+		CONFIG_DIR="$SRC_DIR/config"
+		[ ! -d $CONFIG_DIR ] && mkdir "$CONFIG_DIR"
+		/usr/bin/docker create \
+			--name $NAME \
+			--privileged --restart=unless-stopped \
+			-e TZ=$( cat /etc/timezone ) \
+			-v "$CONFIG_DIR:/config" \
+			-v $SRC_DIR/custom_components:/config/custom_components \
+			-v $SRC_DIR/fake-tild:/config/fake-tild \
+			-v /run/dbus:/run/dbus:ro \
+			--network=host \
+			ghcr.io/home-assistant/home-assistant
+		;;
+
+	remove|start|stop|restart)
+		/usr/bin/docker $1 $NAME
+		;;
+
+	recreate)
+		$0 remove
+		$0 create
+		;;
+
+	logs)
+		/usr/bin/docker logs -f $NAME
+		;;
+
+	fake-tild)
+		/usr/bin/docker exec -t $NAME python3 /config/$@
+		;;
+	*)
+		echo "Usage: $0 [create|remove|recreate|start|stop|restart|logs|fake-tild]"
+		echo "  create     Create docker container"
+		echo "  remove     Remove docker container"
+		echo "  recreate   Recreate docker container"
+		echo "  start      Start docker container"
+		echo "  stop       Stop docker container"
+		echo "  restart    Restart docker container"
+		echo "  logs       Show (and follow) docker container logs"
+		echo "  fake-tild  Run fake Tild server"
+esac

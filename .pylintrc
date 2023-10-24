@@ -1,0 +1,21 @@
+[MESSAGES CONTROL]
+disable=invalid-name,
+	locally-disabled,
+	too-many-arguments,
+	too-many-branches,
+	too-many-locals,
+	too-many-return-statements,
+	too-many-nested-blocks,
+	too-many-instance-attributes,
+	too-many-lines,
+	too-many-statements,
+	too-few-public-methods,
+	logging-too-many-args,
+	duplicate-code,
+	import-error,
+	attribute-defined-outside-init,
+	unused-argument,
+
+[FORMAT]
+# Maximum number of characters on a single line.
+max-line-length=100

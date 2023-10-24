@@ -1,0 +1,13 @@
+#! /usr/bin/python
+"""Script to emulate a CCEI Tild box"""
+
+import os.path
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "custom_components"))
+
+# pylint: disable=wrong-import-position
+from ccei_tild.tild import FakeTildBox  # noqa: E402
+
+fake_tild = FakeTildBox(*sys.argv[1:])  # pylint: disable=too-many-function-args
+fake_tild.run()

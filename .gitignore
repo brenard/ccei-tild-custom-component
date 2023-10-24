@@ -1,0 +1,5 @@
+*~
+.*.swp
+/config
+__pycache__
+*.pyc
