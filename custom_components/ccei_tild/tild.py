@@ -75,6 +75,42 @@ TREATMENT_STATUS_CODES = {
 }
 
 
+def parse_sensors_data(data):
+    """Parse sensors state data"""
+    state = {
+        SYSTEM_DATE: datetime(
+            int(data[132:134]) + 2000,
+            int(data[130:132]) - 1,
+            int(data[128:130]),
+            int(data[124:126]),
+            int(data[122:124]),
+        ).isoformat(),
+        TOGGLES_STATUS_CODE: data[34:35],
+        LIGHT_COLOR_CODE: data[64:66],
+        LIGHT_INTENSITY_CODE: data[71:72],
+        WATER_TEMPERATURE: int(data[66:68], 16),
+        WATER_TEMPERATURE_OFFSET_CODE: data[155:156],
+        FILTRATION_STATUS_CODE: data[75:76],
+        TREATMENT_STATUS_CODE: data[69:70],
+    }
+
+    state[LIGHT_ENABLED] = TOGGLE_STATUS_CODES.get(state[TOGGLES_STATUS_CODE], {}).get("light")
+    state[TREATMENT_ENABLED] = TREATMENT_STATUS_CODES.get(state[TREATMENT_STATUS_CODE])
+    state[FILTRATION_ENABLED] = FILTRATION_STATUS_CODES.get(state[FILTRATION_STATUS_CODE])
+    state[PUMP_ENABLED] = TOGGLE_STATUS_CODES.get(state[TOGGLES_STATUS_CODE], {}).get("pump")
+    state[WATER_TEMPERATURE_OFFSET] = WATER_TEMPERATURE_OFFSET_CODES.get(
+        state[WATER_TEMPERATURE_OFFSET_CODE]
+    )
+    state[WATER_REAL_TEMPERATURE] = (
+        state[WATER_TEMPERATURE] + state[WATER_TEMPERATURE_OFFSET]
+        if state[WATER_TEMPERATURE_OFFSET] is not None
+        else None
+    )
+    state[LIGHT_COLOR] = COLORS.get(state[LIGHT_COLOR_CODE])
+    state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
+    return state
+
+
 class CceiTildClient:
     """CCEI Tild client"""
 
@@ -126,39 +162,9 @@ class CceiTildClient:
             writer.close()
 
         LOGGER.debug("Parse answer and compute state")
-        state = {
-            SYSTEM_HOST: self.host,
-            SYSTEM_DATE: datetime(
-                int(data[132:134]) + 2000,
-                int(data[130:132]) - 1,
-                int(data[128:130]),
-                int(data[124:126]),
-                int(data[122:124]),
-            ).isoformat(),
-            TOGGLES_STATUS_CODE: data[34:35],
-            LIGHT_COLOR_CODE: data[64:66],
-            LIGHT_INTENSITY_CODE: data[71:72],
-            WATER_TEMPERATURE: int(data[66:68], 16),
-            WATER_TEMPERATURE_OFFSET_CODE: data[155:156],
-            FILTRATION_STATUS_CODE: data[75:76],
-            TREATMENT_STATUS_CODE: data[69:70],
-            RAW_DATA: data,
-        }
-
-        state[LIGHT_ENABLED] = TOGGLE_STATUS_CODES.get(state[TOGGLES_STATUS_CODE], {}).get("light")
-        state[TREATMENT_ENABLED] = TREATMENT_STATUS_CODES.get(state[TREATMENT_STATUS_CODE])
-        state[FILTRATION_ENABLED] = FILTRATION_STATUS_CODES.get(state[FILTRATION_STATUS_CODE])
-        state[PUMP_ENABLED] = TOGGLE_STATUS_CODES.get(state[TOGGLES_STATUS_CODE], {}).get("pump")
-        state[WATER_TEMPERATURE_OFFSET] = WATER_TEMPERATURE_OFFSET_CODES.get(
-            state[WATER_TEMPERATURE_OFFSET_CODE]
-        )
-        state[WATER_REAL_TEMPERATURE] = (
-            state[WATER_TEMPERATURE] + state[WATER_TEMPERATURE_OFFSET]
-            if state[WATER_TEMPERATURE_OFFSET] is not None
-            else None
-        )
-        state[LIGHT_COLOR] = COLORS.get(state[LIGHT_COLOR_CODE])
-        state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
+        state = parse_sensors_data(data)
+        state[SYSTEM_HOST] = self.host
+        state[RAW_DATA] = data
         LOGGER.debug(
             "State:%s",
             "\n - {}".format("\n - ".join([f"{key}={value}" for key, value in state.items()])),

@@ -15,7 +15,7 @@ case $1 in
 			-e TZ=$( cat /etc/timezone ) \
 			-v "$CONFIG_DIR:/config" \
 			-v $SRC_DIR/custom_components:/config/custom_components \
-			-v $SRC_DIR/fake-tild:/config/fake-tild \
+			-v $SRC_DIR/bin:/root/bin \
 			-v /run/dbus:/run/dbus:ro \
 			--network=host \
 			ghcr.io/home-assistant/home-assistant
@@ -38,8 +38,8 @@ case $1 in
 		/usr/bin/docker logs -f $NAME
 		;;
 
-	fake-tild)
-		/usr/bin/docker exec -t $NAME python3 /config/$@
+	fake-tild|compare-tild-state-data)
+		/usr/bin/docker exec -t $NAME /root/bin/$@
 		;;
 	*)
 		echo "Usage: $0 [create|remove|recreate|start|stop|restart|logs|fake-tild]"
@@ -51,4 +51,5 @@ case $1 in
 		echo "  restart    Restart docker container"
 		echo "  logs       Show (and follow) docker container logs"
 		echo "  fake-tild  Run fake Tild server"
+		echo "  compare-tild-state-data  Compare raw Tild server state data"
 esac

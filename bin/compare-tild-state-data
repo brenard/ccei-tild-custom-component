@@ -1,0 +1,87 @@
+#! /usr/bin/env python3
+"""Script to emulate a CCEI Tild box"""
+# pylint: disable=redefined-outer-name
+
+import argparse
+import sys
+
+sys.path.append("/config/custom_components")
+
+# pylint: disable=wrong-import-position
+from ccei_tild.tild import parse_sensors_data  # noqa: E402
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("data", nargs="+")
+parser.add_argument("-M", "--markdown", action="store_true", help="Format output in Markdown")
+parser.add_argument("-F", "--forum", action="store_true", help="Format output for the forum")
+
+opts = parser.parse_args()
+
+ref_raw_data = opts.data.pop(0)
+ref_data = list(ref_raw_data)
+ref_parsed_data = parse_sensors_data(ref_raw_data)
+
+# Detect differences
+diff = []
+diff_keys = []
+parsed_data = {ref_raw_data: ref_parsed_data}
+for raw_data in opts.data:
+    data = list(raw_data)
+    parsed_data[raw_data] = parse_sensors_data(raw_data)
+    for idx, char in enumerate(ref_data):
+        if char == data[idx]:
+            continue
+        if idx not in diff:
+            diff.append(idx)
+
+    for k, v in ref_parsed_data.items():
+        if parsed_data[raw_data][k] == v:
+            continue
+        if k not in diff_keys:
+            diff_keys.append(k)
+
+print(f"Raw differences: {', '.join([str(idx) for idx in diff])}")
+print(f"Keys differences: {', '.join(diff_keys)}")
+print()
+
+
+def format_in_red(text):
+    """Format text in red"""
+    if opts.markdown:
+        return f"__{text}__"
+    if opts.forum:
+        return f"**{text}**"
+    return "\033[91m" + text + "\033[0m"
+
+
+def format_diff_data(data):
+    """Format data differences"""
+    r = []
+    for idx, char in enumerate(data):
+        r.append(format_in_red(char) if idx in diff else char)
+    r = "".join(r)
+    if opts.markdown:
+        r = r.replace("____", "")
+    if opts.forum:
+        r = r.replace("****", "")
+    return r
+
+
+def pretty_print_data(data):
+    """Pretty format data and highlight differences"""
+    r = []
+    for k, v in data.items():
+        line = f"{k}: {v}"
+        r.append(format_in_red(line) if k in diff_keys else line)
+    print("- {}".format("\n- ".join(r)))
+
+
+print(format_diff_data(ref_data))
+pretty_print_data(parse_sensors_data(ref_raw_data))
+print()
+
+for raw_data in opts.data:
+    print(format_diff_data(list(raw_data)))
+    pretty_print_data(parse_sensors_data(raw_data))
+    print()
