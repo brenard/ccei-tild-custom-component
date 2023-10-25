@@ -21,7 +21,11 @@ case $1 in
 			ghcr.io/home-assistant/home-assistant
 		;;
 
-	remove|start|stop|restart)
+	remove)
+		/usr/bin/docker remove $NAME || /usr/bin/docker rm $NAME
+		;;
+
+	start|stop|restart)
 		/usr/bin/docker $1 $NAME
 		;;
 
