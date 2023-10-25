@@ -21,6 +21,7 @@ from .const import (
     DOMAIN,
     LAST_REFRESH,
     PLATFORMS,
+    REFRESH_SERVICE_NAME,
     SENSORS_DATA,
 )
 from .tild import CceiTildClient
@@ -82,6 +83,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     entry.async_on_unload(entry.add_update_listener(update_listener))
 
     await coordinator.async_refresh()
+
+    async def handle_refresh(call):
+        """Handle refresh service call"""
+        LOGGER.debug("Refresh service called: force refresh sensors data")
+        await hass.data[DOMAIN][COORDINATOR].async_refresh()
+
+    hass.services.async_register(DOMAIN, REFRESH_SERVICE_NAME, handle_refresh)
 
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady

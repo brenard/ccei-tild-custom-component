@@ -16,6 +16,7 @@ CLIENT = "client"
 
 SENSORS_DATA = "sensors_data"
 LAST_REFRESH = "last_refresh"
+REFRESH_SERVICE_NAME = "refresh"
 
 SYSTEM_HOST = "system_host"
 SYSTEM_DATE = "system_date"
