@@ -27,11 +27,11 @@ A fake Tild server is also provide to emulate a Tild box. You can start it by ru
 `./manage fake-tild`. This fake server is listening on your computer IP address (`0.0.0.0:30302`)
 and you can add the integration by providing the IP address to Home Assistant configuration dialog.
 
-Futhermore, the `manage compare-tild-state-data` command is provided to help to compare raw status
+Futhermore, the `manage analyse-tild-state-data` command is provided to help to analyse raw status
 data retrieved from Tild box:
 
 ```
-usage: manage compare-tild-state-data [-h] [-M] [-F] data [data ...]
+usage: manage analyse-tild-state-data [-h] [-M] [-F] data [data ...]
 
 positional arguments:
   data

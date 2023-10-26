@@ -18,32 +18,8 @@ parser.add_argument("-F", "--forum", action="store_true", help="Format output fo
 
 opts = parser.parse_args()
 
-ref_raw_data = opts.data.pop(0)
-ref_data = list(ref_raw_data)
-ref_parsed_data = parse_sensors_data(ref_raw_data)
-
-# Detect differences
 diff = []
 diff_keys = []
-parsed_data = {ref_raw_data: ref_parsed_data}
-for raw_data in opts.data:
-    data = list(raw_data)
-    parsed_data[raw_data] = parse_sensors_data(raw_data)
-    for idx, char in enumerate(ref_data):
-        if char == data[idx]:
-            continue
-        if idx not in diff:
-            diff.append(idx)
-
-    for k, v in ref_parsed_data.items():
-        if parsed_data[raw_data][k] == v:
-            continue
-        if k not in diff_keys:
-            diff_keys.append(k)
-
-print(f"Raw differences: {', '.join([str(idx) for idx in diff])}")
-print(f"Keys differences: {', '.join(diff_keys)}")
-print()
 
 
 def format_in_red(text):
@@ -76,6 +52,36 @@ def pretty_print_data(data):
         r.append(format_in_red(line) if k in diff_keys else line)
     print("- {}".format("\n- ".join(r)))
 
+
+ref_raw_data = opts.data.pop(0)
+ref_data = list(ref_raw_data)
+ref_parsed_data = parse_sensors_data(ref_raw_data)
+
+if not opts.data:
+    print(ref_raw_data)
+    pretty_print_data(ref_parsed_data)
+    sys.exit(0)
+
+# Detect differences
+parsed_data = {ref_raw_data: ref_parsed_data}
+for raw_data in opts.data:
+    data = list(raw_data)
+    parsed_data[raw_data] = parse_sensors_data(raw_data)
+    for idx, char in enumerate(ref_data):
+        if char == data[idx]:
+            continue
+        if idx not in diff:
+            diff.append(idx)
+
+    for k, v in ref_parsed_data.items():
+        if parsed_data[raw_data][k] == v:
+            continue
+        if k not in diff_keys:
+            diff_keys.append(k)
+
+print(f"Raw differences: {', '.join([str(idx) for idx in sorted(diff)])}")
+print(f"Keys differences: {', '.join(diff_keys)}")
+print()
 
 print(format_diff_data(ref_data))
 pretty_print_data(parse_sensors_data(ref_raw_data))

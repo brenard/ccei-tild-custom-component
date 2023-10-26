@@ -38,7 +38,7 @@ case $1 in
 		/usr/bin/docker logs -f $NAME
 		;;
 
-	fake-tild|compare-tild-state-data)
+	fake-tild|analyse-tild-state-data)
 		/usr/bin/docker exec -t $NAME /root/bin/$@
 		;;
 	*)
@@ -51,5 +51,5 @@ case $1 in
 		echo "  restart    Restart docker container"
 		echo "  logs       Show (and follow) docker container logs"
 		echo "  fake-tild  Run fake Tild server"
-		echo "  compare-tild-state-data  Compare raw Tild server state data"
+		echo "  analyse-tild-state-data  Analyse raw Tild server state data"
 esac
