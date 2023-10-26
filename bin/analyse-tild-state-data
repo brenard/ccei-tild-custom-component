@@ -19,11 +19,11 @@ parser.add_argument("-F", "--forum", action="store_true", help="Format output fo
 opts = parser.parse_args()
 
 
-IDENTIFIED_POS = []
+IDENTIFIED_POS = {}
 for k, pos in IDENTIFIED_FIELDS.items():
-    IDENTIFIED_POS += pos
-diff = []
-diff_keys = []
+    IDENTIFIED_POS.update({(p, k) for p in pos})
+DIFF = {}
+DIFF_KEYS = {}
 
 
 def format_in_red(text):
@@ -39,7 +39,7 @@ def format_diff_data(data):
     """Format data differences"""
     r = []
     for idx, char in enumerate(data):
-        r.append(format_in_red(char) if idx in diff else char)
+        r.append(format_in_red(char) if idx in DIFF else char)
     r = "".join(r)
     if opts.markdown:
         r = r.replace("____", "")
@@ -53,7 +53,7 @@ def pretty_print_data(data):
     r = []
     for k, v in data.items():
         line = f"{k}: {v}"
-        r.append(format_in_red(line) if k in diff_keys else line)
+        r.append(format_in_red(line) if k in DIFF_KEYS else line)
     print("- {}".format("\n- ".join(r)))
 
 
@@ -74,32 +74,47 @@ for raw_data in opts.data:
     for idx, char in enumerate(ref_data):
         if char == data[idx]:
             continue
-        if idx not in diff:
-            diff.append(idx)
+        DIFF[idx] = (DIFF[idx] + [data[idx]]) if idx in DIFF else [char, data[idx]]
 
     for k, v in ref_parsed_data.items():
         if parsed_data[raw_data][k] == v:
             continue
-        if k not in diff_keys:
-            diff_keys.append(k)
+        DIFF_KEYS[k] = (
+            (DIFF_KEYS[k] + [parsed_data[raw_data][k]])
+            if k in DIFF_KEYS
+            else [v, parsed_data[raw_data][k]]
+        )
 
-IDENTIFIED_POS_DIFF = [idx for idx in sorted(diff) if idx in IDENTIFIED_POS]
-NON_IDENTIFIED_POS_DIFF = [idx for idx in sorted(diff) if idx not in IDENTIFIED_POS]
+IDENTIFIED_POS_DIFF = [idx for idx in sorted(DIFF) if idx in IDENTIFIED_POS]
+NON_IDENTIFIED_POS_DIFF = [idx for idx in sorted(DIFF) if idx not in IDENTIFIED_POS]
 
 if IDENTIFIED_POS_DIFF:
     print(
         "Raw idendified position differences: "
-        f"{', '.join([str(idx) for idx in IDENTIFIED_POS_DIFF])}"
+        + ", ".join(
+            [
+                f"{idx} ({IDENTIFIED_POS[idx]}, {' => '.join(DIFF[idx])})"
+                for idx in IDENTIFIED_POS_DIFF
+            ]
+        )
     )
 if NON_IDENTIFIED_POS_DIFF:
     print(
         format_in_red(
-            "Raw non-idendified position differences: "
-            f"{', '.join([str(idx) for idx in NON_IDENTIFIED_POS_DIFF])}"
+            "Raw non-idendified position differences:\n"
+            + "\n".join([f"- {idx} ({' => '.join(DIFF[idx])})" for idx in NON_IDENTIFIED_POS_DIFF])
         )
     )
 
-print(f"Keys differences: {', '.join(diff_keys)}")
+print(
+    "Keys differences:\n"
+    + "\n".join(
+        [
+            f"- {key} ({' => '.join([str(value) for value in values])})"
+            for key, values in DIFF_KEYS.items()
+        ]
+    )
+)
 print()
 
 print(format_diff_data(ref_data))
