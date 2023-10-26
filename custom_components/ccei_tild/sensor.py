@@ -12,7 +12,7 @@ from .const import (
     SENSORS_DATA,
     SYSTEM_DATE,
     SYSTEM_HOST,
-    WATER_REAL_TEMPERATURE,
+    WATER_RAW_TEMPERATURE,
     WATER_TEMPERATURE,
     WATER_TEMPERATURE_OFFSET,
     WATER_TEMPERATURE_OFFSET_CODE,
@@ -28,7 +28,7 @@ async def async_setup_entry(hass, entry, async_add_devices):
         TildSystemDateSensor(coordinator, entry),
         TildWaterTemperatureSensor(coordinator, entry),
         TildWaterTemperatureOffsetSensor(coordinator, entry),
-        TildWaterRealTemperatureSensor(coordinator, entry),
+        TildWaterRawTemperatureSensor(coordinator, entry),
         TildLightIntensitySensor(coordinator, entry),
         TildLightColorSensor(coordinator, entry),
         TildRawStatusDataSensor(coordinator, entry),
@@ -67,15 +67,15 @@ class TildWaterTemperatureSensor(TildSensorEntity):
     _sensor_data_key = WATER_TEMPERATURE
 
 
-class TildWaterRealTemperatureSensor(TildSensorEntity):
-    """Monitors the water real temperature"""
+class TildWaterRawTemperatureSensor(TildSensorEntity):
+    """Monitors the water raw temperature"""
 
-    _attr_id_key = "tild_water_real_temperature"
-    _attr_name = "Water real temperature"
+    _attr_id_key = "tild_water_raw_temperature"
+    _attr_name = "Water raw temperature"
     _attr_unit_of_measurement = TEMP_CELSIUS
     _attr_icon = "mdi:pool-thermometer"
 
-    _sensor_data_key = WATER_REAL_TEMPERATURE
+    _sensor_data_key = WATER_RAW_TEMPERATURE
 
 
 class TildWaterTemperatureOffsetSensor(TildSensorEntity):
