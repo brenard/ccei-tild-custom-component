@@ -16,6 +16,11 @@ from .const import (
     PUMP_ENABLED,
     RAW_DATA,
     SYSTEM_DATE,
+    SYSTEM_DATE_DAY,
+    SYSTEM_DATE_HOUR,
+    SYSTEM_DATE_MINUTE,
+    SYSTEM_DATE_MONTH,
+    SYSTEM_DATE_YEAR,
     SYSTEM_HOST,
     TOGGLES_STATUS_CODE,
     TREATMENT_ENABLED,
@@ -74,26 +79,46 @@ TREATMENT_STATUS_CODES = {
     "3": False,
 }
 
+IDENTIFIED_FIELDS = {
+    SYSTEM_DATE_YEAR: [132, 133],
+    SYSTEM_DATE_MONTH: [130, 131],
+    SYSTEM_DATE_DAY: [128, 129],
+    SYSTEM_DATE_HOUR: [124, 125],
+    SYSTEM_DATE_MINUTE: [122, 123],
+    TOGGLES_STATUS_CODE: [34],
+    LIGHT_COLOR_CODE: [64, 65],
+    LIGHT_INTENSITY_CODE: [71],
+    WATER_TEMPERATURE: [66, 67],
+    WATER_TEMPERATURE_OFFSET_CODE: [155],
+    FILTRATION_STATUS_CODE: [75],
+    TREATMENT_STATUS_CODE: [69],
+}
+
 
 def parse_sensors_data(data):
     """Parse sensors state data"""
-    state = {
-        SYSTEM_DATE: datetime(
-            int(data[132:134]) + 2000,
-            int(data[130:132]) - 1,
-            int(data[128:130]),
-            int(data[124:126]),
-            int(data[122:124]),
-        ).isoformat(),
-        TOGGLES_STATUS_CODE: data[34:35],
-        LIGHT_COLOR_CODE: data[64:66],
-        LIGHT_INTENSITY_CODE: data[71:72],
-        WATER_TEMPERATURE: int(data[66:68], 16),
-        WATER_TEMPERATURE_OFFSET_CODE: data[155:156],
-        FILTRATION_STATUS_CODE: data[75:76],
-        TREATMENT_STATUS_CODE: data[69:70],
-    }
+    state = {}
+    for key, fields in IDENTIFIED_FIELDS.items():
+        state[key] = "".join(map(lambda x: data[x], fields))
 
+    state[SYSTEM_DATE] = datetime(
+        int(state[SYSTEM_DATE_YEAR]) + 2000,
+        int(state[SYSTEM_DATE_MONTH]) - 1,
+        int(state[SYSTEM_DATE_DAY]),
+        int(state[SYSTEM_DATE_HOUR]),
+        int(state[SYSTEM_DATE_MINUTE]),
+    ).isoformat()
+
+    for field in [
+        SYSTEM_DATE_YEAR,
+        SYSTEM_DATE_MONTH,
+        SYSTEM_DATE_DAY,
+        SYSTEM_DATE_HOUR,
+        SYSTEM_DATE_MINUTE,
+    ]:
+        del state[field]
+
+    state[WATER_TEMPERATURE] = int(state[WATER_TEMPERATURE], 16)
     state[LIGHT_ENABLED] = TOGGLE_STATUS_CODES.get(state[TOGGLES_STATUS_CODE], {}).get("light")
     state[TREATMENT_ENABLED] = TREATMENT_STATUS_CODES.get(state[TREATMENT_STATUS_CODE])
     state[FILTRATION_ENABLED] = FILTRATION_STATUS_CODES.get(state[FILTRATION_STATUS_CODE])
@@ -188,28 +213,38 @@ class FakeTildBox:
     @staticmethod
     def get_random_state_data():
         """Generate random state data string"""
-        data = []
-        for idx in range(0, 255):  # pylint: disable=unused-variable
-            data.append("0")
+
         now = datetime.now()
-        data[132:134] = list(f"{now.year-2000:02}")  # year
-        data[130:132] = list(f"{now.month+1:02}")  # month
-        data[128:130] = list(f"{now.day:02}")  # day
-        data[124:126] = list(f"{now.hour:02}")  # hours
-        data[122:124] = list(f"{now.minute:02}")  # minutes
 
         # temperature (base 16, eg. 17 mean 23°C)
         temp = random.randrange(20, 30)
         temp = hex(temp).replace("0x", "")
         temp = f"0{temp}" if len(temp) == 1 else temp
-        data[66:68] = list(temp)
 
-        data[34:35] = list(random.choice(list(TOGGLE_STATUS_CODES.keys())))
-        data[64:66] = list(random.choice(list(COLORS.keys())))
-        data[71:72] = list(random.choice(list(LIGHT_INTENSITY_CODES.keys())))
-        data[75:76] = list(random.choice(list(FILTRATION_STATUS_CODES.keys())))
-        data[69:70] = list(random.choice(list(TREATMENT_STATUS_CODES.keys())))
-        data[155:156] = list(random.choice(list(WATER_TEMPERATURE_OFFSET_CODES.keys())))
+        fields = {
+            SYSTEM_DATE_YEAR: f"{now.year-2000:02}",
+            SYSTEM_DATE_MONTH: f"{now.month+1:02}",
+            SYSTEM_DATE_DAY: f"{now.day:02}",
+            SYSTEM_DATE_HOUR: f"{now.hour:02}",
+            SYSTEM_DATE_MINUTE: f"{now.minute:02}",
+            WATER_TEMPERATURE: temp,
+            TOGGLES_STATUS_CODE: random.choice(list(TOGGLE_STATUS_CODES.keys())),
+            LIGHT_COLOR_CODE: random.choice(list(COLORS.keys())),
+            LIGHT_INTENSITY_CODE: random.choice(list(LIGHT_INTENSITY_CODES.keys())),
+            FILTRATION_STATUS_CODE: random.choice(list(FILTRATION_STATUS_CODES.keys())),
+            TREATMENT_STATUS_CODE: random.choice(list(TREATMENT_STATUS_CODES.keys())),
+            WATER_TEMPERATURE_OFFSET_CODE: random.choice(
+                list(WATER_TEMPERATURE_OFFSET_CODES.keys())
+            ),
+        }
+
+        data = []
+        for idx in range(1, 160):  # pylint: disable=unused-variable
+            data.append("0")
+
+        for field, pos in IDENTIFIED_FIELDS.items():
+            assert field in fields
+            data[pos[0] : pos[-1] + 1] = list(fields[field])
 
         return "".join(data)
 
