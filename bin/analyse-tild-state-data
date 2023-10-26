@@ -8,7 +8,7 @@ import sys
 sys.path.append("/config/custom_components")
 
 # pylint: disable=wrong-import-position
-from ccei_tild.tild import parse_sensors_data  # noqa: E402
+from ccei_tild.tild import IDENTIFIED_FIELDS, parse_sensors_data  # noqa: E402
 
 parser = argparse.ArgumentParser()
 
@@ -18,6 +18,10 @@ parser.add_argument("-F", "--forum", action="store_true", help="Format output fo
 
 opts = parser.parse_args()
 
+
+IDENTIFIED_POS = []
+for k, pos in IDENTIFIED_FIELDS.items():
+    IDENTIFIED_POS += pos
 diff = []
 diff_keys = []
 
@@ -79,7 +83,22 @@ for raw_data in opts.data:
         if k not in diff_keys:
             diff_keys.append(k)
 
-print(f"Raw differences: {', '.join([str(idx) for idx in sorted(diff)])}")
+IDENTIFIED_POS_DIFF = [idx for idx in sorted(diff) if idx in IDENTIFIED_POS]
+NON_IDENTIFIED_POS_DIFF = [idx for idx in sorted(diff) if idx not in IDENTIFIED_POS]
+
+if IDENTIFIED_POS_DIFF:
+    print(
+        "Raw idendified position differences: "
+        f"{', '.join([str(idx) for idx in IDENTIFIED_POS_DIFF])}"
+    )
+if NON_IDENTIFIED_POS_DIFF:
+    print(
+        format_in_red(
+            "Raw non-idendified position differences: "
+            f"{', '.join([str(idx) for idx in NON_IDENTIFIED_POS_DIFF])}"
+        )
+    )
+
 print(f"Keys differences: {', '.join(diff_keys)}")
 print()
 
