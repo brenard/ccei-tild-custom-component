@@ -208,7 +208,7 @@ class FakeTildBox:
         if host:
             self.host = host
         if port:
-            self.port = port
+            self.port = port if port is int else int(port)
 
     @staticmethod
     def get_random_state_data():
