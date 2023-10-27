@@ -53,7 +53,12 @@ class TildSensorEntity(TildEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self.coordinator.data[SENSORS_DATA][self._sensor_data_key]
+        return (
+            self.coordinator.data[SENSORS_DATA][self._sensor_data_key]
+            if self.coordinator.data[SENSORS_DATA]
+            and self._sensor_data_key in self.coordinator.data[SENSORS_DATA]
+            else None
+        )
 
 
 class TildLightEntity(TildEntity, LightEntity):
