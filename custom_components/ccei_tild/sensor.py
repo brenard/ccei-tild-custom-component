@@ -1,9 +1,10 @@
 """Sensor platform"""
-from homeassistant.const import PERCENTAGE, TEMP_CELSIUS
+from homeassistant.const import PERCENTAGE, TEMP_CELSIUS, TIME_HOURS
 
 from .const import (
     COORDINATOR,
     DOMAIN,
+    FILTRATION_EXPECTED_DURATION,
     LIGHT_COLOR,
     LIGHT_COLOR_CODE,
     LIGHT_INTENSITY,
@@ -31,6 +32,7 @@ async def async_setup_entry(hass, entry, async_add_devices):
         TildWaterRawTemperatureSensor(coordinator, entry),
         TildLightIntensitySensor(coordinator, entry),
         TildLightColorSensor(coordinator, entry),
+        TildFiltrationExpectedDurationSensor(coordinator, entry),
         TildRawStatusDataSensor(coordinator, entry),
     ]
     async_add_devices(sensors)
@@ -110,6 +112,16 @@ class TildLightColorSensor(TildSensorEntity):
     _sensor_data_extra_keys = {
         "raw_color_code": LIGHT_COLOR_CODE,
     }
+
+
+class TildFiltrationExpectedDurationSensor(TildSensorEntity):
+    """Monitors the filtration expected duration color"""
+
+    _attr_name = "Filtration expected duration"
+    _attr_unit_of_measurement = TIME_HOURS
+    _attr_icon = "mdi:timer-cog"
+
+    _sensor_data_key = FILTRATION_EXPECTED_DURATION
 
 
 class TildRawStatusDataSensor(TildSensorEntity):

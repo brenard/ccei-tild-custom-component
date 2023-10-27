@@ -7,6 +7,7 @@ from datetime import datetime
 
 from .const import (
     FILTRATION_ENABLED,
+    FILTRATION_EXPECTED_DURATION,
     FILTRATION_STATUS_CODE,
     LIGHT_COLOR,
     LIGHT_COLOR_CODE,
@@ -96,6 +97,7 @@ IDENTIFIED_FIELDS = {
     WATER_TEMPERATURE: [66, 67],
     WATER_TEMPERATURE_OFFSET_CODE: [155],
     FILTRATION_STATUS_CODE: [32],
+    FILTRATION_EXPECTED_DURATION: [33],
     TREATMENT_STATUS_CODE: [69],
 }
 
@@ -127,6 +129,7 @@ def parse_sensors_data(data):
     state[LIGHT_ENABLED] = TOGGLE_STATUS_CODES.get(state[TOGGLES_STATUS_CODE], {}).get("light")
     state[TREATMENT_ENABLED] = TREATMENT_STATUS_CODES.get(state[TREATMENT_STATUS_CODE])
     state[FILTRATION_ENABLED] = FILTRATION_STATUS_CODES.get(state[FILTRATION_STATUS_CODE])
+    state[FILTRATION_EXPECTED_DURATION] = int(state[FILTRATION_EXPECTED_DURATION])
     state[PUMP_ENABLED] = TOGGLE_STATUS_CODES.get(state[TOGGLES_STATUS_CODE], {}).get("pump")
     state[WATER_TEMPERATURE_OFFSET] = WATER_TEMPERATURE_OFFSET_CODES.get(
         state[WATER_TEMPERATURE_OFFSET_CODE]
@@ -241,6 +244,7 @@ class FakeTildBox:
             WATER_TEMPERATURE_OFFSET_CODE: random.choice(
                 list(WATER_TEMPERATURE_OFFSET_CODES.keys())
             ),
+            FILTRATION_EXPECTED_DURATION: str(random.randrange(0, 8)),
         }
 
         data = []
