@@ -18,7 +18,14 @@ class TildEntity(CoordinatorEntity):
         """Initialize the entity."""
         super().__init__(coordinator)
         self.config_entry = config_entry
-        self._attr_unique_id = f"{self.config_entry.entry_id}_{self._attr_id_key}"
+        assert (
+            self._attr_id_key or self._sensor_data_key
+        ), "At least _attr_id_key or _sensor_data_key is required to set the entity ID."
+        self._attr_unique_id = (
+            f"{self.config_entry.entry_id}_{self._attr_id_key}"
+            if self._attr_id_key
+            else f"tild_{self._sensor_data_key}"
+        )
 
     @property
     def device_info(self):

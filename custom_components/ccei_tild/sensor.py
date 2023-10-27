@@ -39,7 +39,6 @@ async def async_setup_entry(hass, entry, async_add_devices):
 class TildSystemHostAddressSensor(TildSensorEntity):
     """Monitors the system host address"""
 
-    _attr_id_key = "tild_system_host"
     _attr_name = "System host address"
     _attr_icon = "mdi:ip-network"
 
@@ -49,7 +48,6 @@ class TildSystemHostAddressSensor(TildSensorEntity):
 class TildSystemDateSensor(TildSensorEntity):
     """Monitors the system date"""
 
-    _attr_id_key = "tild_system_date"
     _attr_name = "System date"
     _attr_icon = "mdi:clock"
 
@@ -59,7 +57,6 @@ class TildSystemDateSensor(TildSensorEntity):
 class TildWaterTemperatureSensor(TildSensorEntity):
     """Monitors the water temperature"""
 
-    _attr_id_key = "tild_water_temperature"
     _attr_name = "Water temperature"
     _attr_unit_of_measurement = TEMP_CELSIUS
     _attr_icon = "mdi:pool-thermometer"
@@ -70,7 +67,6 @@ class TildWaterTemperatureSensor(TildSensorEntity):
 class TildWaterRawTemperatureSensor(TildSensorEntity):
     """Monitors the water raw temperature"""
 
-    _attr_id_key = "tild_water_raw_temperature"
     _attr_name = "Water raw temperature"
     _attr_unit_of_measurement = TEMP_CELSIUS
     _attr_icon = "mdi:pool-thermometer"
@@ -81,7 +77,6 @@ class TildWaterRawTemperatureSensor(TildSensorEntity):
 class TildWaterTemperatureOffsetSensor(TildSensorEntity):
     """Monitors the water temperature offset"""
 
-    _attr_id_key = "tild_water_temperature_offset"
     _attr_name = "Water temperature offset"
     _attr_unit_of_measurement = TEMP_CELSIUS
     _attr_icon = "mdi:thermometer-water"
@@ -95,7 +90,6 @@ class TildWaterTemperatureOffsetSensor(TildSensorEntity):
 class TildLightIntensitySensor(TildSensorEntity):
     """Monitors the light intensity"""
 
-    _attr_id_key = "tild_light_intensity"
     _attr_name = "Light intensity"
     _attr_unit_of_measurement = PERCENTAGE
     _attr_icon = "mdi:brightness-percent"
@@ -109,7 +103,6 @@ class TildLightIntensitySensor(TildSensorEntity):
 class TildLightColorSensor(TildSensorEntity):
     """Monitors the light color"""
 
-    _attr_id_key = "tild_light_color"
     _attr_name = "Light color"
     _attr_icon = "mdi:palette"
 
