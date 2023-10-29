@@ -29,6 +29,7 @@ from .const import (
     SYSTEM_DATE_MONTH,
     SYSTEM_DATE_YEAR,
     SYSTEM_HOST,
+    THERMOREGULATED_FILTRATION_ENABLED,
     TOGGLES_STATUS_CODE,
     TREATMENT_ENABLED,
     TREATMENT_STATUS_CODE,
@@ -79,6 +80,7 @@ LIGHT_MESSAGE_KEY = "sprj"
 FILTRATION_MESSAGE_KEY = "sfil"
 SET_LIGHT_COLOR_MESSAGE_KEY = "prcn"
 SET_LIGHT_INTENSITY_MESSAGE_KEY = "plum"
+THERMOREGULATED_FILTRATION_MESSAGE_KEY = "mfil"
 
 
 def parse_sensors_data(data):
@@ -119,6 +121,7 @@ def parse_sensors_data(data):
     )
     state[LIGHT_COLOR] = LIGHT_COLORS_CODES.get(state[LIGHT_COLOR_CODE])
     state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
+    state[THERMOREGULATED_FILTRATION_ENABLED] = None
     return state
 
 
@@ -200,7 +203,7 @@ class CceiTildClient:
         return state
 
     async def toggle_light(self, state=None):
-        """Turn on the Tild light"""
+        """Turn on/off import names the Tild light"""
         if state is None:
             LOGGER.debug("Ask for toogling the light, call Tild to retreive it current state")
             sensors_data = await self.get_sensors_data()
@@ -228,7 +231,7 @@ class CceiTildClient:
         return False
 
     async def toggle_filtration(self, state=None):
-        """Turn on the Tild filtration"""
+        """Turn on/off the Tild filtration"""
         if state is None:
             LOGGER.debug("Ask for toogling the filtration, call Tild to retreive it current state")
             sensors_data = await self.get_sensors_data()
@@ -253,6 +256,44 @@ class CceiTildClient:
         ):
             return True
         LOGGER.error("Fail to turn %s the filtration", state)
+        return False
+
+    async def toggle_thermoregulated_filtration(self, state=None):
+        """Turn on/off the Tild thermoregulated filtration"""
+        if state is None:
+            LOGGER.debug(
+                "Ask for toogling the thermoregulated filtration, call Tild to retreive it "
+                "current state"
+            )
+            sensors_data = await self.get_sensors_data()
+            if not sensors_data:
+                LOGGER.warning(
+                    "Fail to retreive current thermoregulated filtration state, cant't "
+                    "toggling it."
+                )
+                return False
+            state = ON if sensors_data[THERMOREGULATED_FILTRATION_ENABLED] else ON
+        assert state in [ON, OFF], f"Invalid thermoregulated filtration state '{state}'"
+        LOGGER.debug("Call Tild to turn %s the thermoregulated filtration", state)
+        data = await self._call_tild(
+            {THERMOREGULATED_FILTRATION_MESSAGE_KEY: 1 if state == ON else 0}
+        )
+        if not data:
+            LOGGER.debug("Fail to turn %s the thermoregulated filtration", state)
+            return False
+        sensors_data = parse_sensors_data(data)
+        if not sensors_data:
+            LOGGER.error(
+                "Fail to parse sensors data after turning %s the thermoregulated filtration", state
+            )
+            return False
+        # Update coordinator data
+        self._update_coordinator_sensors_data(sensors_data)
+        if (sensors_data[THERMOREGULATED_FILTRATION_ENABLED] and state == ON) or (
+            not sensors_data[THERMOREGULATED_FILTRATION_ENABLED] and state == OFF
+        ):
+            return True
+        LOGGER.error("Fail to turn %s the thermoregulated filtration", state)
         return False
 
     async def set_light_color(self, color):
@@ -334,6 +375,7 @@ class FakeTildBox:
         self.light_color_code = random.choice(list(LIGHT_COLORS_CODES.keys()))
         self.light_intensity_code = random.choice(list(LIGHT_INTENSITY_CODES.keys()))
         self.filtration_state = random.choice([True, False])
+        self.thermoregulated_filtration_state = random.choice([True, False])
 
     def get_toggle_status_code(self):
         """Retrieve toggle status code according current light & filtration state"""
@@ -438,6 +480,16 @@ class FakeTildBox:
                         f"filtration request from {address[0]}:{address[1]}"
                     )
                     self.filtration_state = bool(message[FILTRATION_MESSAGE_KEY])
+                    connection.send(self.get_state_data().encode("utf8"))
+                elif THERMOREGULATED_FILTRATION_MESSAGE_KEY in message:
+                    print(
+                        "Handle turn "
+                        f"{'on' if message[THERMOREGULATED_FILTRATION_MESSAGE_KEY] else 'off'} "
+                        f"thermoregulated filtration request from {address[0]}:{address[1]}"
+                    )
+                    self.thermoregulated_filtration_state = bool(
+                        message[THERMOREGULATED_FILTRATION_MESSAGE_KEY]
+                    )
                     connection.send(self.get_state_data().encode("utf8"))
                 elif SET_LIGHT_COLOR_MESSAGE_KEY in message:
                     color = message[SET_LIGHT_COLOR_MESSAGE_KEY]
