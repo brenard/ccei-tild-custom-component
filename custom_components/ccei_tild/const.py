@@ -1,13 +1,14 @@
 """Constants for CCEI Tild."""
 
 from homeassistant.components.light import DOMAIN as LIGHT
+from homeassistant.components.select import DOMAIN as SELECT
 from homeassistant.components.sensor import DOMAIN as SENSOR
 from homeassistant.components.switch import DOMAIN as SWITCH
 
 MANUFACTER = "CCEI"
 NAME = "Tild"
 DOMAIN = "ccei_tild"
-PLATFORMS = [SENSOR, LIGHT, SWITCH]
+PLATFORMS = [SENSOR, LIGHT, SWITCH, SELECT]
 CONF_HOST = "host"
 CONF_REFRESH_RATE = "refresh_rate"
 CONF_REFRESH_RATE_DEFAULT = 5
@@ -49,3 +50,39 @@ RAW_DATA = "raw_data"
 
 ATTR_COLOR = "color"
 ATTR_INTENSITY = "intensity"
+
+
+LIGHT_COLORS_CODES = {
+    "01": "cold",
+    "02": "blue",
+    "03": "lagoon",
+    "04": "cyan",
+    "05": "purple",
+    "06": "magenta",
+    "07": "pink",
+    "08": "red",
+    "09": "orange",
+    "0A": "green",
+    "0B": "favorite",
+    "10": "gradient sequence",
+    "11": "rainbow",
+    "12": "parade",
+    "13": "techno",
+}
+
+LIGHT_INTENSITY_CODES = {
+    "0": 25,
+    "4": 50,
+    "8": 75,
+    "C": 100,
+}
+
+WATER_TEMPERATURE_OFFSET_CODES = {
+    "6": -3,
+    "5": -2,
+    "4": -1,
+    "0": 0,
+    "1": 1,
+    "2": 2,
+    "3": 3,
+}

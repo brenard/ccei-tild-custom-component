@@ -1,5 +1,6 @@
 """TildEntity class"""
 from homeassistant.components.light import LightEntity
+from homeassistant.components.select import SelectEntity
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import callback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -28,6 +29,16 @@ class TildEntity(CoordinatorEntity):
         )
 
     @property
+    def sensor_data(self):
+        """Return the sensor data"""
+        return (
+            self.coordinator.data[SENSORS_DATA][self._sensor_data_key]
+            if self.coordinator.data[SENSORS_DATA]
+            and self._sensor_data_key in self.coordinator.data[SENSORS_DATA]
+            else None
+        )
+
+    @property
     def device_info(self):
         """Return device registry information for this entity."""
         return {
@@ -53,12 +64,7 @@ class TildSensorEntity(TildEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return (
-            self.coordinator.data[SENSORS_DATA][self._sensor_data_key]
-            if self.coordinator.data[SENSORS_DATA]
-            and self._sensor_data_key in self.coordinator.data[SENSORS_DATA]
-            else None
-        )
+        return self.sensor_data
 
 
 class TildLightEntity(TildEntity, LightEntity):
@@ -72,7 +78,7 @@ class TildLightEntity(TildEntity, LightEntity):
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         # pylint: disable=attribute-defined-outside-init
-        self._attr_is_on = self.coordinator.data[SENSORS_DATA][self._sensor_data_key]
+        self._attr_is_on = bool(self.sensor_data)
         self.async_write_ha_state()
 
 
@@ -83,5 +89,14 @@ class TildSwitchEntity(TildEntity, SwitchEntity):
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         # pylint: disable=attribute-defined-outside-init
-        self._attr_is_on = self.coordinator.data[SENSORS_DATA][self._sensor_data_key]
+        self._attr_is_on = bool(self.sensor_data)
         self.async_write_ha_state()
+
+
+class TildSelectEntity(TildEntity, SelectEntity):
+    """Representation of a CCEI Tild select entity."""
+
+    @property
+    def current_option(self):
+        """Return current select option"""
+        return str(self.sensor_data) if self.sensor_data is not None else None

@@ -14,9 +14,11 @@ from .const import (
     FILTRATION_STATUS_CODE,
     LIGHT_COLOR,
     LIGHT_COLOR_CODE,
+    LIGHT_COLORS_CODES,
     LIGHT_ENABLED,
     LIGHT_INTENSITY,
     LIGHT_INTENSITY_CODE,
+    LIGHT_INTENSITY_CODES,
     OFF,
     ON,
     RAW_DATA,
@@ -34,44 +36,10 @@ from .const import (
     WATER_TEMPERATURE,
     WATER_TEMPERATURE_OFFSET,
     WATER_TEMPERATURE_OFFSET_CODE,
+    WATER_TEMPERATURE_OFFSET_CODES,
 )
 
 LOGGER = logging.getLogger(__name__)
-
-COLORS = {
-    "01": "cold",
-    "02": "blue",
-    "03": "lagoon",
-    "04": "cyan",
-    "05": "purple",
-    "06": "magenta",
-    "07": "pink",
-    "08": "red",
-    "09": "orange",
-    "0A": "green",
-    "0B": "favorite",
-    "10": "gradient sequence",
-    "11": "rainbow",
-    "12": "parade",
-    "13": "techno",
-}
-
-LIGHT_INTENSITY_CODES = {
-    "0": 25,
-    "4": 50,
-    "8": 75,
-    "C": 100,
-}
-
-WATER_TEMPERATURE_OFFSET_CODES = {
-    "6": -3,
-    "5": -2,
-    "4": -1,
-    "0": 0,
-    "1": 1,
-    "2": 2,
-    "3": 3,
-}
 
 TOGGLE_STATUS_CODES = {
     "0": {"light": False, "filtration": False},
@@ -149,7 +117,7 @@ def parse_sensors_data(data):
         if state[WATER_TEMPERATURE_OFFSET] is not None
         else None
     )
-    state[LIGHT_COLOR] = COLORS.get(state[LIGHT_COLOR_CODE])
+    state[LIGHT_COLOR] = LIGHT_COLORS_CODES.get(state[LIGHT_COLOR_CODE])
     state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
     return state
 
@@ -289,18 +257,29 @@ class CceiTildClient:
 
     async def set_light_color(self, color):
         """Set the light color"""
-        if color in COLORS:
+        if color in LIGHT_COLORS_CODES:
             color_code = color
-            color = COLORS[color]
+            color = LIGHT_COLORS_CODES[color]
         else:
-            assert color in COLORS.values(), f"Invalid light color '{color}'"
-            color_idx = list(COLORS.values()).index(color)
-            color_code = list(COLORS.keys())[color_idx]
-        data = await self._call_tild({SET_LIGHT_COLOR_MESSAGE_KEY: color_code}, False)
+            assert color in LIGHT_COLORS_CODES.values(), f"Invalid light color '{color}'"
+            color_idx = list(LIGHT_COLORS_CODES.values()).index(color)
+            color_code = list(LIGHT_COLORS_CODES.keys())[color_idx]
+        data = await self._call_tild({SET_LIGHT_COLOR_MESSAGE_KEY: color_code})
         if not data:
             LOGGER.debug("Fail to set light color to %s (%s)", color, color_code)
             return False
-        return True
+        sensors_data = parse_sensors_data(data)
+        if not sensors_data:
+            LOGGER.error(
+                "Fail to parse sensors data after setting light color to %s (%s)", color, color_code
+            )
+            return False
+        # Update coordinator data
+        self._update_coordinator_sensors_data(sensors_data)
+        if sensors_data[LIGHT_COLOR_CODE] == color_code:
+            return True
+        LOGGER.error("Fail to set light color to %s (%s)", color, color_code)
+        return False
 
     async def set_light_intensity(self, intensity):
         """Set the light intensity"""
@@ -314,11 +293,24 @@ class CceiTildClient:
             ), f"Invalid light intensity '{intensity}'"
             intensity_idx = list(LIGHT_INTENSITY_CODES.values()).index(intensity)
             intensity_code = list(LIGHT_INTENSITY_CODES.keys())[intensity_idx]
-        data = await self._call_tild({SET_LIGHT_INTENSITY_MESSAGE_KEY: intensity_code}, False)
+        data = await self._call_tild({SET_LIGHT_INTENSITY_MESSAGE_KEY: intensity_code})
         if not data:
             LOGGER.debug("Fail to set light intensity to %s (%s)", intensity, intensity_code)
             return False
-        return True
+        sensors_data = parse_sensors_data(data)
+        if not sensors_data:
+            LOGGER.error(
+                "Fail to parse sensors data after setting light intensity to %s (%s)",
+                intensity,
+                intensity_code,
+            )
+            return False
+        # Update coordinator data
+        self._update_coordinator_sensors_data(sensors_data)
+        if sensors_data[LIGHT_INTENSITY_CODE] == intensity_code:
+            return True
+        LOGGER.error("Fail to set light intensity to %s (%s)", intensity, intensity_code)
+        return False
 
     def _update_coordinator_sensors_data(self, sensors_data):
         """Update coordinator data after some Tild action"""
@@ -339,7 +331,7 @@ class FakeTildBox:
             self.port = port if port is int else int(port)
 
         self.light_state = random.choice([True, False])
-        self.light_color_code = random.choice(list(COLORS.keys()))
+        self.light_color_code = random.choice(list(LIGHT_COLORS_CODES.keys()))
         self.light_intensity_code = random.choice(list(LIGHT_INTENSITY_CODES.keys()))
         self.filtration_state = random.choice([True, False])
 
@@ -453,7 +445,7 @@ class FakeTildBox:
                         f"Handle set light color request to '{color}' from "
                         f"{address[0]}:{address[1]}"
                     )
-                    if color not in COLORS:
+                    if color not in LIGHT_COLORS_CODES:
                         print(f"Invalid color '{color}'")
                         connection.send(b"ERROR: Invalid color")
                     else:
