@@ -23,9 +23,8 @@ class TildEntity(CoordinatorEntity):
             self._attr_id_key or self._sensor_data_key
         ), "At least _attr_id_key or _sensor_data_key is required to set the entity ID."
         self._attr_unique_id = (
-            f"{self.config_entry.entry_id}_{self._attr_id_key}"
-            if self._attr_id_key
-            else f"tild_{self._sensor_data_key}"
+            f"{self.config_entry.entry_id}_tild_"
+            f"{self._attr_id_key if self._attr_id_key else self._sensor_data_key}"
         )
 
     @property
