@@ -13,6 +13,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
+    ATTR_COLOR,
     CLIENT,
     CONF_HOST,
     CONF_REFRESH_RATE,
@@ -23,6 +24,7 @@ from .const import (
     PLATFORMS,
     REFRESH_SERVICE_NAME,
     SENSORS_DATA,
+    SET_LIGHT_COLOR_SERVICE_NAME,
 )
 from .tild import CceiTildClient
 
@@ -90,6 +92,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await hass.data[DOMAIN][COORDINATOR].async_refresh()
 
     hass.services.async_register(DOMAIN, REFRESH_SERVICE_NAME, handle_refresh)
+
+    async def handle_set_light_color(call):
+        """Handle set_light_color service call"""
+        color = call.data.get(ATTR_COLOR)
+        LOGGER.debug("Set light color service called: set color to %s", color)
+        success = await hass.data[DOMAIN][CLIENT].set_light_color(color)
+        if success:
+            await hass.data[DOMAIN][COORDINATOR].async_refresh()
+            return True
+        return False
+
+    hass.services.async_register(DOMAIN, SET_LIGHT_COLOR_SERVICE_NAME, handle_set_light_color)
 
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady

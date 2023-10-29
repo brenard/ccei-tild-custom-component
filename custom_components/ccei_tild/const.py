@@ -17,6 +17,7 @@ CLIENT = "client"
 SENSORS_DATA = "sensors_data"
 LAST_REFRESH = "last_refresh"
 REFRESH_SERVICE_NAME = "refresh"
+SET_LIGHT_COLOR_SERVICE_NAME = "set_light_color"
 
 SYSTEM_HOST = "system_host"
 SYSTEM_DATE = "system_date"
@@ -43,3 +44,5 @@ WATER_TEMPERATURE_OFFSET = "water_temperature_offset"
 FILTRATION_ENABLED = "filtration_enabled"
 TREATMENT_ENABLED = "treatment_enabled"
 RAW_DATA = "raw_data"
+
+ATTR_COLOR = "color"

@@ -1,5 +1,6 @@
 """CCEI Tild client"""
 import asyncio
+import json
 import logging
 import random
 import socket
@@ -37,7 +38,7 @@ LOGGER = logging.getLogger(__name__)
 
 COLORS = {
     "01": "cold",
-    "02": "bleu",
+    "02": "blue",
     "03": "lagoon",
     "04": "cyan",
     "05": "purple",
@@ -103,10 +104,9 @@ IDENTIFIED_FIELDS = {
 }
 
 GET_SENSORS_DATA_MESSAGE = "Begin"
-TURN_ON_LIGHT_MESSAGE = '{"sprj":1}'
-TURN_OFF_LIGHT_MESSAGE = '{"sprj":0}'
-TURN_ON_FILTRATION_MESSAGE = '{"sfil":1}'
-TURN_OFF_FILTRATION_MESSAGE = '{"sfil":0}'
+LIGHT_MESSAGE_KEY = "sprj"
+FILTRATION_MESSAGE_KEY = "sfil"
+SET_LIGHT_COLOR_MESSAGE_KEY = "prcn"
 
 
 def parse_sensors_data(data):
@@ -182,6 +182,7 @@ class CceiTildClient:
 
     async def _call_tild(self, message, awaiting_answser=True):
         """Call tild"""
+        message = json.dumps(message) if isinstance(message, dict) else message
         LOGGER.debug("Start connection to tcp://%s:%d...", self.host, self.port)
         reader, writer = await asyncio.open_connection(self.host, self.port)
         LOGGER.debug("Connection established")
@@ -236,9 +237,7 @@ class CceiTildClient:
             state = ON if sensors_data[LIGHT_ENABLED] else ON
         assert state in [ON, OFF], f"Invalid light state '{state}'"
         LOGGER.debug("Call Tild to turn %s the light", state)
-        data = await self._call_tild(
-            TURN_ON_LIGHT_MESSAGE if state == ON else TURN_OFF_LIGHT_MESSAGE, False
-        )
+        data = await self._call_tild({LIGHT_MESSAGE_KEY: 1 if state == ON else 0}, False)
         if not data:
             LOGGER.debug("Fail to turn %s the light", state)
             return False
@@ -255,11 +254,24 @@ class CceiTildClient:
             state = ON if sensors_data[FILTRATION_ENABLED] else ON
         assert state in [ON, OFF], f"Invalid filtration state '{state}'"
         LOGGER.debug("Call Tild to turn %s the filtration", state)
-        data = await self._call_tild(
-            TURN_ON_FILTRATION_MESSAGE if state == ON else TURN_OFF_FILTRATION_MESSAGE, False
-        )
+        data = await self._call_tild({FILTRATION_MESSAGE_KEY: 1 if state == ON else 0}, False)
         if not data:
             LOGGER.debug("Fail to turn %s the filtration", state)
+            return False
+        return True
+
+    async def set_light_color(self, color):
+        """Set the light color"""
+        if color in COLORS:
+            color_code = color
+            color = COLORS[color]
+        else:
+            assert color in COLORS.values(), f"Invalid light color '{color}'"
+            color_idx = list(COLORS.values()).index(color)
+            color_code = list(COLORS.keys())[color_idx]
+        data = await self._call_tild({SET_LIGHT_COLOR_MESSAGE_KEY: color_code}, False)
+        if not data:
+            LOGGER.debug("Fail to set light color to %s (%s)", color, color_code)
             return False
         return True
 
@@ -278,6 +290,7 @@ class FakeTildBox:
             self.port = port if port is int else int(port)
 
         self.light_state = random.choice([True, False])
+        self.light_color_code = random.choice(list(COLORS.keys()))
         self.filtration_state = random.choice([True, False])
 
     def get_toggle_status_code(self):
@@ -321,7 +334,7 @@ class FakeTildBox:
             SYSTEM_DATE_MINUTE: f"{now.minute:02}",
             WATER_TEMPERATURE: temp,
             TOGGLES_STATUS_CODE: self.get_toggle_status_code(),
-            LIGHT_COLOR_CODE: random.choice(list(COLORS.keys())),
+            LIGHT_COLOR_CODE: self.light_color_code,
             LIGHT_INTENSITY_CODE: random.choice(list(LIGHT_INTENSITY_CODES.keys())),
             FILTRATION_STATUS_CODE: self.get_filtration_status_code(),
             TREATMENT_STATUS_CODE: random.choice(list(TREATMENT_STATUS_CODES.keys())),
@@ -355,22 +368,45 @@ class FakeTildBox:
             if message == GET_SENSORS_DATA_MESSAGE:
                 print(f"Handle a {GET_SENSORS_DATA_MESSAGE} request from {address[0]}:{address[1]}")
                 connection.send(self.get_random_state_data().encode("utf8"))
-            elif message in [TURN_ON_LIGHT_MESSAGE, TURN_OFF_LIGHT_MESSAGE]:
-                print(
-                    f"Handle turn {'on' if message == TURN_ON_LIGHT_MESSAGE else 'off'} light "
-                    f"request from {address[0]}:{address[1]}"
-                )
-                self.light_state = message == TURN_ON_LIGHT_MESSAGE
-                # No expected answer
-            elif message in [TURN_ON_FILTRATION_MESSAGE, TURN_OFF_FILTRATION_MESSAGE]:
-                print(
-                    f"Handle turn {'on' if message == TURN_ON_FILTRATION_MESSAGE else 'off'} "
-                    f"filtration request from {address[0]}:{address[1]}"
-                )
-                self.filtration_state = message == TURN_ON_FILTRATION_MESSAGE
-                # No expected answer
             else:
-                print(f"Handle unknown '{message}' request from {address[0]}:{address[1]}")
-                connection.send(b"unknown")
+                try:
+                    message = json.loads(message)
+                    if not isinstance(message, dict):
+                        raise ValueError("Unexpected JSON message, must be a dict")
+                except json.decoder.JSONDecodeError:
+                    print(f"Fail to decode JSON message '{message}' from {address[0]}:{address[1]}")
+                    connection.send(b"ERROR: fail to decode JSON message")
+                except ValueError:
+                    print(f"Unexpected JSON message '{message}' from {address[0]}:{address[1]}")
+                    connection.send(b"ERROR: unexcepected JSON message")
+                if LIGHT_MESSAGE_KEY in message:
+                    print(
+                        f"Handle turn {'on' if message[LIGHT_MESSAGE_KEY] else 'off'} light "
+                        f"request from {address[0]}:{address[1]}"
+                    )
+                    self.light_state = bool(message[LIGHT_MESSAGE_KEY])
+                elif FILTRATION_MESSAGE_KEY in message:
+                    print(
+                        f"Handle turn {'on' if message[FILTRATION_MESSAGE_KEY] else 'off'} "
+                        f"filtration request from {address[0]}:{address[1]}"
+                    )
+                    self.filtration_state = bool(message[FILTRATION_MESSAGE_KEY])
+                    # No expected answer
+                elif SET_LIGHT_COLOR_MESSAGE_KEY in message:
+                    color = message[SET_LIGHT_COLOR_MESSAGE_KEY]
+                    print(
+                        f"Handle set light color request to '{color}' from "
+                        f"{address[0]}:{address[1]}"
+                    )
+                    if color not in COLORS:
+                        print(f"Invalid color '{color}'")
+                        connection.send(b"ERROR: Invalid color")
+                    self.light_color_code = color
+                    # No expected answer
+                else:
+                    print(
+                        f"Handle unknown JSON request from {address[0]}:{address[1]}: '{message}'"
+                    )
+                    connection.send(b"ERROR: unknown JSON request")
             print(f"Close connection from {address[0]}:{address[1]}")
             connection.close()

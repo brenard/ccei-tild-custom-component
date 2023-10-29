@@ -1,1 +1,26 @@
 refresh:
+
+set_light_color:
+    fields:
+        color:
+            required: true
+            example: cyan
+            selector:
+                select:
+                    translation_key: "color"
+                    options:
+                        - "cold"
+                        - "blue"
+                        - "lagoon"
+                        - "cyan"
+                        - "purple"
+                        - "magenta"
+                        - "pink"
+                        - "red"
+                        - "orange"
+                        - "green"
+                        - "favorite"
+                        - "gradient sequence"
+                        - "rainbow"
+                        - "parade"
+                        - "techno"
