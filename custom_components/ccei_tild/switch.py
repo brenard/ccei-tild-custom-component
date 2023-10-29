@@ -35,11 +35,9 @@ class TildFiltrationSwitch(TildSwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Turn the filtration on."""
         success = await self.hass.data[DOMAIN][CLIENT].toggle_filtration(ON)
-        if success:
-            await self.coordinator.async_request_refresh()
+        return success
 
     async def async_turn_off(self, **kwargs):
         """Turn the filtration on."""
         success = await self.hass.data[DOMAIN][CLIENT].toggle_filtration(OFF)
-        if success:
-            await self.coordinator.async_request_refresh()
+        return success

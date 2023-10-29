@@ -24,11 +24,9 @@ class TildLight(TildLightEntity):
     async def async_turn_on(self, **kwargs):
         """Turn the light on."""
         success = await self.hass.data[DOMAIN][CLIENT].toggle_light(ON)
-        if success:
-            await self.coordinator.async_request_refresh()
+        return success
 
     async def async_turn_off(self, **kwargs):
         """Turn the light on."""
         success = await self.hass.data[DOMAIN][CLIENT].toggle_light(OFF)
-        if success:
-            await self.coordinator.async_request_refresh()
+        return success

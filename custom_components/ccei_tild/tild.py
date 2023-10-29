@@ -7,6 +7,8 @@ import socket
 from datetime import datetime
 
 from .const import (
+    COORDINATOR,
+    DOMAIN,
     FILTRATION_ENABLED,
     FILTRATION_EXPECTED_DURATION,
     FILTRATION_STATUS_CODE,
@@ -159,7 +161,8 @@ class CceiTildClient:
     port = None
     encoding = "utf8"
 
-    def __init__(self, host, port=None):
+    def __init__(self, hass, host, port=None):
+        self.hass = hass
         self.host = host
         self.port = int(port) if port else 30302
         LOGGER.debug("Instanciate Tild client on %s:%d", self.host, self.port)
@@ -239,11 +242,22 @@ class CceiTildClient:
             state = ON if sensors_data[LIGHT_ENABLED] else ON
         assert state in [ON, OFF], f"Invalid light state '{state}'"
         LOGGER.debug("Call Tild to turn %s the light", state)
-        data = await self._call_tild({LIGHT_MESSAGE_KEY: 1 if state == ON else 0}, False)
+        data = await self._call_tild({LIGHT_MESSAGE_KEY: 1 if state == ON else 0})
         if not data:
-            LOGGER.debug("Fail to turn %s the light", state)
+            LOGGER.error("Fail to turn %s the light (invalid data return)", state)
             return False
-        return True
+        sensors_data = parse_sensors_data(data)
+        if not sensors_data:
+            LOGGER.error("Fail to parse sensors data after turning %s the light", state)
+            return False
+        # Update coordinator data
+        self._update_coordinator_sensors_data(sensors_data)
+        if (sensors_data[LIGHT_ENABLED] and state == ON) or (
+            not sensors_data[LIGHT_ENABLED] and state == OFF
+        ):
+            return True
+        LOGGER.error("Fail to turn %s the light", state)
+        return False
 
     async def toggle_filtration(self, state=None):
         """Turn on the Tild filtration"""
@@ -256,11 +270,22 @@ class CceiTildClient:
             state = ON if sensors_data[FILTRATION_ENABLED] else ON
         assert state in [ON, OFF], f"Invalid filtration state '{state}'"
         LOGGER.debug("Call Tild to turn %s the filtration", state)
-        data = await self._call_tild({FILTRATION_MESSAGE_KEY: 1 if state == ON else 0}, False)
+        data = await self._call_tild({FILTRATION_MESSAGE_KEY: 1 if state == ON else 0})
         if not data:
             LOGGER.debug("Fail to turn %s the filtration", state)
             return False
-        return True
+        sensors_data = parse_sensors_data(data)
+        if not sensors_data:
+            LOGGER.error("Fail to parse sensors data after turning %s the filtration", state)
+            return False
+        # Update coordinator data
+        self._update_coordinator_sensors_data(sensors_data)
+        if (sensors_data[FILTRATION_ENABLED] and state == ON) or (
+            not sensors_data[FILTRATION_ENABLED] and state == OFF
+        ):
+            return True
+        LOGGER.error("Fail to turn %s the filtration", state)
+        return False
 
     async def set_light_color(self, color):
         """Set the light color"""
@@ -294,6 +319,10 @@ class CceiTildClient:
             LOGGER.debug("Fail to set light intensity to %s (%s)", intensity, intensity_code)
             return False
         return True
+
+    def _update_coordinator_sensors_data(self, sensors_data):
+        """Update coordinator data after some Tild action"""
+        self.hass.data[DOMAIN][COORDINATOR].async_set_updated_sensors_data(sensors_data)
 
 
 class FakeTildBox:
@@ -337,8 +366,8 @@ class FakeTildBox:
         )
         return "X"
 
-    def get_random_state_data(self):
-        """Generate random state data string"""
+    def get_state_data(self):
+        """Generate state data string"""
 
         now = datetime.now()
 
@@ -388,7 +417,7 @@ class FakeTildBox:
             message = connection.recv(1024).decode("utf-8").strip()
             if message == GET_SENSORS_DATA_MESSAGE:
                 print(f"Handle a {GET_SENSORS_DATA_MESSAGE} request from {address[0]}:{address[1]}")
-                connection.send(self.get_random_state_data().encode("utf8"))
+                connection.send(self.get_state_data().encode("utf8"))
             else:
                 try:
                     message = json.loads(message)
@@ -397,22 +426,27 @@ class FakeTildBox:
                 except json.decoder.JSONDecodeError:
                     print(f"Fail to decode JSON message '{message}' from {address[0]}:{address[1]}")
                     connection.send(b"ERROR: fail to decode JSON message")
+                    connection.close()
+                    continue
                 except ValueError:
                     print(f"Unexpected JSON message '{message}' from {address[0]}:{address[1]}")
                     connection.send(b"ERROR: unexcepected JSON message")
+                    connection.close()
+                    continue
                 if LIGHT_MESSAGE_KEY in message:
                     print(
                         f"Handle turn {'on' if message[LIGHT_MESSAGE_KEY] else 'off'} light "
                         f"request from {address[0]}:{address[1]}"
                     )
                     self.light_state = bool(message[LIGHT_MESSAGE_KEY])
+                    connection.send(self.get_state_data().encode("utf8"))
                 elif FILTRATION_MESSAGE_KEY in message:
                     print(
                         f"Handle turn {'on' if message[FILTRATION_MESSAGE_KEY] else 'off'} "
                         f"filtration request from {address[0]}:{address[1]}"
                     )
                     self.filtration_state = bool(message[FILTRATION_MESSAGE_KEY])
-                    # No expected answer
+                    connection.send(self.get_state_data().encode("utf8"))
                 elif SET_LIGHT_COLOR_MESSAGE_KEY in message:
                     color = message[SET_LIGHT_COLOR_MESSAGE_KEY]
                     print(
@@ -422,8 +456,9 @@ class FakeTildBox:
                     if color not in COLORS:
                         print(f"Invalid color '{color}'")
                         connection.send(b"ERROR: Invalid color")
-                    self.light_color_code = color
-                    # No expected answer
+                    else:
+                        self.light_color_code = color
+                        connection.send(self.get_state_data().encode("utf8"))
                 elif SET_LIGHT_INTENSITY_MESSAGE_KEY in message:
                     intensity = message[SET_LIGHT_INTENSITY_MESSAGE_KEY]
                     print(
@@ -433,8 +468,9 @@ class FakeTildBox:
                     if intensity not in LIGHT_INTENSITY_CODES:
                         print(f"Invalid intensity '{intensity}'")
                         connection.send(b"ERROR: Invalid intensity")
-                    self.light_intensity_code = intensity
-                    # No expected answer
+                    else:
+                        self.light_intensity_code = intensity
+                        connection.send(self.get_state_data().encode("utf8"))
                 else:
                     print(
                         f"Handle unknown JSON request from {address[0]}:{address[1]}: '{message}'"
