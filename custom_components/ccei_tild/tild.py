@@ -73,6 +73,7 @@ WATER_TEMPERATURE_OFFSET_CODES = {
 
 TOGGLE_STATUS_CODES = {
     "0": {"light": False, "filtration": False},
+    "1": {"light": False, "filtration": True},
     "2": {"light": True, "filtration": False},
     "3": {"light": True, "filtration": True},
 }
