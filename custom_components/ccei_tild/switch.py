@@ -1,5 +1,5 @@
 """Switch platform"""
-from .const import COORDINATOR, DOMAIN, FILTRATION_ENABLED, PUMP_ENABLED, TREATMENT_ENABLED
+from .const import CLIENT, COORDINATOR, DOMAIN, FILTRATION_ENABLED, OFF, ON, TREATMENT_ENABLED
 from .entity import TildSwitchEntity
 
 
@@ -9,7 +9,6 @@ async def async_setup_entry(hass, entry, async_add_devices):
     switchs = [
         TildTreatmentSwitch(coordinator, entry, hass),
         TildFiltrationSwitch(coordinator, entry, hass),
-        TildPumpSwitch(coordinator, entry, hass),
     ]
     async_add_devices(switchs)
 
@@ -33,12 +32,14 @@ class TildFiltrationSwitch(TildSwitchEntity):
 
     _sensor_data_key = FILTRATION_ENABLED
 
+    async def async_turn_on(self, **kwargs):
+        """Turn the filtration on."""
+        success = await self.hass.data[DOMAIN][CLIENT].toggle_filtration(ON)
+        if success:
+            await self.coordinator.async_request_refresh()
 
-class TildPumpSwitch(TildSwitchEntity):
-    """Manage the pump"""
-
-    _attr_id_key = "tild_pump"
-    _attr_name = "Pump"
-    _attr_icon = "mdi:pump"
-
-    _sensor_data_key = PUMP_ENABLED
+    async def async_turn_off(self, **kwargs):
+        """Turn the filtration on."""
+        success = await self.hass.data[DOMAIN][CLIENT].toggle_filtration(OFF)
+        if success:
+            await self.coordinator.async_request_refresh()

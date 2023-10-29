@@ -16,7 +16,6 @@ from .const import (
     LIGHT_INTENSITY_CODE,
     OFF,
     ON,
-    PUMP_ENABLED,
     RAW_DATA,
     SYSTEM_DATE,
     SYSTEM_DATE_DAY,
@@ -72,9 +71,9 @@ WATER_TEMPERATURE_OFFSET_CODES = {
 }
 
 TOGGLE_STATUS_CODES = {
-    "0": {"light": False, "pump": False},
-    "2": {"light": True, "pump": False},
-    "3": {"light": True, "pump": True},
+    "0": {"light": False, "filtration": False},
+    "2": {"light": True, "filtration": False},
+    "3": {"light": True, "filtration": True},
 }
 
 FILTRATION_STATUS_CODES = {
@@ -106,6 +105,8 @@ IDENTIFIED_FIELDS = {
 GET_SENSORS_DATA_MESSAGE = "Begin"
 TURN_ON_LIGHT_MESSAGE = '{"sprj":1}'
 TURN_OFF_LIGHT_MESSAGE = '{"sprj":0}'
+TURN_ON_FILTRATION_MESSAGE = '{"sfil":1}'
+TURN_OFF_FILTRATION_MESSAGE = '{"sfil":0}'
 
 
 def parse_sensors_data(data):
@@ -136,7 +137,6 @@ def parse_sensors_data(data):
     state[TREATMENT_ENABLED] = TREATMENT_STATUS_CODES.get(state[TREATMENT_STATUS_CODE])
     state[FILTRATION_ENABLED] = FILTRATION_STATUS_CODES.get(state[FILTRATION_STATUS_CODE])
     state[FILTRATION_EXPECTED_DURATION] = int(state[FILTRATION_EXPECTED_DURATION])
-    state[PUMP_ENABLED] = TOGGLE_STATUS_CODES.get(state[TOGGLES_STATUS_CODE], {}).get("pump")
     state[WATER_TEMPERATURE_OFFSET] = WATER_TEMPERATURE_OFFSET_CODES.get(
         state[WATER_TEMPERATURE_OFFSET_CODE]
     )
@@ -183,8 +183,7 @@ class CceiTildClient:
     async def _call_tild(self, message, awaiting_answser=True):
         """Call tild"""
         LOGGER.debug("Start connection to tcp://%s:%d...", self.host, self.port)
-        connect = asyncio.open_connection(self.host, self.port)
-        reader, writer = await connect
+        reader, writer = await asyncio.open_connection(self.host, self.port)
         LOGGER.debug("Connection established")
         try:
             LOGGER.debug(
@@ -245,6 +244,25 @@ class CceiTildClient:
             return False
         return True
 
+    async def toggle_filtration(self, state=None):
+        """Turn on the Tild filtration"""
+        if state is None:
+            LOGGER.debug("Ask for toogling the filtration, call Tild to retreive it current state")
+            sensors_data = await self.get_sensors_data()
+            if not sensors_data:
+                LOGGER.warning("Fail to retreive current filtration state, cant't toggling it.")
+                return False
+            state = ON if sensors_data[FILTRATION_ENABLED] else ON
+        assert state in [ON, OFF], f"Invalid filtration state '{state}'"
+        LOGGER.debug("Call Tild to turn %s the filtration", state)
+        data = await self._call_tild(
+            TURN_ON_FILTRATION_MESSAGE if state == ON else TURN_OFF_FILTRATION_MESSAGE, False
+        )
+        if not data:
+            LOGGER.debug("Fail to turn %s the filtration", state)
+            return False
+        return True
+
 
 class FakeTildBox:
     """Fake Tild box"""
@@ -260,17 +278,28 @@ class FakeTildBox:
             self.port = port if port is int else int(port)
 
         self.light_state = random.choice([True, False])
-        self.pump_state = random.choice([True, False])
+        self.filtration_state = random.choice([True, False])
 
     def get_toggle_status_code(self):
-        """Retrieve toggle status code from current light & pump state"""
+        """Retrieve toggle status code according current light & filtration state"""
         for code, state in TOGGLE_STATUS_CODES.items():
-            if state["light"] == self.light_state and state["pump"] == self.pump_state:
+            if state["light"] == self.light_state and state["filtration"] == self.filtration_state:
                 return code
         LOGGER.warning(
-            "No toggle status code found for light %s and pump %s",
+            "No toggle status code found for light %s and filtration %s",
             "on" if self.light_state else "off",
-            "on" if self.pump_state else "off",
+            "on" if self.filtration_state else "off",
+        )
+        return "X"
+
+    def get_filtration_status_code(self):
+        """Retrieve filtration status code according current state"""
+        for code, state in FILTRATION_STATUS_CODES.items():
+            if state == self.filtration_state:
+                return code
+        LOGGER.warning(
+            "No filtration status code found for %s",
+            "on" if self.filtration_state else "off",
         )
         return "X"
 
@@ -294,7 +323,7 @@ class FakeTildBox:
             TOGGLES_STATUS_CODE: self.get_toggle_status_code(),
             LIGHT_COLOR_CODE: random.choice(list(COLORS.keys())),
             LIGHT_INTENSITY_CODE: random.choice(list(LIGHT_INTENSITY_CODES.keys())),
-            FILTRATION_STATUS_CODE: random.choice(list(FILTRATION_STATUS_CODES.keys())),
+            FILTRATION_STATUS_CODE: self.get_filtration_status_code(),
             TREATMENT_STATUS_CODE: random.choice(list(TREATMENT_STATUS_CODES.keys())),
             WATER_TEMPERATURE_OFFSET_CODE: random.choice(
                 list(WATER_TEMPERATURE_OFFSET_CODES.keys())
@@ -333,7 +362,15 @@ class FakeTildBox:
                 )
                 self.light_state = message == TURN_ON_LIGHT_MESSAGE
                 # No expected answer
+            elif message in [TURN_ON_FILTRATION_MESSAGE, TURN_OFF_FILTRATION_MESSAGE]:
+                print(
+                    f"Handle turn {'on' if message == TURN_ON_FILTRATION_MESSAGE else 'off'} "
+                    f"filtration request from {address[0]}:{address[1]}"
+                )
+                self.filtration_state = message == TURN_ON_FILTRATION_MESSAGE
+                # No expected answer
             else:
                 print(f"Handle unknown '{message}' request from {address[0]}:{address[1]}")
                 connection.send(b"unknown")
+            print(f"Close connection from {address[0]}:{address[1]}")
             connection.close()
