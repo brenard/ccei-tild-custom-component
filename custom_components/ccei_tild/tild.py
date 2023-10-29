@@ -107,6 +107,7 @@ GET_SENSORS_DATA_MESSAGE = "Begin"
 LIGHT_MESSAGE_KEY = "sprj"
 FILTRATION_MESSAGE_KEY = "sfil"
 SET_LIGHT_COLOR_MESSAGE_KEY = "prcn"
+SET_LIGHT_INTENSITY_MESSAGE_KEY = "plum"
 
 
 def parse_sensors_data(data):
@@ -275,6 +276,24 @@ class CceiTildClient:
             return False
         return True
 
+    async def set_light_intensity(self, intensity):
+        """Set the light intensity"""
+        if intensity in LIGHT_INTENSITY_CODES:
+            intensity_code = intensity
+            intensity = LIGHT_INTENSITY_CODES[intensity]
+        else:
+            intensity = int(intensity)
+            assert (
+                intensity in LIGHT_INTENSITY_CODES.values()
+            ), f"Invalid light intensity '{intensity}'"
+            intensity_idx = list(LIGHT_INTENSITY_CODES.values()).index(intensity)
+            intensity_code = list(LIGHT_INTENSITY_CODES.keys())[intensity_idx]
+        data = await self._call_tild({SET_LIGHT_INTENSITY_MESSAGE_KEY: intensity_code}, False)
+        if not data:
+            LOGGER.debug("Fail to set light intensity to %s (%s)", intensity, intensity_code)
+            return False
+        return True
+
 
 class FakeTildBox:
     """Fake Tild box"""
@@ -291,6 +310,7 @@ class FakeTildBox:
 
         self.light_state = random.choice([True, False])
         self.light_color_code = random.choice(list(COLORS.keys()))
+        self.light_intensity_code = random.choice(list(LIGHT_INTENSITY_CODES.keys()))
         self.filtration_state = random.choice([True, False])
 
     def get_toggle_status_code(self):
@@ -335,7 +355,7 @@ class FakeTildBox:
             WATER_TEMPERATURE: temp,
             TOGGLES_STATUS_CODE: self.get_toggle_status_code(),
             LIGHT_COLOR_CODE: self.light_color_code,
-            LIGHT_INTENSITY_CODE: random.choice(list(LIGHT_INTENSITY_CODES.keys())),
+            LIGHT_INTENSITY_CODE: str(self.light_intensity_code),
             FILTRATION_STATUS_CODE: self.get_filtration_status_code(),
             TREATMENT_STATUS_CODE: random.choice(list(TREATMENT_STATUS_CODES.keys())),
             WATER_TEMPERATURE_OFFSET_CODE: random.choice(
@@ -402,6 +422,17 @@ class FakeTildBox:
                         print(f"Invalid color '{color}'")
                         connection.send(b"ERROR: Invalid color")
                     self.light_color_code = color
+                    # No expected answer
+                elif SET_LIGHT_INTENSITY_MESSAGE_KEY in message:
+                    intensity = message[SET_LIGHT_INTENSITY_MESSAGE_KEY]
+                    print(
+                        f"Handle set light intensity request to '{intensity}' from "
+                        f"{address[0]}:{address[1]}"
+                    )
+                    if intensity not in LIGHT_INTENSITY_CODES:
+                        print(f"Invalid intensity '{intensity}'")
+                        connection.send(b"ERROR: Invalid intensity")
+                    self.light_intensity_code = intensity
                     # No expected answer
                 else:
                     print(

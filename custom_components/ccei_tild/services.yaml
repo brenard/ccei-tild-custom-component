@@ -24,3 +24,17 @@ set_light_color:
                         - "rainbow"
                         - "parade"
                         - "techno"
+
+set_light_intensity:
+    fields:
+        intensity:
+            required: true
+            example: 25
+            selector:
+                select:
+                    translation_key: "intensity"
+                    options:
+                        - "25"
+                        - "50"
+                        - "75"
+                        - "100"
