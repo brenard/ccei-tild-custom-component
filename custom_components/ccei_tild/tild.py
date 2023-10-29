@@ -14,6 +14,8 @@ from .const import (
     LIGHT_ENABLED,
     LIGHT_INTENSITY,
     LIGHT_INTENSITY_CODE,
+    OFF,
+    ON,
     PUMP_ENABLED,
     RAW_DATA,
     SYSTEM_DATE,
@@ -101,6 +103,10 @@ IDENTIFIED_FIELDS = {
     TREATMENT_STATUS_CODE: [69],
 }
 
+GET_SENSORS_DATA_MESSAGE = "Begin"
+TURN_ON_LIGHT_MESSAGE = '{"sprj":1}'
+TURN_OFF_LIGHT_MESSAGE = '{"sprj":0}'
+
 
 def parse_sensors_data(data):
     """Parse sensors state data"""
@@ -149,6 +155,7 @@ class CceiTildClient:
 
     host = None
     port = None
+    encoding = "utf8"
 
     def __init__(self, host, port=None):
         self.host = host
@@ -173,26 +180,41 @@ class CceiTildClient:
             sock_udp.close()
         return (str(server[0]) if server else None, name if name else None)
 
+    async def _call_tild(self, message, awaiting_answser=True):
+        """Call tild"""
+        LOGGER.debug("Start connection to tcp://%s:%d...", self.host, self.port)
+        connect = asyncio.open_connection(self.host, self.port)
+        reader, writer = await connect
+        LOGGER.debug("Connection established")
+        try:
+            LOGGER.debug(
+                "Send message '%s' and awaiting answer..."
+                if awaiting_answser
+                else "Send message '%s' without awaiting answer...",
+                message,
+            )
+            writer.write(message.encode(self.encoding))
+            if not awaiting_answser:
+                return True
+            data = await reader.read(256)
+            data = data.decode(self.encoding)
+            LOGGER.debug("Answer received: %s", data)
+            return data
+        finally:
+            writer.close()
+        return False
+
     async def get_sensors_data(self):
         """Async retrieve sensors state data"""
         return await self._get_sensors_data()
 
     async def _get_sensors_data(self):
         """Retrieve sensors state data"""
-        LOGGER.debug("Start connection to tcp://%s:%d...", self.host, self.port)
-        connect = asyncio.open_connection(self.host, self.port)
-        reader, writer = await connect
-        LOGGER.debug("Connection established")
-        try:
-            LOGGER.debug("Send begin and awaiting answer...")
-            writer.write(b"Begin")
-            data = await reader.read(256)
-            data = data.decode("UTF-8")
-            LOGGER.debug("Answer received: %s", data)
-            if not data:
-                return False
-        finally:
-            writer.close()
+        LOGGER.debug("Call Tild for sensors data")
+        data = await self._call_tild("Begin")
+        if not data:
+            LOGGER.debug("No data received from Tild for sensors data")
+            return False
 
         LOGGER.debug("Parse answer and compute state")
         state = parse_sensors_data(data)
@@ -203,6 +225,25 @@ class CceiTildClient:
             "\n - {}".format("\n - ".join([f"{key}={value}" for key, value in state.items()])),
         )
         return state
+
+    async def toggle_light(self, state=None):
+        """Turn on the Tild light"""
+        if state is None:
+            LOGGER.debug("Ask for toogling the light, call Tild to retreive it current state")
+            sensors_data = await self.get_sensors_data()
+            if not sensors_data:
+                LOGGER.warning("Fail to retreive current light state, cant't toggling it.")
+                return False
+            state = ON if sensors_data[LIGHT_ENABLED] else ON
+        assert state in [ON, OFF], f"Invalid light state '{state}'"
+        LOGGER.debug("Call Tild to turn %s the light", state)
+        data = await self._call_tild(
+            TURN_ON_LIGHT_MESSAGE if state == ON else TURN_OFF_LIGHT_MESSAGE, False
+        )
+        if not data:
+            LOGGER.debug("Fail to turn %s the light", state)
+            return False
+        return True
 
 
 class FakeTildBox:
@@ -218,8 +259,22 @@ class FakeTildBox:
         if port:
             self.port = port if port is int else int(port)
 
-    @staticmethod
-    def get_random_state_data():
+        self.light_state = random.choice([True, False])
+        self.pump_state = random.choice([True, False])
+
+    def get_toggle_status_code(self):
+        """Retrieve toggle status code from current light & pump state"""
+        for code, state in TOGGLE_STATUS_CODES.items():
+            if state["light"] == self.light_state and state["pump"] == self.pump_state:
+                return code
+        LOGGER.warning(
+            "No toggle status code found for light %s and pump %s",
+            "on" if self.light_state else "off",
+            "on" if self.pump_state else "off",
+        )
+        return "X"
+
+    def get_random_state_data(self):
         """Generate random state data string"""
 
         now = datetime.now()
@@ -236,7 +291,7 @@ class FakeTildBox:
             SYSTEM_DATE_HOUR: f"{now.hour:02}",
             SYSTEM_DATE_MINUTE: f"{now.minute:02}",
             WATER_TEMPERATURE: temp,
-            TOGGLES_STATUS_CODE: random.choice(list(TOGGLE_STATUS_CODES.keys())),
+            TOGGLES_STATUS_CODE: self.get_toggle_status_code(),
             LIGHT_COLOR_CODE: random.choice(list(COLORS.keys())),
             LIGHT_INTENSITY_CODE: random.choice(list(LIGHT_INTENSITY_CODES.keys())),
             FILTRATION_STATUS_CODE: random.choice(list(FILTRATION_STATUS_CODES.keys())),
@@ -267,10 +322,18 @@ class FakeTildBox:
 
         while True:
             connection, address = self.sock.accept()
-            buf = connection.recv(1024).decode("utf-8").strip()
-            if buf == "Begin":
-                print(f"Handle a begin request from {address[0]}:{address[1]}")
+            message = connection.recv(1024).decode("utf-8").strip()
+            if message == GET_SENSORS_DATA_MESSAGE:
+                print(f"Handle a {GET_SENSORS_DATA_MESSAGE} request from {address[0]}:{address[1]}")
                 connection.send(self.get_random_state_data().encode("utf8"))
+            elif message in [TURN_ON_LIGHT_MESSAGE, TURN_OFF_LIGHT_MESSAGE]:
+                print(
+                    f"Handle turn {'on' if message == TURN_ON_LIGHT_MESSAGE else 'off'} light "
+                    f"request from {address[0]}:{address[1]}"
+                )
+                self.light_state = message == TURN_ON_LIGHT_MESSAGE
+                # No expected answer
             else:
+                print(f"Handle unknown '{message}' request from {address[0]}:{address[1]}")
                 connection.send(b"unknown")
             connection.close()

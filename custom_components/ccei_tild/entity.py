@@ -14,10 +14,11 @@ class TildEntity(CoordinatorEntity):
     _attr_friendly_name = None
     _sensor_data_extra_keys = {}
 
-    def __init__(self, coordinator, config_entry):
+    def __init__(self, coordinator, config_entry, hass):
         """Initialize the entity."""
         super().__init__(coordinator)
         self.config_entry = config_entry
+        self.hass = hass
         assert (
             self._attr_id_key or self._sensor_data_key
         ), "At least _attr_id_key or _sensor_data_key is required to set the entity ID."

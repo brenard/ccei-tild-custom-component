@@ -7,9 +7,9 @@ async def async_setup_entry(hass, entry, async_add_devices):
     """Set up sensor platform."""
     coordinator = hass.data[DOMAIN][COORDINATOR]
     switchs = [
-        TildTreatmentSwitch(coordinator, entry),
-        TildFiltrationSwitch(coordinator, entry),
-        TildPumpSwitch(coordinator, entry),
+        TildTreatmentSwitch(coordinator, entry, hass),
+        TildFiltrationSwitch(coordinator, entry, hass),
+        TildPumpSwitch(coordinator, entry, hass),
     ]
     async_add_devices(switchs)
 

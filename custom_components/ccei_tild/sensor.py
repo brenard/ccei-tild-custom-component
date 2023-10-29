@@ -25,15 +25,15 @@ async def async_setup_entry(hass, entry, async_add_devices):
     """Set up sensor platform."""
     coordinator = hass.data[DOMAIN][COORDINATOR]
     sensors = [
-        TildSystemHostAddressSensor(coordinator, entry),
-        TildSystemDateSensor(coordinator, entry),
-        TildWaterTemperatureSensor(coordinator, entry),
-        TildWaterTemperatureOffsetSensor(coordinator, entry),
-        TildWaterRawTemperatureSensor(coordinator, entry),
-        TildLightIntensitySensor(coordinator, entry),
-        TildLightColorSensor(coordinator, entry),
-        TildFiltrationExpectedDurationSensor(coordinator, entry),
-        TildRawStatusDataSensor(coordinator, entry),
+        TildSystemHostAddressSensor(coordinator, entry, hass),
+        TildSystemDateSensor(coordinator, entry, hass),
+        TildWaterTemperatureSensor(coordinator, entry, hass),
+        TildWaterTemperatureOffsetSensor(coordinator, entry, hass),
+        TildWaterRawTemperatureSensor(coordinator, entry, hass),
+        TildLightIntensitySensor(coordinator, entry, hass),
+        TildLightColorSensor(coordinator, entry, hass),
+        TildFiltrationExpectedDurationSensor(coordinator, entry, hass),
+        TildRawStatusDataSensor(coordinator, entry, hass),
     ]
     async_add_devices(sensors)
 
