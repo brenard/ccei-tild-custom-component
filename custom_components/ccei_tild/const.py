@@ -39,6 +39,8 @@ LIGHT_COLOR_CODE = "light_color_code"
 LIGHT_COLOR = "light_color"
 LIGHT_INTENSITY_CODE = "light_intensity_code"
 LIGHT_INTENSITY = "light_intensity"
+LIGHT_TIMER_DURATION_CODE = "light_timer_duration_code"
+LIGHT_TIMER_DURATION = "light_timer_duration"
 ON = "on"
 OFF = "off"
 WATER_TEMPERATURE = "water_temperature"
@@ -86,4 +88,8 @@ WATER_TEMPERATURE_OFFSET_CODES = {
     "1": 1,
     "2": 2,
     "3": 3,
+}
+
+DURATION_CODES = {
+    f"{idx:02x}".upper(): f"{int(idx*15/60):02}:{idx*15%60:02}" for idx in range(1, 96)
 }

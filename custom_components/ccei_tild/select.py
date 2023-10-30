@@ -5,12 +5,15 @@ from .const import (
     CLIENT,
     COORDINATOR,
     DOMAIN,
+    DURATION_CODES,
     LIGHT_COLOR,
     LIGHT_COLOR_CODE,
     LIGHT_COLORS_CODES,
     LIGHT_INTENSITY,
     LIGHT_INTENSITY_CODE,
     LIGHT_INTENSITY_CODES,
+    LIGHT_TIMER_DURATION,
+    LIGHT_TIMER_DURATION_CODE,
     WATER_TEMPERATURE_OFFSET,
     WATER_TEMPERATURE_OFFSET_CODE,
     WATER_TEMPERATURE_OFFSET_CODES,
@@ -24,13 +27,14 @@ async def async_setup_entry(hass, entry, async_add_devices):
     selects = [
         TildLightIntensitySelect(coordinator, entry, hass),
         TildLightColorSelect(coordinator, entry, hass),
+        TildLightTimerDurationSelect(coordinator, entry, hass),
         TildWaterTemperatureOffsetSelect(coordinator, entry, hass),
     ]
     async_add_devices(selects)
 
 
 class TildLightIntensitySelect(TildSelectEntity):
-    """Monitors the light intensity"""
+    """Select the light intensity"""
 
     _attr_name = "Light intensity"
     _attr_unit_of_measurement = PERCENTAGE
@@ -49,7 +53,7 @@ class TildLightIntensitySelect(TildSelectEntity):
 
 
 class TildLightColorSelect(TildSelectEntity):
-    """Monitors the light color"""
+    """Select the light color"""
 
     _attr_name = "Light color"
     _attr_icon = "mdi:palette"
@@ -66,8 +70,26 @@ class TildLightColorSelect(TildSelectEntity):
         await self.hass.data[DOMAIN][CLIENT].set_light_color(option)
 
 
+class TildLightTimerDurationSelect(TildSelectEntity):
+    """Select the light timer duration"""
+
+    _attr_name = "Light timer duration"
+    _attr_icon = "mdi:timer-cog-outline"
+
+    _sensor_data_key = LIGHT_TIMER_DURATION
+    _sensor_data_extra_keys = {
+        "raw_duration_code": LIGHT_TIMER_DURATION_CODE,
+    }
+
+    _attr_options = list(DURATION_CODES.values())
+
+    async def async_select_option(self, option: str) -> None:
+        """Change the selected option."""
+        await self.hass.data[DOMAIN][CLIENT].set_light_timer_duration(option)
+
+
 class TildWaterTemperatureOffsetSelect(TildSelectEntity):
-    """Monitors the water temperature offset"""
+    """Select the water temperature offset"""
 
     _attr_name = "Water temperature offset"
     _attr_unit_of_measurement = TEMP_CELSIUS

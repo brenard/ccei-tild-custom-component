@@ -9,6 +9,7 @@ from datetime import datetime
 from .const import (
     COORDINATOR,
     DOMAIN,
+    DURATION_CODES,
     FILTRATION_ENABLED,
     FILTRATION_EXPECTED_DURATION,
     FILTRATION_STATUS_CODE,
@@ -20,6 +21,8 @@ from .const import (
     LIGHT_INTENSITY_CODE,
     LIGHT_INTENSITY_CODES,
     LIGHT_STATUS_CODE,
+    LIGHT_TIMER_DURATION,
+    LIGHT_TIMER_DURATION_CODE,
     OFF,
     ON,
     RAW_DATA,
@@ -71,6 +74,7 @@ IDENTIFIED_FIELDS = {
     FILTRATION_STATUS_CODE: [32],
     FILTRATION_EXPECTED_DURATION: [33],
     TREATMENT_STATUS_CODE: [69],
+    LIGHT_TIMER_DURATION_CODE: [72, 73],
 }
 
 GET_SENSORS_DATA_MESSAGE = "Begin"
@@ -79,6 +83,7 @@ FILTRATION_MESSAGE_KEY = "sfil"
 SET_LIGHT_COLOR_MESSAGE_KEY = "prcn"
 SET_LIGHT_INTENSITY_MESSAGE_KEY = "plum"
 THERMOREGULATED_FILTRATION_MESSAGE_KEY = "mfil"
+SET_LIGHT_TIMER_DURATION_MESSAGE_KEY = "pret"
 
 
 def parse_sensors_data(data):
@@ -124,6 +129,7 @@ def parse_sensors_data(data):
     state[LIGHT_COLOR] = LIGHT_COLORS_CODES.get(state[LIGHT_COLOR_CODE])
     state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
     state[THERMOREGULATED_FILTRATION_ENABLED] = None
+    state[LIGHT_TIMER_DURATION] = DURATION_CODES.get(state[LIGHT_TIMER_DURATION_CODE])
     return state
 
 
@@ -355,6 +361,34 @@ class CceiTildClient:
         LOGGER.error("Fail to set light intensity to %s (%s)", intensity, intensity_code)
         return False
 
+    async def set_light_timer_duration(self, duration):
+        """Set the light timer duration"""
+        if duration in DURATION_CODES:
+            duration_code = duration
+            duration = DURATION_CODES[duration]
+        else:
+            assert duration in DURATION_CODES.values(), f"Invalid light timer duration '{duration}'"
+            duration_idx = list(DURATION_CODES.values()).index(duration)
+            duration_code = list(DURATION_CODES.keys())[duration_idx]
+        data = await self._call_tild({SET_LIGHT_TIMER_DURATION_MESSAGE_KEY: duration_code})
+        if not data:
+            LOGGER.debug("Fail to set light timer duration to %s (%s)", duration, duration_code)
+            return False
+        sensors_data = parse_sensors_data(data)
+        if not sensors_data:
+            LOGGER.error(
+                "Fail to parse sensors data after setting light timer duration to %s (%s)",
+                duration,
+                duration_code,
+            )
+            return False
+        # Update coordinator data
+        self._update_coordinator_sensors_data(sensors_data)
+        if sensors_data[LIGHT_TIMER_DURATION_CODE] == duration_code:
+            return True
+        LOGGER.error("Fail to set light timer duration to %s (%s)", duration, duration_code)
+        return False
+
     def _update_coordinator_sensors_data(self, sensors_data):
         """Update coordinator data after some Tild action"""
         self.hass.data[DOMAIN][COORDINATOR].async_set_updated_sensors_data(sensors_data)
@@ -376,6 +410,7 @@ class FakeTildBox:
         self.light_state = random.choice([True, False])
         self.light_color_code = random.choice(list(LIGHT_COLORS_CODES.keys()))
         self.light_intensity_code = random.choice(list(LIGHT_INTENSITY_CODES.keys()))
+        self.light_timer_duration_code = random.choice(list(DURATION_CODES.keys()))
         self.filtration_state = random.choice([True, False])
         self.thermoregulated_filtration_state = random.choice([True, False])
 
@@ -421,6 +456,7 @@ class FakeTildBox:
             LIGHT_STATUS_CODE: self.get_light_status_code(),
             LIGHT_COLOR_CODE: self.light_color_code,
             LIGHT_INTENSITY_CODE: str(self.light_intensity_code),
+            LIGHT_TIMER_DURATION_CODE: self.light_timer_duration_code,
             FILTRATION_STATUS_CODE: self.get_filtration_status_code(),
             TREATMENT_STATUS_CODE: random.choice(list(TREATMENT_STATUS_CODES.keys())),
             WATER_TEMPERATURE_OFFSET_CODE: random.choice(
@@ -502,6 +538,7 @@ class FakeTildBox:
                         print(f"Invalid color '{color}'")
                         connection.send(b"ERROR: Invalid color")
                     else:
+                        print(f"Light color set to {LIGHT_COLORS_CODES[color]} ({color})")
                         self.light_color_code = color
                         connection.send(self.get_state_data().encode("utf8"))
                 elif SET_LIGHT_INTENSITY_MESSAGE_KEY in message:
@@ -514,7 +551,26 @@ class FakeTildBox:
                         print(f"Invalid intensity '{intensity}'")
                         connection.send(b"ERROR: Invalid intensity")
                     else:
+                        print(
+                            f"Light intensity set to {LIGHT_INTENSITY_CODES[intensity]} "
+                            f"({intensity})"
+                        )
                         self.light_intensity_code = intensity
+                        connection.send(self.get_state_data().encode("utf8"))
+                elif SET_LIGHT_TIMER_DURATION_MESSAGE_KEY in message:
+                    duration = message[SET_LIGHT_TIMER_DURATION_MESSAGE_KEY]
+                    print(
+                        f"Handle set light timer duration request to '{duration}' from "
+                        f"{address[0]}:{address[1]}"
+                    )
+                    if duration not in DURATION_CODES:
+                        print(f"Invalid duration '{duration}'")
+                        connection.send(b"ERROR: Invalid duration")
+                    else:
+                        print(
+                            f"Light timer duration set to {DURATION_CODES[duration]} ({duration})"
+                        )
+                        self.light_timer_duration_code = duration
                         connection.send(self.get_state_data().encode("utf8"))
                 else:
                     print(
