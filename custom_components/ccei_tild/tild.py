@@ -19,6 +19,7 @@ from .const import (
     LIGHT_INTENSITY,
     LIGHT_INTENSITY_CODE,
     LIGHT_INTENSITY_CODES,
+    LIGHT_STATUS_CODE,
     OFF,
     ON,
     RAW_DATA,
@@ -30,7 +31,6 @@ from .const import (
     SYSTEM_DATE_YEAR,
     SYSTEM_HOST,
     THERMOREGULATED_FILTRATION_ENABLED,
-    TOGGLES_STATUS_CODE,
     TREATMENT_ENABLED,
     TREATMENT_STATUS_CODE,
     WATER_RAW_TEMPERATURE,
@@ -42,11 +42,9 @@ from .const import (
 
 LOGGER = logging.getLogger(__name__)
 
-TOGGLE_STATUS_CODES = {
-    "0": {"light": False, "filtration": False},
-    "1": {"light": False, "filtration": True},
-    "2": {"light": True, "filtration": False},
-    "3": {"light": True, "filtration": True},
+LIGHT_STATUS_CODES = {
+    "C": True,
+    "8": False,
 }
 
 FILTRATION_STATUS_CODES = {
@@ -65,7 +63,7 @@ IDENTIFIED_FIELDS = {
     SYSTEM_DATE_DAY: [128, 129],
     SYSTEM_DATE_HOUR: [124, 125],
     SYSTEM_DATE_MINUTE: [122, 123],
-    TOGGLES_STATUS_CODE: [34],
+    LIGHT_STATUS_CODE: [70],
     LIGHT_COLOR_CODE: [64, 65],
     LIGHT_INTENSITY_CODE: [71],
     WATER_TEMPERATURE: [66, 67],
@@ -107,7 +105,7 @@ def parse_sensors_data(data):
         del state[field]
 
     state[WATER_TEMPERATURE] = int(state[WATER_TEMPERATURE], 16)
-    state[LIGHT_ENABLED] = TOGGLE_STATUS_CODES.get(state[TOGGLES_STATUS_CODE], {}).get("light")
+    state[LIGHT_ENABLED] = LIGHT_STATUS_CODES.get(state[LIGHT_STATUS_CODE])
     state[TREATMENT_ENABLED] = TREATMENT_STATUS_CODES.get(state[TREATMENT_STATUS_CODE])
     state[FILTRATION_ENABLED] = FILTRATION_STATUS_CODES.get(state[FILTRATION_STATUS_CODE])
     state[FILTRATION_EXPECTED_DURATION] = int(state[FILTRATION_EXPECTED_DURATION])
@@ -377,15 +375,14 @@ class FakeTildBox:
         self.filtration_state = random.choice([True, False])
         self.thermoregulated_filtration_state = random.choice([True, False])
 
-    def get_toggle_status_code(self):
-        """Retrieve toggle status code according current light & filtration state"""
-        for code, state in TOGGLE_STATUS_CODES.items():
-            if state["light"] == self.light_state and state["filtration"] == self.filtration_state:
+    def get_light_status_code(self):
+        """Retrieve light status code according current state"""
+        for code, state in LIGHT_STATUS_CODES.items():
+            if state == self.light_state:
                 return code
         LOGGER.warning(
-            "No toggle status code found for light %s and filtration %s",
+            "No light status code found for %s",
             "on" if self.light_state else "off",
-            "on" if self.filtration_state else "off",
         )
         return "X"
 
@@ -417,7 +414,7 @@ class FakeTildBox:
             SYSTEM_DATE_HOUR: f"{now.hour:02}",
             SYSTEM_DATE_MINUTE: f"{now.minute:02}",
             WATER_TEMPERATURE: temp,
-            TOGGLES_STATUS_CODE: self.get_toggle_status_code(),
+            LIGHT_STATUS_CODE: self.get_light_status_code(),
             LIGHT_COLOR_CODE: self.light_color_code,
             LIGHT_INTENSITY_CODE: str(self.light_intensity_code),
             FILTRATION_STATUS_CODE: self.get_filtration_status_code(),

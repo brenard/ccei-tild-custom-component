@@ -1,5 +1,5 @@
 """Sensor platform"""
-from .const import CLIENT, COORDINATOR, DOMAIN, LIGHT_ENABLED, OFF, ON
+from .const import CLIENT, COORDINATOR, DOMAIN, LIGHT_ENABLED, LIGHT_STATUS_CODE, OFF, ON
 from .entity import TildLightEntity
 
 
@@ -20,6 +20,9 @@ class TildLight(TildLightEntity):
     _attr_icon = "mdi:light-flood-up"
 
     _sensor_data_key = LIGHT_ENABLED
+    _sensor_data_extra_keys = {
+        "raw_status_code": LIGHT_STATUS_CODE,
+    }
 
     async def async_turn_on(self, **kwargs):
         """Turn the light on."""
