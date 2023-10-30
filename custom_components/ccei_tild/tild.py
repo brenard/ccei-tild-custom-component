@@ -83,6 +83,10 @@ THERMOREGULATED_FILTRATION_MESSAGE_KEY = "mfil"
 
 def parse_sensors_data(data):
     """Parse sensors state data"""
+    # Limit to last 160 characters to handle case when multiple state data strings are sent by the
+    # Tild after requesting action
+    data = data[-160:] if len(data) > 160 else data
+
     state = {}
     for key, fields in IDENTIFIED_FIELDS.items():
         state[key] = "".join(map(lambda x: data[x], fields))
