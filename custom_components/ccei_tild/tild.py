@@ -78,12 +78,70 @@ IDENTIFIED_FIELDS = {
 }
 
 GET_SENSORS_DATA_MESSAGE = "Begin"
-LIGHT_MESSAGE_KEY = "sprj"
-FILTRATION_MESSAGE_KEY = "sfil"
-SET_LIGHT_COLOR_MESSAGE_KEY = "prcn"
-SET_LIGHT_INTENSITY_MESSAGE_KEY = "plum"
-THERMOREGULATED_FILTRATION_MESSAGE_KEY = "mfil"
-SET_LIGHT_TIMER_DURATION_MESSAGE_KEY = "pret"
+
+SET_WATER_TEMPERATURE_OFFSET_MESSAGE_KEY = "toft"  # water temperature offset code
+SET_FORCE_FILTRATION_WITH_LIGHT_STATUS_MESSAGE_KEY = "cmff"  # 0 or 1
+
+SET_LIGHT_STATUS_MESSAGE_KEY = "sprj"  # 0 or 1
+SET_LIGHT_COLOR_MESSAGE_KEY = "prcn"  # color code
+SET_LIGHT_INTENSITY_MESSAGE_KEY = "plum"  # 0, 1, 2 or 3
+SET_LIGHT_SEQUENCE_SPEED_MESSAGE_KEY = "pspd"  # 0, 1 or 2
+
+SET_LIGHT_PROG_STATUS_MESSAGE_KEY = "mprj"  # 0 = off, 1 = prog or 2 = timer
+SET_LIGHT_TIMER_DURATION_MESSAGE_KEY = "pret"  # duration code or 255 = OFF
+SET_LIGHT_PROG_MODE_DUSK_MESSAGE_KEY = "aprj"  # 0 or 1
+SET_LIGHT_PROG_WEEK_END_MODE_MESSAGE_KEY = "mprw"  # 0 or 1
+SET_LIGHT_PROG_START_HOUR_MESSAGE_KEY = "prjs"  # hour code
+SET_LIGHT_PROG_DURATION_MESSAGE_KEY = "prjl"  # duration code or 255 = OFF
+SET_LIGHT_PROG_WEEK_END_START_HOUR_MESSAGE_KEY = "prws"  # hour code
+SET_LIGHT_PROG_WEEK_END_DURATION_MESSAGE_KEY = "prwl"  # duration code or 255 = OFF
+
+SET_FILTRATION_STATUS_MESSAGE_KEY = "sfil"  # 0 or 1
+SET_FILTRATION_PROG_STATUS_MESSAGE_KEY = "mfil"  # 0 or 1
+SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY = "afil"  # 0 or 1
+SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY = "mpfw"  # 0 or 1
+
+SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY = "fip1"  # 0 or 1
+SET_FILTRATION_PROG_FIRST_RANGE_START_HOUR_MESSAGE_KEY = "fis1"  # hour code
+SET_FILTRATION_PROG_FIRST_RANGE_END_HOUR_MESSAGE_KEY = "fie1"  # hour code
+SET_FILTRATION_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY = "fip2"  # 0 or 1
+SET_FILTRATION_PROG_SECOND_RANGE_START_HOUR_MESSAGE_KEY = "fis2"  # hour code
+SET_FILTRATION_PROG_SECOND_RANGE_END_HOUR_MESSAGE_KEY = "fie2"  # hour code
+SET_FILTRATION_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY = "fip3"  # 0 or 1
+SET_FILTRATION_PROG_THIRD_RANGE_START_HOUR_MESSAGE_KEY = "fis3"  # hour code
+SET_FILTRATION_PROG_THIRD_RANGE_END_HOUR_MESSAGE_KEY = "fie3"  # hour code
+
+SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY = "fwp1"  # 0 or 1
+SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_MESSAGE_KEY = "fws1"  # hour code
+SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_MESSAGE_KEY = "fwe1"  # hour code
+SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY = "fwp1"  # 0 or 1
+SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_MESSAGE_KEY = "fws1"  # hour code
+SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_MESSAGE_KEY = "fwe1"  # hour code
+SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY = "fwp1"  # 0 or 1
+SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_MESSAGE_KEY = "fws1"  # hour code
+SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_MESSAGE_KEY = "fwe1"  # hour code
+
+SET_AUX_PROG_STATUS_MESSAGE_KEY = "maux"  # 0 or 1
+SET_AUX_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY = "maux"  # 0 or 1
+SET_AUX_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY = "axp1"  # 0 or 1
+SET_AUX_PROG_FIRST_RANGE_START_HOUR_MESSAGE_KEY = "axs1"  # hour code
+SET_AUX_PROG_FIRST_RANGE_END_HOUR_MESSAGE_KEY = "axe1"  # hour code
+SET_AUX_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY = "axp2"  # 0 or 1
+SET_AUX_PROG_SECOND_RANGE_START_HOUR_MESSAGE_KEY = "axs2"  # hour code
+SET_AUX_PROG_SECOND_RANGE_END_HOUR_MESSAGE_KEY = "axe2"  # hour code
+SET_AUX_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY = "axp3"  # 0 or 1
+SET_AUX_PROG_THIRD_RANGE_START_HOUR_MESSAGE_KEY = "axs3"  # hour code
+SET_AUX_PROG_THIRD_RANGE_END_HOUR_MESSAGE_KEY = "axe3"  # hour code
+
+SET_AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY = "awp1"  # 0 or 1
+SET_AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR_MESSAGE_KEY = "aws1"  # hour code
+SET_AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR_MESSAGE_KEY = "awe1"  # hour code
+SET_AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY = "awp2"  # 0 or 1
+SET_AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR_MESSAGE_KEY = "aws2"  # hour code
+SET_AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_MESSAGE_KEY = "awe2"  # hour code
+SET_AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY = "awp3"  # 0 or 1
+SET_AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_MESSAGE_KEY = "aws3"  # hour code
+SET_AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_MESSAGE_KEY = "awe3"  # hour code
 
 
 def parse_sensors_data(data):
@@ -221,7 +279,7 @@ class CceiTildClient:
             state = ON if sensors_data[LIGHT_ENABLED] else ON
         assert state in [ON, OFF], f"Invalid light state '{state}'"
         LOGGER.debug("Call Tild to turn %s the light", state)
-        data = await self._call_tild({LIGHT_MESSAGE_KEY: 1 if state == ON else 0})
+        data = await self._call_tild({SET_LIGHT_STATUS_MESSAGE_KEY: 1 if state == ON else 0})
         if not data:
             LOGGER.error("Fail to turn %s the light (invalid data return)", state)
             return False
@@ -249,7 +307,7 @@ class CceiTildClient:
             state = ON if sensors_data[FILTRATION_ENABLED] else ON
         assert state in [ON, OFF], f"Invalid filtration state '{state}'"
         LOGGER.debug("Call Tild to turn %s the filtration", state)
-        data = await self._call_tild({FILTRATION_MESSAGE_KEY: 1 if state == ON else 0})
+        data = await self._call_tild({SET_FILTRATION_STATUS_MESSAGE_KEY: 1 if state == ON else 0})
         if not data:
             LOGGER.debug("Fail to turn %s the filtration", state)
             return False
@@ -284,7 +342,7 @@ class CceiTildClient:
         assert state in [ON, OFF], f"Invalid thermoregulated filtration state '{state}'"
         LOGGER.debug("Call Tild to turn %s the thermoregulated filtration", state)
         data = await self._call_tild(
-            {THERMOREGULATED_FILTRATION_MESSAGE_KEY: 1 if state == ON else 0}
+            {SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY: 1 if state == ON else 0}
         )
         if not data:
             LOGGER.debug("Fail to turn %s the thermoregulated filtration", state)
@@ -448,7 +506,7 @@ class FakeTildBox:
 
         fields = {
             SYSTEM_DATE_YEAR: f"{now.year-2000:02}",
-            SYSTEM_DATE_MONTH: f"{now.month+1:02}",
+            SYSTEM_DATE_MONTH: f"{now.month:02}",
             SYSTEM_DATE_DAY: f"{now.day:02}",
             SYSTEM_DATE_HOUR: f"{now.hour:02}",
             SYSTEM_DATE_MINUTE: f"{now.minute:02}",
@@ -504,28 +562,27 @@ class FakeTildBox:
                     connection.send(b"ERROR: unexcepected JSON message")
                     connection.close()
                     continue
-                if LIGHT_MESSAGE_KEY in message:
+                if SET_LIGHT_STATUS_MESSAGE_KEY in message:
+                    self.light_state = bool(message[SET_LIGHT_STATUS_MESSAGE_KEY])
                     print(
-                        f"Handle turn {'on' if message[LIGHT_MESSAGE_KEY] else 'off'} light "
+                        f"Handle turn {'on' if self.light_state else 'off'} light request from "
+                        f"{address[0]}:{address[1]}"
+                    )
+                    connection.send(self.get_state_data().encode("utf8"))
+                elif SET_FILTRATION_STATUS_MESSAGE_KEY in message:
+                    self.filtration_state = bool(message[SET_FILTRATION_STATUS_MESSAGE_KEY])
+                    print(
+                        f"Handle turn {'on' if self.filtration_state else 'off'} filtration "
                         f"request from {address[0]}:{address[1]}"
                     )
-                    self.light_state = bool(message[LIGHT_MESSAGE_KEY])
                     connection.send(self.get_state_data().encode("utf8"))
-                elif FILTRATION_MESSAGE_KEY in message:
-                    print(
-                        f"Handle turn {'on' if message[FILTRATION_MESSAGE_KEY] else 'off'} "
-                        f"filtration request from {address[0]}:{address[1]}"
-                    )
-                    self.filtration_state = bool(message[FILTRATION_MESSAGE_KEY])
-                    connection.send(self.get_state_data().encode("utf8"))
-                elif THERMOREGULATED_FILTRATION_MESSAGE_KEY in message:
-                    print(
-                        "Handle turn "
-                        f"{'on' if message[THERMOREGULATED_FILTRATION_MESSAGE_KEY] else 'off'} "
-                        f"thermoregulated filtration request from {address[0]}:{address[1]}"
-                    )
+                elif SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY in message:
                     self.thermoregulated_filtration_state = bool(
-                        message[THERMOREGULATED_FILTRATION_MESSAGE_KEY]
+                        message[SET_FILTRATION_STATUS_MESSAGE_KEY]
+                    )
+                    print(
+                        f"Handle turn {'on' if self.thermoregulated_filtration_state else 'off'} "
+                        f"thermoregulated filtration request from {address[0]}:{address[1]}"
                     )
                     connection.send(self.get_state_data().encode("utf8"))
                 elif SET_LIGHT_COLOR_MESSAGE_KEY in message:

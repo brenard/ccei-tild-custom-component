@@ -93,3 +93,6 @@ WATER_TEMPERATURE_OFFSET_CODES = {
 DURATION_CODES = {
     f"{idx:02x}".upper(): f"{int(idx*15/60):02}:{idx*15%60:02}" for idx in range(1, 96)
 }
+
+HOURS_CODES = DURATION_CODES.copy()
+HOURS_CODES["00"] = "00:00"
