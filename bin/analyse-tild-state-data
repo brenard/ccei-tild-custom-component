@@ -8,7 +8,7 @@ import sys
 sys.path.append("/config/custom_components")
 
 # pylint: disable=wrong-import-position
-from ccei_tild.tild import IDENTIFIED_FIELDS, parse_sensors_data  # noqa: E402
+from ccei_tild.tild import diff_sensors_data, parse_sensors_data  # noqa: E402
 
 parser = argparse.ArgumentParser()
 
@@ -17,13 +17,6 @@ parser.add_argument("-M", "--markdown", action="store_true", help="Format output
 parser.add_argument("-F", "--forum", action="store_true", help="Format output for the forum")
 
 opts = parser.parse_args()
-
-
-IDENTIFIED_POS = {}
-for k, pos in IDENTIFIED_FIELDS.items():
-    IDENTIFIED_POS.update({(p, k) for p in pos})
-DIFF = {}
-DIFF_KEYS = {}
 
 
 def format_in_red(text):
@@ -35,11 +28,11 @@ def format_in_red(text):
     return "\033[91m" + text + "\033[0m"
 
 
-def format_diff_data(data):
+def format_diff_data(data, diff):
     """Format data differences"""
     r = []
     for idx, char in enumerate(data):
-        r.append(format_in_red(char) if idx in DIFF else char)
+        r.append(format_in_red(char) if idx in diff else char)
     r = "".join(r)
     if opts.markdown:
         r = r.replace("____", "")
@@ -48,61 +41,44 @@ def format_diff_data(data):
     return r
 
 
-def pretty_print_data(data):
+def pretty_print_data(data, diff_keys=None):
     """Pretty format data and highlight differences"""
     r = []
     for k, v in data.items():
         line = f"{k}: {v}"
-        r.append(format_in_red(line) if k in DIFF_KEYS else line)
+        r.append(format_in_red(line) if diff_keys and k in diff_keys else line)
     print("- {}".format("\n- ".join(r)))
 
 
 ref_raw_data = opts.data.pop(0)
-ref_data = list(ref_raw_data)
-ref_parsed_data = parse_sensors_data(ref_raw_data)
-
 if not opts.data:
     print(ref_raw_data)
-    pretty_print_data(ref_parsed_data)
+    pretty_print_data(parse_sensors_data(ref_raw_data))
     sys.exit(0)
 
 # Detect differences
-parsed_data = {ref_raw_data: ref_parsed_data}
-for raw_data in opts.data:
-    data = list(raw_data)
-    parsed_data[raw_data] = parse_sensors_data(raw_data)
-    for idx, char in enumerate(ref_data):
-        if char == data[idx]:
-            continue
-        DIFF[idx] = (DIFF[idx] + [data[idx]]) if idx in DIFF else [char, data[idx]]
+diff = diff_sensors_data(ref_raw_data, *opts.data)
 
-    for k, v in ref_parsed_data.items():
-        if parsed_data[raw_data][k] == v:
-            continue
-        DIFF_KEYS[k] = (
-            (DIFF_KEYS[k] + [parsed_data[raw_data][k]])
-            if k in DIFF_KEYS
-            else [v, parsed_data[raw_data][k]]
-        )
-
-IDENTIFIED_POS_DIFF = [idx for idx in sorted(DIFF) if idx in IDENTIFIED_POS]
-NON_IDENTIFIED_POS_DIFF = [idx for idx in sorted(DIFF) if idx not in IDENTIFIED_POS]
-
-if IDENTIFIED_POS_DIFF:
+if diff["identified_pos_diff"]:
     print(
         "Raw idendified position differences: "
         + ", ".join(
             [
-                f"{idx} ({IDENTIFIED_POS[idx]}, {' => '.join(DIFF[idx])})"
-                for idx in IDENTIFIED_POS_DIFF
+                f"{idx} ({diff['identified_pos'][idx]}, {' => '.join(diff['diff'][idx])})"
+                for idx in diff["identified_pos_diff"]
             ]
         )
     )
-if NON_IDENTIFIED_POS_DIFF:
+if diff["non_identified_pos_diff"]:
     print(
         format_in_red(
             "Raw non-idendified position differences:\n"
-            + "\n".join([f"- {idx} ({' => '.join(DIFF[idx])})" for idx in NON_IDENTIFIED_POS_DIFF])
+            + "\n".join(
+                [
+                    f"- {idx} ({' => '.join(diff['diff'][idx])})"
+                    for idx in diff["non_identified_pos_diff"]
+                ]
+            )
         )
     )
 
@@ -111,17 +87,17 @@ print(
     + "\n".join(
         [
             f"- {key} ({' => '.join([str(value) for value in values])})"
-            for key, values in DIFF_KEYS.items()
+            for key, values in diff["diff_keys"].items()
         ]
     )
 )
 print()
 
-print(format_diff_data(ref_data))
-pretty_print_data(parse_sensors_data(ref_raw_data))
+print(format_diff_data(list(diff["ref_raw_data"]), diff["diff"]))
+pretty_print_data(diff["parsed_data"][diff["ref_raw_data"]], diff["diff_keys"])
 print()
 
 for raw_data in opts.data:
-    print(format_diff_data(list(raw_data)))
-    pretty_print_data(parse_sensors_data(raw_data))
+    print(format_diff_data(list(raw_data), diff["diff"]))
+    pretty_print_data(diff["parsed_data"][raw_data], diff["diff_keys"])
     print()

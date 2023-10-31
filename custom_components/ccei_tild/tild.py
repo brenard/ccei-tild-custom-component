@@ -144,13 +144,13 @@ SET_AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_MESSAGE_KEY = "aws3"  # hour code
 SET_AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_MESSAGE_KEY = "awe3"  # hour code
 
 
-def parse_sensors_data(data):
+def parse_sensors_data(data, system_host=None):
     """Parse sensors state data"""
     # Limit to last 160 characters to handle case when multiple state data strings are sent by the
     # Tild after requesting action
     data = data[-160:] if len(data) > 160 else data
 
-    state = {}
+    state = {RAW_DATA: data, SYSTEM_HOST: system_host}
     for key, fields in IDENTIFIED_FIELDS.items():
         state[key] = "".join(map(lambda x: data[x], fields))
 
@@ -191,12 +191,98 @@ def parse_sensors_data(data):
     return state
 
 
+def diff_sensors_data(ref_raw_data, *other_raw_data):
+    """Compute differences between sensors data strings"""
+    ref_parsed_data = parse_sensors_data(ref_raw_data)
+
+    # Detect differences
+    result = {
+        "ref_raw_data": ref_raw_data,
+        "identified_pos": {p: k for k, pos in IDENTIFIED_FIELDS.items() for p in pos},
+        "parsed_data": {ref_raw_data: ref_parsed_data},
+        "diff": {},
+        "diff_keys": {},
+    }
+    for raw_data in other_raw_data:
+        data = list(raw_data)
+        result["parsed_data"][raw_data] = parse_sensors_data(raw_data)
+        for idx, char in enumerate(list(ref_raw_data)):
+            if char == data[idx]:
+                continue
+            result["diff"][idx] = (
+                (result["diff"][idx] + [data[idx]]) if idx in result["diff"] else [char, data[idx]]
+            )
+
+        for k, v in ref_parsed_data.items():
+            if result["parsed_data"][raw_data][k] == v:
+                continue
+            result["diff_keys"][k] = (
+                (result["diff_keys"][k] + [result["parsed_data"][raw_data][k]])
+                if k in result["diff_keys"]
+                else [v, result["parsed_data"][raw_data][k]]
+            )
+
+    result["identified_pos_diff"] = [
+        pos for pos in sorted(result["diff"]) if pos in result["identified_pos"]
+    ]
+    result["non_identified_pos_diff"] = [
+        pos for pos in sorted(result["diff"]) if pos not in result["identified_pos"]
+    ]
+    return result
+
+
+def log_sensors_data_diff(ref_raw_data, *other_raw_data):
+    """Detect and log sensors data differences"""
+    diff = diff_sensors_data(ref_raw_data, *other_raw_data)
+    msg = [f"New data: {raw_data}" for raw_data in other_raw_data]
+    msg.insert(0, f"Reference data: {ref_raw_data}")
+    diff_msg = []
+    if diff["identified_pos_diff"]:
+        diff_msg.append(
+            "Raw idendified position differences:\n"
+            + "\n".join(
+                [
+                    f" - {idx} ({diff['identified_pos'][idx]}, {' => '.join(diff['diff'][idx])})"
+                    for idx in diff["identified_pos_diff"]
+                ]
+            )
+        )
+    if diff["non_identified_pos_diff"]:
+        diff_msg.append(
+            "Raw non-idendified position differences:\n"
+            + "\n".join(
+                [
+                    f" - {idx} ({' => '.join(diff['diff'][idx])})"
+                    for idx in diff["non_identified_pos_diff"]
+                ]
+            )
+        )
+
+    if diff["diff_keys"]:
+        diff_msg.append(
+            "Keys differences:\n"
+            + "\n".join(
+                [
+                    f" - {key} ({' => '.join([str(value) for value in values])})"
+                    for key, values in diff["diff_keys"].items()
+                ]
+            )
+        )
+
+    LOGGER.debug(
+        "Differences:%s",
+        " No deteted differences" if not diff_msg else ("\n" + "\n".join(diff_msg)),
+    )
+
+
 class CceiTildClient:
     """CCEI Tild client"""
 
     host = None
     port = None
     encoding = "utf8"
+
+    last_sensors_data = None
 
     def __init__(self, hass, host, port=None):
         self.hass = hass
@@ -257,16 +343,22 @@ class CceiTildClient:
         if not data:
             LOGGER.debug("No data received from Tild for sensors data")
             return False
-
         LOGGER.debug("Parse answer and compute state")
-        state = parse_sensors_data(data)
-        state[SYSTEM_HOST] = self.host
-        state[RAW_DATA] = data
+        state = parse_sensors_data(data, self.host)
         LOGGER.debug(
             "State:%s",
             "\n - {}".format("\n - ".join([f"{key}={value}" for key, value in state.items()])),
         )
+        self.log_sensors_data_diff(state)
         return state
+
+    def log_sensors_data_diff(self, new_data):
+        """Log sensors data change differences"""
+        if not new_data:
+            return
+        if self.last_sensors_data:
+            log_sensors_data_diff(self.last_sensors_data[RAW_DATA], new_data[RAW_DATA])
+        self.last_sensors_data = new_data
 
     async def toggle_light(self, state=None):
         """Turn on/off import names the Tild light"""
@@ -449,6 +541,7 @@ class CceiTildClient:
 
     def _update_coordinator_sensors_data(self, sensors_data):
         """Update coordinator data after some Tild action"""
+        self.log_sensors_data_diff(sensors_data)
         self.hass.data[DOMAIN][COORDINATOR].async_set_updated_sensors_data(sensors_data)
 
 
