@@ -97,11 +97,11 @@ def parse_sensors_data(data):
         state[key] = "".join(map(lambda x: data[x], fields))
 
     state[SYSTEM_DATE] = datetime(
-        int(state[SYSTEM_DATE_YEAR]) + 2000,
-        int(state[SYSTEM_DATE_MONTH]) - 1,
-        int(state[SYSTEM_DATE_DAY]),
-        int(state[SYSTEM_DATE_HOUR]),
-        int(state[SYSTEM_DATE_MINUTE]),
+        year=int(state[SYSTEM_DATE_YEAR]) + 2000,
+        month=int(state[SYSTEM_DATE_MONTH]),
+        day=int(state[SYSTEM_DATE_DAY]),
+        hour=int(state[SYSTEM_DATE_HOUR]),
+        minute=int(state[SYSTEM_DATE_MINUTE]),
     ).isoformat()
 
     for field in [
