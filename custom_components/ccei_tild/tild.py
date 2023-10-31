@@ -381,6 +381,7 @@ class CceiTildClient:
             return False
         # Update coordinator data
         self._update_coordinator_sensors_data(sensors_data)
+        return True
         if (sensors_data[LIGHT_ENABLED] and state == ON) or (
             not sensors_data[LIGHT_ENABLED] and state == OFF
         ):
@@ -409,6 +410,7 @@ class CceiTildClient:
             return False
         # Update coordinator data
         self._update_coordinator_sensors_data(sensors_data)
+        return True
         if (sensors_data[FILTRATION_ENABLED] and state == ON) or (
             not sensors_data[FILTRATION_ENABLED] and state == OFF
         ):
@@ -447,6 +449,7 @@ class CceiTildClient:
             return False
         # Update coordinator data
         self._update_coordinator_sensors_data(sensors_data)
+        return True
         if (sensors_data[THERMOREGULATED_FILTRATION_ENABLED] and state == ON) or (
             not sensors_data[THERMOREGULATED_FILTRATION_ENABLED] and state == OFF
         ):
@@ -475,6 +478,7 @@ class CceiTildClient:
             return False
         # Update coordinator data
         self._update_coordinator_sensors_data(sensors_data)
+        return True
         if sensors_data[LIGHT_COLOR_CODE] == color_code:
             return True
         LOGGER.error("Fail to set light color to %s (%s)", color, color_code)
@@ -506,6 +510,7 @@ class CceiTildClient:
             return False
         # Update coordinator data
         self._update_coordinator_sensors_data(sensors_data)
+        return True
         if sensors_data[LIGHT_INTENSITY_CODE] == intensity_code:
             return True
         LOGGER.error("Fail to set light intensity to %s (%s)", intensity, intensity_code)
@@ -534,6 +539,7 @@ class CceiTildClient:
             return False
         # Update coordinator data
         self._update_coordinator_sensors_data(sensors_data)
+        return True
         if sensors_data[LIGHT_TIMER_DURATION_CODE] == duration_code:
             return True
         LOGGER.error("Fail to set light timer duration to %s (%s)", duration, duration_code)
