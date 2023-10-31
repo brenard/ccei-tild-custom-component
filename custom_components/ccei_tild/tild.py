@@ -33,6 +33,7 @@ from .const import (
     SYSTEM_DATE_MONTH,
     SYSTEM_DATE_YEAR,
     SYSTEM_HOST,
+    THERMOREGULATED_FILTRATION_CODE,
     THERMOREGULATED_FILTRATION_ENABLED,
     TREATMENT_ENABLED,
     TREATMENT_STATUS_CODE,
@@ -45,20 +46,9 @@ from .const import (
 
 LOGGER = logging.getLogger(__name__)
 
-LIGHT_STATUS_CODES = {
-    "C": True,
-    "8": False,
-}
-
-FILTRATION_STATUS_CODES = {
-    "2": True,
-    "0": False,
-}
-
-TREATMENT_STATUS_CODES = {
-    "7": True,
-    "3": False,
-}
+LIGHT_STATUS_CODES = {"C": ON, "8": OFF}
+FILTRATION_STATUS_CODES = {"2": ON, "0": OFF}
+TREATMENT_STATUS_CODES = {"7": ON, "3": OFF}
 
 IDENTIFIED_FIELDS = {
     SYSTEM_DATE_YEAR: [132, 133],
@@ -186,7 +176,7 @@ def parse_sensors_data(data, system_host=None):
     )
     state[LIGHT_COLOR] = LIGHT_COLORS_CODES.get(state[LIGHT_COLOR_CODE])
     state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
-    state[THERMOREGULATED_FILTRATION_ENABLED] = None
+    state[THERMOREGULATED_FILTRATION_CODE] = state[THERMOREGULATED_FILTRATION_ENABLED] = None
     state[LIGHT_TIMER_DURATION] = DURATION_CODES.get(state[LIGHT_TIMER_DURATION_CODE])
     return state
 
@@ -361,189 +351,110 @@ class CceiTildClient:
         self.last_sensors_data = new_data
 
     async def toggle_light(self, state=None):
-        """Turn on/off import names the Tild light"""
-        if state is None:
-            LOGGER.debug("Ask for toogling the light, call Tild to retreive it current state")
-            sensors_data = await self.get_sensors_data()
-            if not sensors_data:
-                LOGGER.warning("Fail to retreive current light state, cant't toggling it.")
-                return False
-            state = ON if sensors_data[LIGHT_ENABLED] else ON
-        assert state in [ON, OFF], f"Invalid light state '{state}'"
-        LOGGER.debug("Call Tild to turn %s the light", state)
-        data = await self._call_tild({SET_LIGHT_STATUS_MESSAGE_KEY: 1 if state == ON else 0})
-        if not data:
-            LOGGER.error("Fail to turn %s the light (invalid data return)", state)
-            return False
-        sensors_data = parse_sensors_data(data)
-        if not sensors_data:
-            LOGGER.error("Fail to parse sensors data after turning %s the light", state)
-            return False
-        # Update coordinator data
-        self._update_coordinator_sensors_data(sensors_data)
-        return True
-        if (sensors_data[LIGHT_ENABLED] and state == ON) or (
-            not sensors_data[LIGHT_ENABLED] and state == OFF
-        ):
-            return True
-        LOGGER.error("Fail to turn %s the light", state)
-        return False
+        """Turn on/off the Tild light"""
+        return await self._toggle_item_state(
+            label="light",
+            sensor_key=LIGHT_ENABLED,
+            message_key=SET_LIGHT_STATUS_MESSAGE_KEY,
+            state=state,
+        )
 
     async def toggle_filtration(self, state=None):
         """Turn on/off the Tild filtration"""
-        if state is None:
-            LOGGER.debug("Ask for toogling the filtration, call Tild to retreive it current state")
-            sensors_data = await self.get_sensors_data()
-            if not sensors_data:
-                LOGGER.warning("Fail to retreive current filtration state, cant't toggling it.")
-                return False
-            state = ON if sensors_data[FILTRATION_ENABLED] else ON
-        assert state in [ON, OFF], f"Invalid filtration state '{state}'"
-        LOGGER.debug("Call Tild to turn %s the filtration", state)
-        data = await self._call_tild({SET_FILTRATION_STATUS_MESSAGE_KEY: 1 if state == ON else 0})
-        if not data:
-            LOGGER.debug("Fail to turn %s the filtration", state)
-            return False
-        sensors_data = parse_sensors_data(data)
-        if not sensors_data:
-            LOGGER.error("Fail to parse sensors data after turning %s the filtration", state)
-            return False
-        # Update coordinator data
-        self._update_coordinator_sensors_data(sensors_data)
-        return True
-        if (sensors_data[FILTRATION_ENABLED] and state == ON) or (
-            not sensors_data[FILTRATION_ENABLED] and state == OFF
-        ):
-            return True
-        LOGGER.error("Fail to turn %s the filtration", state)
-        return False
+        return await self._toggle_item_state(
+            label="filtration",
+            sensor_key=FILTRATION_ENABLED,
+            message_key=SET_FILTRATION_STATUS_MESSAGE_KEY,
+            state=state,
+        )
 
     async def toggle_thermoregulated_filtration(self, state=None):
         """Turn on/off the Tild thermoregulated filtration"""
-        if state is None:
-            LOGGER.debug(
-                "Ask for toogling the thermoregulated filtration, call Tild to retreive it "
-                "current state"
-            )
-            sensors_data = await self.get_sensors_data()
-            if not sensors_data:
-                LOGGER.warning(
-                    "Fail to retreive current thermoregulated filtration state, cant't "
-                    "toggling it."
-                )
-                return False
-            state = ON if sensors_data[THERMOREGULATED_FILTRATION_ENABLED] else ON
-        assert state in [ON, OFF], f"Invalid thermoregulated filtration state '{state}'"
-        LOGGER.debug("Call Tild to turn %s the thermoregulated filtration", state)
-        data = await self._call_tild(
-            {SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY: 1 if state == ON else 0}
+        return await self._toggle_item_state(
+            label="thermoregulated filtration",
+            sensor_key=THERMOREGULATED_FILTRATION_ENABLED,
+            message_key=SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY,
+            state=state,
         )
-        if not data:
-            LOGGER.debug("Fail to turn %s the thermoregulated filtration", state)
-            return False
-        sensors_data = parse_sensors_data(data)
-        if not sensors_data:
-            LOGGER.error(
-                "Fail to parse sensors data after turning %s the thermoregulated filtration", state
-            )
-            return False
-        # Update coordinator data
-        self._update_coordinator_sensors_data(sensors_data)
-        return True
-        if (sensors_data[THERMOREGULATED_FILTRATION_ENABLED] and state == ON) or (
-            not sensors_data[THERMOREGULATED_FILTRATION_ENABLED] and state == OFF
-        ):
-            return True
-        LOGGER.error("Fail to turn %s the thermoregulated filtration", state)
-        return False
 
     async def set_light_color(self, color):
         """Set the light color"""
-        if color in LIGHT_COLORS_CODES:
-            color_code = color
-            color = LIGHT_COLORS_CODES[color]
-        else:
-            assert color in LIGHT_COLORS_CODES.values(), f"Invalid light color '{color}'"
-            color_idx = list(LIGHT_COLORS_CODES.values()).index(color)
-            color_code = list(LIGHT_COLORS_CODES.keys())[color_idx]
-        data = await self._call_tild({SET_LIGHT_COLOR_MESSAGE_KEY: color_code})
-        if not data:
-            LOGGER.debug("Fail to set light color to %s (%s)", color, color_code)
-            return False
-        sensors_data = parse_sensors_data(data)
-        if not sensors_data:
-            LOGGER.error(
-                "Fail to parse sensors data after setting light color to %s (%s)", color, color_code
-            )
-            return False
-        # Update coordinator data
-        self._update_coordinator_sensors_data(sensors_data)
-        return True
-        if sensors_data[LIGHT_COLOR_CODE] == color_code:
-            return True
-        LOGGER.error("Fail to set light color to %s (%s)", color, color_code)
-        return False
+        return await self._set_item_state(
+            label="light color",
+            sensor_key=LIGHT_COLOR_CODE,
+            state=color,
+            codes=LIGHT_COLORS_CODES,
+            message_key=SET_LIGHT_COLOR_MESSAGE_KEY,
+        )
 
     async def set_light_intensity(self, intensity):
         """Set the light intensity"""
-        if intensity in LIGHT_INTENSITY_CODES:
-            intensity_code = intensity
-            intensity = LIGHT_INTENSITY_CODES[intensity]
-        else:
-            intensity = int(intensity)
-            assert (
-                intensity in LIGHT_INTENSITY_CODES.values()
-            ), f"Invalid light intensity '{intensity}'"
-            intensity_idx = list(LIGHT_INTENSITY_CODES.values()).index(intensity)
-            intensity_code = list(LIGHT_INTENSITY_CODES.keys())[intensity_idx]
-        data = await self._call_tild({SET_LIGHT_INTENSITY_MESSAGE_KEY: intensity_code})
-        if not data:
-            LOGGER.debug("Fail to set light intensity to %s (%s)", intensity, intensity_code)
-            return False
-        sensors_data = parse_sensors_data(data)
-        if not sensors_data:
-            LOGGER.error(
-                "Fail to parse sensors data after setting light intensity to %s (%s)",
-                intensity,
-                intensity_code,
-            )
-            return False
-        # Update coordinator data
-        self._update_coordinator_sensors_data(sensors_data)
-        return True
-        if sensors_data[LIGHT_INTENSITY_CODE] == intensity_code:
-            return True
-        LOGGER.error("Fail to set light intensity to %s (%s)", intensity, intensity_code)
-        return False
+        return await self._set_item_state(
+            label="light intensity",
+            sensor_key=LIGHT_INTENSITY_CODE,
+            state=intensity,
+            codes=LIGHT_INTENSITY_CODES,
+            message_key=SET_LIGHT_INTENSITY_MESSAGE_KEY,
+        )
 
     async def set_light_timer_duration(self, duration):
         """Set the light timer duration"""
-        if duration in DURATION_CODES:
-            duration_code = duration
-            duration = DURATION_CODES[duration]
+        return await self._set_item_state(
+            label="light timer duration",
+            sensor_key=LIGHT_TIMER_DURATION_CODE,
+            state=duration,
+            codes=DURATION_CODES,
+            message_key=SET_LIGHT_TIMER_DURATION_MESSAGE_KEY,
+        )
+
+    async def _set_item_state(
+        self, label, sensor_key, state, codes, message_key, sensor_key_is_state=False
+    ):
+        """Set item on Tild"""
+        if state in codes:
+            code = state
+            state = codes[state]
         else:
-            assert duration in DURATION_CODES.values(), f"Invalid light timer duration '{duration}'"
-            duration_idx = list(DURATION_CODES.values()).index(duration)
-            duration_code = list(DURATION_CODES.keys())[duration_idx]
-        data = await self._call_tild({SET_LIGHT_TIMER_DURATION_MESSAGE_KEY: duration_code})
+            assert state in codes.values(), f"Invalid {label} '{state}'"
+            idx = list(codes.values()).index(state)
+            code = list(codes.keys())[idx]
+        data = await self._call_tild({message_key: code})
         if not data:
-            LOGGER.debug("Fail to set light timer duration to %s (%s)", duration, duration_code)
+            LOGGER.debug("Fail to set %s to %s (%s)", label, state, code)
             return False
         sensors_data = parse_sensors_data(data)
         if not sensors_data:
             LOGGER.error(
-                "Fail to parse sensors data after setting light timer duration to %s (%s)",
-                duration,
-                duration_code,
+                "Fail to parse sensors data after setting %s to %s (%s)",
+                label,
+                state,
+                code,
             )
             return False
         # Update coordinator data
         self._update_coordinator_sensors_data(sensors_data)
         return True
-        if sensors_data[LIGHT_TIMER_DURATION_CODE] == duration_code:
+        # pylint: disable=unreachable
+        if (sensor_key_is_state and sensors_data[sensor_key] == state) or (
+            not sensor_key_is_state and sensors_data[sensor_key] == code
+        ):
             return True
-        LOGGER.error("Fail to set light timer duration to %s (%s)", duration, duration_code)
+        LOGGER.error("Fail to set %s to %s (%s)", label, state, code)
         return False
+
+    async def _toggle_item_state(self, label, sensor_key, message_key, state=None):
+        """Turn on/off an item on Tild"""
+        if state is None:
+            LOGGER.debug("Ask for toogling the %s, call Tild to retreive it current state", label)
+            if not self.last_sensors_data:
+                sensors_data = await self.get_sensors_data()
+                if not sensors_data:
+                    LOGGER.warning("Fail to retreive current %s state, cant't toggling it.", label)
+                    return False
+            state = ON if sensors_data[sensor_key] else OFF
+        assert state in [ON, OFF], f"Invalid {label} state '{state}'"
+        LOGGER.debug("Call Tild to turn %s the %s", state, label)
+        return await self._set_item_state(label, sensor_key, state, {1: ON, 0: OFF}, message_key)
 
     def _update_coordinator_sensors_data(self, sensors_data):
         """Update coordinator data after some Tild action"""
@@ -564,12 +475,12 @@ class FakeTildBox:
         if port:
             self.port = port if port is int else int(port)
 
-        self.light_state = random.choice([True, False])
+        self.light_state = random.choice([ON, OFF])
         self.light_color_code = random.choice(list(LIGHT_COLORS_CODES.keys()))
         self.light_intensity_code = random.choice(list(LIGHT_INTENSITY_CODES.keys()))
         self.light_timer_duration_code = random.choice(list(DURATION_CODES.keys()))
-        self.filtration_state = random.choice([True, False])
-        self.thermoregulated_filtration_state = random.choice([True, False])
+        self.filtration_state = random.choice([ON, OFF])
+        self.thermoregulated_filtration_state = random.choice([ON, OFF])
 
     def get_light_status_code(self):
         """Retrieve light status code according current state"""
@@ -632,6 +543,29 @@ class FakeTildBox:
 
         return "".join(data)
 
+    def handle_toogleable_request(self, connection, address, label, code, attr):
+        """Handle a request to set an Tild toogleable item"""
+        print(f"Handle set {label} request to '{code}' from {address[0]}:{address[1]}")
+        state = {1: ON, 0: OFF}.get(code)
+        if state is None:
+            print(f"Invalid {label} state '{code}'")
+            connection.send(b"ERROR: Invalid state")
+        else:
+            setattr(self, attr, state)
+            print(f"{label} turned {'on' if state is ON else 'off'}")
+            connection.send(self.get_state_data().encode("utf8"))
+
+    def handle_set_item_request(self, connection, address, label, code, codes, attr):
+        """Handle a request to set an Tild item"""
+        print(f"Handle set {label} request to '{code}' from {address[0]}:{address[1]}")
+        if code not in codes:
+            print(f"Invalid {label} code '{code}'")
+            connection.send(f"ERROR: Invalid {label} code '{code}'".encode())
+        else:
+            print(f"{label} set to {codes[code]} ({code})")
+            setattr(self, attr, code)
+            connection.send(self.get_state_data().encode("utf8"))
+
     def run(self):
         """Run service"""
         print(f"Start fake Tild service on {self.host}:{self.port}")
@@ -662,72 +596,56 @@ class FakeTildBox:
                     connection.close()
                     continue
                 if SET_LIGHT_STATUS_MESSAGE_KEY in message:
-                    self.light_state = bool(message[SET_LIGHT_STATUS_MESSAGE_KEY])
-                    print(
-                        f"Handle turn {'on' if self.light_state else 'off'} light request from "
-                        f"{address[0]}:{address[1]}"
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "light",
+                        message[SET_LIGHT_STATUS_MESSAGE_KEY],
+                        "light_state",
                     )
-                    connection.send(self.get_state_data().encode("utf8"))
                 elif SET_FILTRATION_STATUS_MESSAGE_KEY in message:
-                    self.filtration_state = bool(message[SET_FILTRATION_STATUS_MESSAGE_KEY])
-                    print(
-                        f"Handle turn {'on' if self.filtration_state else 'off'} filtration "
-                        f"request from {address[0]}:{address[1]}"
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "fitration",
+                        message[SET_FILTRATION_STATUS_MESSAGE_KEY],
+                        "filtration_state",
                     )
-                    connection.send(self.get_state_data().encode("utf8"))
                 elif SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY in message:
-                    self.thermoregulated_filtration_state = bool(
-                        message[SET_FILTRATION_STATUS_MESSAGE_KEY]
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "filtration programming thermoregulated",
+                        message[SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY],
+                        "thermoregulated_filtration_state",
                     )
-                    print(
-                        f"Handle turn {'on' if self.thermoregulated_filtration_state else 'off'} "
-                        f"thermoregulated filtration request from {address[0]}:{address[1]}"
-                    )
-                    connection.send(self.get_state_data().encode("utf8"))
                 elif SET_LIGHT_COLOR_MESSAGE_KEY in message:
-                    color = message[SET_LIGHT_COLOR_MESSAGE_KEY]
-                    print(
-                        f"Handle set light color request to '{color}' from "
-                        f"{address[0]}:{address[1]}"
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "light color",
+                        message[SET_LIGHT_COLOR_MESSAGE_KEY],
+                        LIGHT_COLORS_CODES,
+                        "light_color_code",
                     )
-                    if color not in LIGHT_COLORS_CODES:
-                        print(f"Invalid color '{color}'")
-                        connection.send(b"ERROR: Invalid color")
-                    else:
-                        print(f"Light color set to {LIGHT_COLORS_CODES[color]} ({color})")
-                        self.light_color_code = color
-                        connection.send(self.get_state_data().encode("utf8"))
                 elif SET_LIGHT_INTENSITY_MESSAGE_KEY in message:
-                    intensity = message[SET_LIGHT_INTENSITY_MESSAGE_KEY]
-                    print(
-                        f"Handle set light intensity request to '{intensity}' from "
-                        f"{address[0]}:{address[1]}"
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "light intensity",
+                        message[SET_LIGHT_INTENSITY_MESSAGE_KEY],
+                        LIGHT_INTENSITY_CODES,
+                        "light_intensity_code",
                     )
-                    if intensity not in LIGHT_INTENSITY_CODES:
-                        print(f"Invalid intensity '{intensity}'")
-                        connection.send(b"ERROR: Invalid intensity")
-                    else:
-                        print(
-                            f"Light intensity set to {LIGHT_INTENSITY_CODES[intensity]} "
-                            f"({intensity})"
-                        )
-                        self.light_intensity_code = intensity
-                        connection.send(self.get_state_data().encode("utf8"))
                 elif SET_LIGHT_TIMER_DURATION_MESSAGE_KEY in message:
-                    duration = message[SET_LIGHT_TIMER_DURATION_MESSAGE_KEY]
-                    print(
-                        f"Handle set light timer duration request to '{duration}' from "
-                        f"{address[0]}:{address[1]}"
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "light timer duration",
+                        message[SET_LIGHT_TIMER_DURATION_MESSAGE_KEY],
+                        DURATION_CODES,
+                        "light_timer_duration_code",
                     )
-                    if duration not in DURATION_CODES:
-                        print(f"Invalid duration '{duration}'")
-                        connection.send(b"ERROR: Invalid duration")
-                    else:
-                        print(
-                            f"Light timer duration set to {DURATION_CODES[duration]} ({duration})"
-                        )
-                        self.light_timer_duration_code = duration
-                        connection.send(self.get_state_data().encode("utf8"))
                 else:
                     print(
                         f"Handle unknown JSON request from {address[0]}:{address[1]}: '{message}'"

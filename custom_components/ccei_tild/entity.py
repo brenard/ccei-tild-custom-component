@@ -1,18 +1,21 @@
 """TildEntity class"""
+import logging
+
 from homeassistant.components.light import LightEntity
 from homeassistant.components.select import SelectEntity
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import callback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, LAST_REFRESH, MANUFACTER, NAME, SENSORS_DATA
+from .const import CLIENT, DOMAIN, LAST_REFRESH, MANUFACTER, NAME, OFF, ON, SENSORS_DATA
+
+LOGGER = logging.getLogger(__name__)
 
 
 class TildEntity(CoordinatorEntity):
     """Representation of a CCEI Tild entity."""
 
     _attr_id_key = None
-    _attr_friendly_name = None
     _sensor_data_extra_keys = {}
 
     def __init__(self, coordinator, config_entry, hass):
@@ -67,36 +70,58 @@ class TildSensorEntity(TildEntity):
         return self.sensor_data
 
 
-class TildLightEntity(TildEntity, LightEntity):
+class TildToggleableEntity(TildEntity):
     """
-    Representation of a CCEI Tild light entity.
+    Representation of a CCEI Tild toggleable entity.
     Based on https://developers.home-assistant.io/docs/integration_fetching_data
     #coordinated-single-api-poll-for-data-for-all-entities
     """
 
+    _client_toggle_method = None
+
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         # pylint: disable=attribute-defined-outside-init
-        self._attr_is_on = bool(self.sensor_data)
+        self._attr_is_on = {ON: True, OFF: False}.get(self.sensor_data)
         self.async_write_ha_state()
 
+    async def async_turn_on(self, **kwargs):
+        """Turn the toggleable on."""
+        if self._client_toggle_method is None:
+            raise NotImplementedError()
+        return await getattr(self.hass.data[DOMAIN][CLIENT], self._client_toggle_method)(ON)
 
-class TildSwitchEntity(TildEntity, SwitchEntity):
+    async def async_turn_off(self, **kwargs):
+        """Turn the toggleable on."""
+        if self._client_toggle_method is None:
+            raise NotImplementedError()
+        return await getattr(self.hass.data[DOMAIN][CLIENT], self._client_toggle_method)(OFF)
+
+
+class TildLightEntity(TildToggleableEntity, LightEntity):
+    """Representation of a CCEI Tild light entity."""
+
+
+class TildSwitchEntity(TildToggleableEntity, SwitchEntity):
     """Representation of a CCEI Tild switch entity."""
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        # pylint: disable=attribute-defined-outside-init
-        self._attr_is_on = bool(self.sensor_data)
-        self.async_write_ha_state()
 
 
 class TildSelectEntity(TildEntity, SelectEntity):
     """Representation of a CCEI Tild select entity."""
 
+    _client_set_method = None
+    _sensor_data_type = None
+
     @property
     def current_option(self):
         """Return current select option"""
         return str(self.sensor_data) if self.sensor_data is not None else None
+
+    async def async_select_option(self, option: str) -> None:
+        """Change the selected option."""
+        if self._client_set_method is None:
+            raise NotImplementedError()
+        if self._sensor_data_type is not None:
+            option = self._sensor_data_type(option)
+        return await getattr(self.hass.data[DOMAIN][CLIENT], self._client_set_method)(option)

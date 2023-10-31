@@ -1,5 +1,5 @@
 """Sensor platform"""
-from .const import CLIENT, COORDINATOR, DOMAIN, LIGHT_ENABLED, LIGHT_STATUS_CODE, OFF, ON
+from .const import COORDINATOR, DOMAIN, LIGHT_ENABLED, LIGHT_STATUS_CODE
 from .entity import TildLightEntity
 
 
@@ -24,12 +24,4 @@ class TildLight(TildLightEntity):
         "raw_status_code": LIGHT_STATUS_CODE,
     }
 
-    async def async_turn_on(self, **kwargs):
-        """Turn the light on."""
-        success = await self.hass.data[DOMAIN][CLIENT].toggle_light(ON)
-        return success
-
-    async def async_turn_off(self, **kwargs):
-        """Turn the light on."""
-        success = await self.hass.data[DOMAIN][CLIENT].toggle_light(OFF)
-        return success
+    _client_toggle_method = "toggle_light"

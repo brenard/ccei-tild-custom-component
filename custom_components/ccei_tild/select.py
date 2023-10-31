@@ -2,7 +2,6 @@
 from homeassistant.const import PERCENTAGE, TEMP_CELSIUS
 
 from .const import (
-    CLIENT,
     COORDINATOR,
     DOMAIN,
     DURATION_CODES,
@@ -41,15 +40,14 @@ class TildLightIntensitySelect(TildSelectEntity):
     _attr_icon = "mdi:brightness-percent"
 
     _sensor_data_key = LIGHT_INTENSITY
+    _sensor_data_type = int
     _sensor_data_extra_keys = {
         "raw_intensity_code": LIGHT_INTENSITY_CODE,
     }
 
     _attr_options = [str(intensity) for intensity in LIGHT_INTENSITY_CODES.values()]
 
-    async def async_select_option(self, option: str) -> None:
-        """Change the selected option."""
-        await self.hass.data[DOMAIN][CLIENT].set_light_intensity(int(option))
+    _client_set_method = "set_light_intensity"
 
 
 class TildLightColorSelect(TildSelectEntity):
@@ -65,9 +63,7 @@ class TildLightColorSelect(TildSelectEntity):
 
     _attr_options = list(LIGHT_COLORS_CODES.values())
 
-    async def async_select_option(self, option: str) -> None:
-        """Change the selected option."""
-        await self.hass.data[DOMAIN][CLIENT].set_light_color(option)
+    _client_set_method = "set_light_color"
 
 
 class TildLightTimerDurationSelect(TildSelectEntity):
@@ -83,9 +79,7 @@ class TildLightTimerDurationSelect(TildSelectEntity):
 
     _attr_options = list(DURATION_CODES.values())
 
-    async def async_select_option(self, option: str) -> None:
-        """Change the selected option."""
-        await self.hass.data[DOMAIN][CLIENT].set_light_timer_duration(option)
+    _client_set_method = "set_light_timer_duration"
 
 
 class TildWaterTemperatureOffsetSelect(TildSelectEntity):

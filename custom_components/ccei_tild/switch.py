@@ -1,11 +1,8 @@
 """Switch platform"""
 from .const import (
-    CLIENT,
     COORDINATOR,
     DOMAIN,
     FILTRATION_ENABLED,
-    OFF,
-    ON,
     THERMOREGULATED_FILTRATION_ENABLED,
     TREATMENT_ENABLED,
 )
@@ -42,15 +39,7 @@ class TildFiltrationSwitch(TildSwitchEntity):
 
     _sensor_data_key = FILTRATION_ENABLED
 
-    async def async_turn_on(self, **kwargs):
-        """Turn the filtration on."""
-        success = await self.hass.data[DOMAIN][CLIENT].toggle_filtration(ON)
-        return success
-
-    async def async_turn_off(self, **kwargs):
-        """Turn the filtration on."""
-        success = await self.hass.data[DOMAIN][CLIENT].toggle_filtration(OFF)
-        return success
+    _client_toggle_method = "toggle_filtration"
 
 
 class TildThermoregulatedFiltrationSwitch(TildSwitchEntity):
@@ -62,12 +51,4 @@ class TildThermoregulatedFiltrationSwitch(TildSwitchEntity):
 
     _sensor_data_key = THERMOREGULATED_FILTRATION_ENABLED
 
-    async def async_turn_on(self, **kwargs):
-        """Turn the filtration on."""
-        success = await self.hass.data[DOMAIN][CLIENT].toggle_thermoregulated_filtration(ON)
-        return success
-
-    async def async_turn_off(self, **kwargs):
-        """Turn the filtration on."""
-        success = await self.hass.data[DOMAIN][CLIENT].toggle_thermoregulated_filtration(OFF)
-        return success
+    _client_toggle_method = "toggle_thermoregulated_filtration"
