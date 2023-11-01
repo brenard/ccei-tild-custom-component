@@ -90,8 +90,11 @@ class TildWaterTemperatureOffsetSelect(TildSelectEntity):
     _attr_icon = "mdi:thermometer-water"
 
     _sensor_data_key = WATER_TEMPERATURE_OFFSET
+    _sensor_data_type = int
     _sensor_data_extra_keys = {
         "raw_offset_code": WATER_TEMPERATURE_OFFSET_CODE,
     }
 
     _attr_options = [str(offset) for offset in WATER_TEMPERATURE_OFFSET_CODES.values()]
+
+    _client_set_method = "set_water_temperature_offset"

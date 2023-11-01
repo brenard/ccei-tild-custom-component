@@ -407,6 +407,16 @@ class CceiTildClient:
             message_key=SET_LIGHT_TIMER_DURATION_MESSAGE_KEY,
         )
 
+    async def set_water_temperature_offset(self, offset):
+        """Set the water temperature offset"""
+        return await self._set_item_state(
+            label="water temperature offset",
+            sensor_key=WATER_TEMPERATURE_OFFSET_CODE,
+            state=offset,
+            codes=WATER_TEMPERATURE_OFFSET_CODES,
+            message_key=SET_WATER_TEMPERATURE_OFFSET_MESSAGE_KEY,
+        )
+
     async def _set_item_state(
         self, label, sensor_key, state, codes, message_key, sensor_key_is_state=False
     ):
@@ -481,6 +491,8 @@ class FakeTildBox:
         self.light_timer_duration_code = random.choice(list(DURATION_CODES.keys()))
         self.filtration_state = random.choice([ON, OFF])
         self.thermoregulated_filtration_state = random.choice([ON, OFF])
+        self.water_temperature = random.randrange(20, 30)
+        self.water_temperature_offset_code = random.choice(list(WATER_TEMPERATURE_OFFSET_CODES))
 
     def get_light_status_code(self):
         """Retrieve light status code according current state"""
@@ -506,13 +518,9 @@ class FakeTildBox:
 
     def get_state_data(self):
         """Generate state data string"""
-
+        # Water temperature evolution
+        self.water_temperature += random.choice([-1, 0, 1])
         now = datetime.now()
-
-        # temperature (base 16, eg. 17 mean 23°C)
-        temp = random.randrange(20, 30)
-        temp = hex(temp).replace("0x", "")
-        temp = f"0{temp}" if len(temp) == 1 else temp
 
         fields = {
             SYSTEM_DATE_YEAR: f"{now.year-2000:02}",
@@ -520,16 +528,14 @@ class FakeTildBox:
             SYSTEM_DATE_DAY: f"{now.day:02}",
             SYSTEM_DATE_HOUR: f"{now.hour:02}",
             SYSTEM_DATE_MINUTE: f"{now.minute:02}",
-            WATER_TEMPERATURE: temp,
+            WATER_TEMPERATURE: f"{self.water_temperature:02x}",
             LIGHT_STATUS_CODE: self.get_light_status_code(),
             LIGHT_COLOR_CODE: self.light_color_code,
             LIGHT_INTENSITY_CODE: str(self.light_intensity_code),
             LIGHT_TIMER_DURATION_CODE: self.light_timer_duration_code,
             FILTRATION_STATUS_CODE: self.get_filtration_status_code(),
             TREATMENT_STATUS_CODE: random.choice(list(TREATMENT_STATUS_CODES.keys())),
-            WATER_TEMPERATURE_OFFSET_CODE: random.choice(
-                list(WATER_TEMPERATURE_OFFSET_CODES.keys())
-            ),
+            WATER_TEMPERATURE_OFFSET_CODE: self.water_temperature_offset_code,
             FILTRATION_EXPECTED_DURATION: str(random.randrange(0, 8)),
         }
 
@@ -645,6 +651,15 @@ class FakeTildBox:
                         message[SET_LIGHT_TIMER_DURATION_MESSAGE_KEY],
                         DURATION_CODES,
                         "light_timer_duration_code",
+                    )
+                elif SET_WATER_TEMPERATURE_OFFSET_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "water temperature offset",
+                        message[SET_WATER_TEMPERATURE_OFFSET_MESSAGE_KEY],
+                        WATER_TEMPERATURE_OFFSET_CODES,
+                        "water_temperature_offset_code",
                     )
                 else:
                     print(
