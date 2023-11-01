@@ -1,8 +1,12 @@
 """TildEntity class"""
 import logging
 
+from homeassistant.components.light import ENTITY_ID_FORMAT as LIGHT_ENTITY_ID_FORMAT
 from homeassistant.components.light import LightEntity
+from homeassistant.components.select import ENTITY_ID_FORMAT as SELECT_ENTITY_ID_FORMAT
 from homeassistant.components.select import SelectEntity
+from homeassistant.components.sensor import ENTITY_ID_FORMAT as SENSOR_ENTITY_ID_FORMAT
+from homeassistant.components.switch import ENTITY_ID_FORMAT as SWITCH_ENTITY_ID_FORMAT
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import callback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -16,6 +20,7 @@ class TildEntity(CoordinatorEntity):
     """Representation of a CCEI Tild entity."""
 
     _attr_id_key = None
+    _entity_id_format = None
     _sensor_data_extra_keys = {}
 
     def __init__(self, coordinator, config_entry, hass):
@@ -30,6 +35,10 @@ class TildEntity(CoordinatorEntity):
             f"{self.config_entry.entry_id}_tild_"
             f"{self._attr_id_key if self._attr_id_key else self._sensor_data_key}"
         )
+        if self._entity_id_format:
+            self.entity_id = self._entity_id_format.format(
+                self._attr_id_key if self._attr_id_key else f"tild_{self._sensor_data_key}"
+            )
 
     @property
     def sensor_data(self):
@@ -63,6 +72,8 @@ class TildEntity(CoordinatorEntity):
 
 class TildSensorEntity(TildEntity):
     """Representation of a CCEI Tild sensor entity."""
+
+    _entity_id_format = SENSOR_ENTITY_ID_FORMAT
 
     @property
     def state(self):
@@ -102,13 +113,19 @@ class TildToggleableEntity(TildEntity):
 class TildLightEntity(TildToggleableEntity, LightEntity):
     """Representation of a CCEI Tild light entity."""
 
+    _entity_id_format = LIGHT_ENTITY_ID_FORMAT
+
 
 class TildSwitchEntity(TildToggleableEntity, SwitchEntity):
     """Representation of a CCEI Tild switch entity."""
 
+    _entity_id_format = SWITCH_ENTITY_ID_FORMAT
+
 
 class TildSelectEntity(TildEntity, SelectEntity):
     """Representation of a CCEI Tild select entity."""
+
+    _entity_id_format = SELECT_ENTITY_ID_FORMAT
 
     _client_set_method = None
     _sensor_data_type = None
