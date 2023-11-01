@@ -7,12 +7,54 @@ import socket
 from datetime import datetime
 
 from .const import (
+    AUX_PROG_FIRST_RANGE_END_HOUR_CODE,
+    AUX_PROG_FIRST_RANGE_START_HOUR_CODE,
+    AUX_PROG_FIRST_RANGE_STATUS_ENABLED,
+    AUX_PROG_SECOND_RANGE_END_HOUR_CODE,
+    AUX_PROG_SECOND_RANGE_START_HOUR_CODE,
+    AUX_PROG_SECOND_RANGE_STATUS_ENABLED,
+    AUX_PROG_STATUS_ENABLED,
+    AUX_PROG_THIRD_RANGE_END_HOUR_CODE,
+    AUX_PROG_THIRD_RANGE_START_HOUR_CODE,
+    AUX_PROG_THIRD_RANGE_STATUS_ENABLED,
+    AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
+    AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
+    AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_ENABLED,
+    AUX_PROG_WEEK_END_MODE_STATUS_ENABLED,
+    AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
+    AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
+    AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_ENABLED,
+    AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
+    AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
+    AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_ENABLED,
     COORDINATOR,
     DOMAIN,
     DURATION_CODES,
     FILTRATION_ENABLED,
     FILTRATION_EXPECTED_DURATION,
+    FILTRATION_PROG_FIRST_RANGE_END_HOUR_CODE,
+    FILTRATION_PROG_FIRST_RANGE_START_HOUR_CODE,
+    FILTRATION_PROG_FIRST_RANGE_STATUS_ENABLED,
+    FILTRATION_PROG_SECOND_RANGE_END_HOUR_CODE,
+    FILTRATION_PROG_SECOND_RANGE_START_HOUR_CODE,
+    FILTRATION_PROG_SECOND_RANGE_STATUS_ENABLED,
+    FILTRATION_PROG_STATUS_ENABLED,
+    FILTRATION_PROG_THERMOREGULATED_STATUS_ENABLED,
+    FILTRATION_PROG_THIRD_RANGE_END_HOUR_CODE,
+    FILTRATION_PROG_THIRD_RANGE_START_HOUR_CODE,
+    FILTRATION_PROG_THIRD_RANGE_STATUS_ENABLED,
+    FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
+    FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
+    FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_ENABLED,
+    FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
+    FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
+    FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_ENABLED,
+    FILTRATION_PROG_WEEK_END_STATUS_ENABLED,
+    FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
+    FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
+    FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_ENABLED,
     FILTRATION_STATUS_CODE,
+    HOUR_CODES,
     LIGHT_COLOR,
     LIGHT_COLOR_CODE,
     LIGHT_COLORS_CODES,
@@ -20,11 +62,22 @@ from .const import (
     LIGHT_INTENSITY,
     LIGHT_INTENSITY_CODE,
     LIGHT_INTENSITY_CODES,
+    LIGHT_PROG_DURATION_CODE,
+    LIGHT_PROG_MODE_DUSK_ENABLED,
+    LIGHT_PROG_START_HOUR_CODE,
+    LIGHT_PROG_STATUS_CODE,
+    LIGHT_PROG_STATUS_CODES,
+    LIGHT_PROG_WEEK_END_DURATION_CODE,
+    LIGHT_PROG_WEEK_END_MODE_ENABLED,
+    LIGHT_PROG_WEEK_END_START_HOUR_CODE,
+    LIGHT_SEQUENCE_SPEED_CODE,
+    LIGHT_SEQUENCE_SPEED_CODES,
     LIGHT_STATUS_CODE,
     LIGHT_TIMER_DURATION,
     LIGHT_TIMER_DURATION_CODE,
     OFF,
     ON,
+    PROG_RANGE_DURATION_WITH_OFF_CODES,
     RAW_DATA,
     SYSTEM_DATE,
     SYSTEM_DATE_DAY,
@@ -417,6 +470,477 @@ class CceiTildClient:
             message_key=SET_WATER_TEMPERATURE_OFFSET_MESSAGE_KEY,
         )
 
+    async def set_light_prog_status(self, state):
+        """Set the light programming status"""
+        return await self._set_item_state(
+            label="light programming status",
+            sensor_key=LIGHT_PROG_STATUS_CODE,
+            state=state,
+            codes=LIGHT_PROG_STATUS_CODES,
+            message_key=SET_LIGHT_PROG_STATUS_MESSAGE_KEY,
+        )
+
+    async def toggle_light_prog_mode_dusk(self, state=None):
+        """Turn on/off the Tild light programming mode dusk"""
+        return await self._toggle_item_state(
+            label="light programming mode dusk",
+            sensor_key=LIGHT_PROG_MODE_DUSK_ENABLED,
+            message_key=SET_LIGHT_PROG_MODE_DUSK_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def toggle_light_prog_week_end_mode(self, state=None):
+        """Turn on/off the Tild light programming mode week-end"""
+        return await self._toggle_item_state(
+            label="light programming mode week-end",
+            sensor_key=LIGHT_PROG_WEEK_END_MODE_ENABLED,
+            message_key=SET_LIGHT_PROG_WEEK_END_MODE_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_light_prog_start_hour(self, state):
+        """Set the light programming start hour"""
+        return await self._set_item_state(
+            label="light programming start hour",
+            sensor_key=LIGHT_PROG_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_LIGHT_PROG_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_light_prog_duration(self, state):
+        """Set the light programming duration"""
+        return await self._set_item_state(
+            label="light programming duration",
+            sensor_key=LIGHT_PROG_DURATION_CODE,
+            state=state,
+            codes=PROG_RANGE_DURATION_WITH_OFF_CODES,
+            message_key=SET_LIGHT_PROG_DURATION_MESSAGE_KEY,
+        )
+
+    async def set_light_prog_week_end_start_hour(self, state):
+        """Set the light programming week-end start hour"""
+        return await self._set_item_state(
+            label="light programming week-end start hour",
+            sensor_key=LIGHT_PROG_WEEK_END_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_LIGHT_PROG_WEEK_END_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_light_prog_week_end_duration(self, state):
+        """Set the light programming week-end duration"""
+        return await self._set_item_state(
+            label="light programming week-end duration",
+            sensor_key=LIGHT_PROG_WEEK_END_DURATION_CODE,
+            state=state,
+            codes=PROG_RANGE_DURATION_WITH_OFF_CODES,
+            message_key=SET_LIGHT_PROG_WEEK_END_DURATION_MESSAGE_KEY,
+        )
+
+    async def set_light_sequence_speed(self, state):
+        """Set the light sequence speed"""
+        return await self._set_item_state(
+            label="light sequence speed",
+            sensor_key=LIGHT_SEQUENCE_SPEED_CODE,
+            state=state,
+            codes=LIGHT_SEQUENCE_SPEED_CODES,
+            message_key=SET_LIGHT_SEQUENCE_SPEED_MESSAGE_KEY,
+        )
+
+    async def toggle_filtration_prog_status(self, state=None):
+        """Turn on/off the Tild filtration programming"""
+        return await self._toggle_item_state(
+            label="filtration programming",
+            sensor_key=FILTRATION_PROG_STATUS_ENABLED,
+            message_key=SET_FILTRATION_PROG_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def toggle_filtration_prog_thermoregulated_status(self, state=None):
+        """Turn on/off the Tild filtration programming thermoregulated"""
+        return await self._toggle_item_state(
+            label="filtration programming thermoregulated",
+            sensor_key=FILTRATION_PROG_THERMOREGULATED_STATUS_ENABLED,
+            message_key=SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def toggle_filtration_prog_week_end_status(self, state=None):
+        """Turn on/off the Tild filtration programming mode week-end"""
+        return await self._toggle_item_state(
+            label="filtration programming mode week-end",
+            sensor_key=FILTRATION_PROG_WEEK_END_STATUS_ENABLED,
+            message_key=SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def toggle_filtration_prog_first_range_status(self, state=None):
+        """Turn on/off the Tild filtration programming first range"""
+        return await self._toggle_item_state(
+            label="filtration programming first range",
+            sensor_key=FILTRATION_PROG_FIRST_RANGE_STATUS_ENABLED,
+            message_key=SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_filtration_prog_first_range_start_hour(self, state):
+        """Set the filtration programming first range start hour"""
+        return await self._set_item_state(
+            label="filtration programming first range start hour",
+            sensor_key=FILTRATION_PROG_FIRST_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_FIRST_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_filtration_prog_first_range_end_hour(self, state):
+        """Set the filtration programming first range end hour"""
+        return await self._set_item_state(
+            label="filtration programming first range end hour",
+            sensor_key=FILTRATION_PROG_FIRST_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_FIRST_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_filtration_prog_second_range_status(self, state=None):
+        """Turn on/off the Tild filtration programming second range"""
+        return await self._toggle_item_state(
+            label="filtration programming second range",
+            sensor_key=FILTRATION_PROG_SECOND_RANGE_STATUS_ENABLED,
+            message_key=SET_FILTRATION_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_filtration_prog_second_range_start_hour(self, state):
+        """Set the filtration programming second range start hour"""
+        return await self._set_item_state(
+            label="filtration programming second range start hour",
+            sensor_key=FILTRATION_PROG_SECOND_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_SECOND_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_filtration_prog_second_range_end_hour(self, state):
+        """Set the filtration programming second range end hour"""
+        return await self._set_item_state(
+            label="filtration programming second range end hour",
+            sensor_key=FILTRATION_PROG_SECOND_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_SECOND_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_filtration_prog_third_range_status(self, state=None):
+        """Turn on/off the Tild filtration programming third range"""
+        return await self._toggle_item_state(
+            label="filtration programming third range",
+            sensor_key=FILTRATION_PROG_THIRD_RANGE_STATUS_ENABLED,
+            message_key=SET_FILTRATION_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_filtration_prog_third_range_start_hour(self, state):
+        """Set the filtration programming third range start hour"""
+        return await self._set_item_state(
+            label="filtration programming third range start hour",
+            sensor_key=FILTRATION_PROG_THIRD_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_THIRD_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_filtration_prog_third_range_end_hour(self, state):
+        """Set the filtration programming third range end hour"""
+        return await self._set_item_state(
+            label="filtration programming third range end hour",
+            sensor_key=FILTRATION_PROG_THIRD_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_THIRD_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_filtration_prog_week_end_first_range_status(self, state=None):
+        """Turn on/off the Tild filtration programming week-end first range"""
+        return await self._toggle_item_state(
+            label="filtration programming week-end first range",
+            sensor_key=FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_ENABLED,
+            message_key=SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_filtration_prog_week_end_first_range_start_hour(self, state):
+        """Set the filtration programming week-end first range start hour"""
+        return await self._set_item_state(
+            label="filtration programming week-end first range start hour",
+            sensor_key=FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_filtration_prog_week_end_first_range_end_hour(self, state):
+        """Set the filtration programming week-end first range end hour"""
+        return await self._set_item_state(
+            label="filtration programming week-end first range end hour",
+            sensor_key=FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_filtration_prog_week_end_second_range_status(self, state=None):
+        """Turn on/off the Tild filtration programming week-end second range"""
+        return await self._toggle_item_state(
+            label="filtration programming week-end second range",
+            sensor_key=FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_ENABLED,
+            message_key=SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_filtration_prog_week_end_second_range_start_hour(self, state):
+        """Set the filtration programming week-end second range start hour"""
+        return await self._set_item_state(
+            label="filtration programming week-end second range start hour",
+            sensor_key=FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_filtration_prog_week_end_second_range_end_hour(self, state):
+        """Set the filtration programming week-end second range end hour"""
+        return await self._set_item_state(
+            label="filtration programming week-end second range end hour",
+            sensor_key=FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_filtration_prog_week_end_third_range_status(self, state=None):
+        """Turn on/off the Tild filtration programming week-end third range"""
+        return await self._toggle_item_state(
+            label="filtration programming week-end third range",
+            sensor_key=FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_ENABLED,
+            message_key=SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_filtration_prog_week_end_third_range_start_hour(self, state):
+        """Set the filtration programming week-end third range start hour"""
+        return await self._set_item_state(
+            label="filtration programming week-end third range start hour",
+            sensor_key=FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_filtration_prog_week_end_third_range_end_hour(self, state):
+        """Set the filtration programming week-end third range end hour"""
+        return await self._set_item_state(
+            label="filtration programming week-end third range end hour",
+            sensor_key=FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_aux_prog_status(self, state=None):
+        """Turn on/off the Tild auxiliary programming"""
+        return await self._toggle_item_state(
+            label="auxiliary programming",
+            sensor_key=AUX_PROG_STATUS_ENABLED,
+            message_key=SET_AUX_PROG_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def toggle_aux_prog_week_end_mode_status(self, state=None):
+        """Turn on/off the Tild auxiliary programming week-end mode"""
+        return await self._toggle_item_state(
+            label="auxiliary programming week-end mode",
+            sensor_key=AUX_PROG_WEEK_END_MODE_STATUS_ENABLED,
+            message_key=SET_AUX_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def toggle_aux_prog_first_range_status(self, state=None):
+        """Turn on/off the Tild auxiliary programming first range"""
+        return await self._toggle_item_state(
+            label="auxiliary programming first range",
+            sensor_key=AUX_PROG_FIRST_RANGE_STATUS_ENABLED,
+            message_key=SET_AUX_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_aux_prog_first_range_start_hour(self, state):
+        """Set the auxiliary programming first range start hour"""
+        return await self._set_item_state(
+            label="auxiliary programming first range start hour",
+            sensor_key=AUX_PROG_FIRST_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_FIRST_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_aux_prog_first_range_end_hour(self, state):
+        """Set the auxiliary programming first range end hour"""
+        return await self._set_item_state(
+            label="auxiliary programming first range end hour",
+            sensor_key=AUX_PROG_FIRST_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_FIRST_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_aux_prog_second_range_status(self, state=None):
+        """Turn on/off the Tild auxiliary programming second range"""
+        return await self._toggle_item_state(
+            label="auxiliary programming second range",
+            sensor_key=AUX_PROG_SECOND_RANGE_STATUS_ENABLED,
+            message_key=SET_AUX_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_aux_prog_second_range_start_hour(self, state):
+        """Set the auxiliary programming second range start hour"""
+        return await self._set_item_state(
+            label="auxiliary programming second range start hour",
+            sensor_key=AUX_PROG_SECOND_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_SECOND_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_aux_prog_second_range_end_hour(self, state):
+        """Set the auxiliary programming second range end hour"""
+        return await self._set_item_state(
+            label="auxiliary programming second range end hour",
+            sensor_key=AUX_PROG_SECOND_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_SECOND_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_aux_prog_third_range_status(self, state=None):
+        """Turn on/off the Tild auxiliary programming third range"""
+        return await self._toggle_item_state(
+            label="auxiliary programming third range",
+            sensor_key=AUX_PROG_THIRD_RANGE_STATUS_ENABLED,
+            message_key=SET_AUX_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_aux_prog_third_range_start_hour(self, state):
+        """Set the auxiliary programming third range start hour"""
+        return await self._set_item_state(
+            label="auxiliary programming third range start hour",
+            sensor_key=AUX_PROG_THIRD_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_THIRD_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_aux_prog_third_range_end_hour(self, state):
+        """Set the auxiliary programming third range end hour"""
+        return await self._set_item_state(
+            label="auxiliary programming third range end hour",
+            sensor_key=AUX_PROG_THIRD_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_THIRD_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_aux_prog_week_end_first_range_status(self, state=None):
+        """Turn on/off the Tild auxiliary programming week-end first range"""
+        return await self._toggle_item_state(
+            label="auxiliary programming week-end first range",
+            sensor_key=AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_ENABLED,
+            message_key=SET_AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_aux_prog_week_end_first_range_start_hour(self, state):
+        """Set the auxiliary programming week-end first range start hour"""
+        return await self._set_item_state(
+            label="auxiliary programming week-end first range start hour",
+            sensor_key=AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_aux_prog_week_end_first_range_end_hour(self, state):
+        """Set the auxiliary programming week-end first range end hour"""
+        return await self._set_item_state(
+            label="auxiliary programming week-end first range end hour",
+            sensor_key=AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_aux_prog_week_end_second_range_status(self, state=None):
+        """Turn on/off the Tild auxiliary programming week-end second range"""
+        return await self._toggle_item_state(
+            label="auxiliary programming week-end second range",
+            sensor_key=AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_ENABLED,
+            message_key=SET_AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_aux_prog_week_end_second_range_start_hour(self, state):
+        """Set the auxiliary programming week-end second range start hour"""
+        return await self._set_item_state(
+            label="auxiliary programming week-end second range start hour",
+            sensor_key=AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_aux_prog_week_end_second_range_end_hour(self, state):
+        """Set the auxiliary programming week-end second range end hour"""
+        return await self._set_item_state(
+            label="auxiliary programming week-end second range end hour",
+            sensor_key=AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
+    async def toggle_aux_prog_week_end_third_range_status(self, state=None):
+        """Turn on/off the Tild auxiliary programming week-end third range"""
+        return await self._toggle_item_state(
+            label="auxiliary programming week-end third range",
+            sensor_key=AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_ENABLED,
+            message_key=SET_AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY,
+            state=state,
+        )
+
+    async def set_aux_prog_week_end_third_range_start_hour(self, state):
+        """Set the auxiliary programming week-end third range start hour"""
+        return await self._set_item_state(
+            label="auxiliary programming week-end third range start hour",
+            sensor_key=AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_MESSAGE_KEY,
+        )
+
+    async def set_aux_prog_week_end_third_range_end_hour(self, state):
+        """Set the auxiliary programming week-end third range end hour"""
+        return await self._set_item_state(
+            label="auxiliary programming week-end third range end hour",
+            sensor_key=AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
+            state=state,
+            codes=HOUR_CODES,
+            message_key=SET_AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_MESSAGE_KEY,
+        )
+
     async def _set_item_state(
         self, label, sensor_key, state, codes, message_key, sensor_key_is_state=False
     ):
@@ -493,6 +1017,57 @@ class FakeTildBox:
         self.thermoregulated_filtration_state = random.choice([ON, OFF])
         self.water_temperature = random.randrange(20, 30)
         self.water_temperature_offset_code = random.choice(list(WATER_TEMPERATURE_OFFSET_CODES))
+        self.light_prog_mode_dusk_state = random.choice([ON, OFF])
+        self.light_prog_week_end_mode_state = random.choice([ON, OFF])
+        self.filtration_prog_status_state = random.choice([ON, OFF])
+        self.filtration_prog_thermoregulated_status_state = random.choice([ON, OFF])
+        self.filtration_prog_week_end_status_state = random.choice([ON, OFF])
+        self.filtration_prog_first_range_status_state = random.choice([ON, OFF])
+        self.filtration_prog_second_range_status_state = random.choice([ON, OFF])
+        self.filtration_prog_third_range_status_state = random.choice([ON, OFF])
+        self.filtration_prog_week_end_first_range_status_state = random.choice([ON, OFF])
+        self.filtration_prog_week_end_second_range_status_state = random.choice([ON, OFF])
+        self.filtration_prog_week_end_third_range_status_state = random.choice([ON, OFF])
+        self.aux_prog_status_state = random.choice([ON, OFF])
+        self.aux_prog_week_end_mode_status_state = random.choice([ON, OFF])
+        self.aux_prog_first_range_status_state = random.choice([ON, OFF])
+        self.aux_prog_second_range_status_state = random.choice([ON, OFF])
+        self.aux_prog_third_range_status_state = random.choice([ON, OFF])
+        self.aux_prog_week_end_first_range_status_state = random.choice([ON, OFF])
+        self.aux_prog_week_end_second_range_status_state = random.choice([ON, OFF])
+        self.aux_prog_week_end_third_range_status_state = random.choice([ON, OFF])
+        self.light_prog_status_code = random.choice(list(LIGHT_PROG_STATUS_CODES))
+        self.light_prog_start_hour_code = random.choice(list(HOUR_CODES))
+        self.light_prog_duration_code = random.choice(list(PROG_RANGE_DURATION_WITH_OFF_CODES))
+        self.light_prog_week_end_start_hour_code = random.choice(list(HOUR_CODES))
+        self.light_prog_week_end_duration_code = random.choice(
+            list(PROG_RANGE_DURATION_WITH_OFF_CODES)
+        )
+        self.light_sequence_speed_code = random.choice(list(LIGHT_SEQUENCE_SPEED_CODES))
+        self.filtration_prog_first_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_first_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_second_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_second_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_third_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_third_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_week_end_first_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_week_end_first_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_week_end_second_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_week_end_second_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_week_end_third_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.filtration_prog_week_end_third_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_first_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_first_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_second_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_second_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_third_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_third_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_week_end_first_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_week_end_first_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_week_end_second_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_week_end_second_range_end_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_week_end_third_range_start_hour_code = random.choice(list(HOUR_CODES))
+        self.aux_prog_week_end_third_range_end_hour_code = random.choice(list(HOUR_CODES))
 
     def get_light_status_code(self):
         """Retrieve light status code according current state"""
@@ -625,6 +1200,158 @@ class FakeTildBox:
                         message[SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY],
                         "thermoregulated_filtration_state",
                     )
+                elif SET_LIGHT_PROG_MODE_DUSK_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "light programming mode dusk",
+                        message[SET_LIGHT_PROG_MODE_DUSK_MESSAGE_KEY],
+                        "light_prog_mode_dusk_state",
+                    )
+                elif SET_LIGHT_PROG_WEEK_END_MODE_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "light programming mode week-end",
+                        message[SET_LIGHT_PROG_WEEK_END_MODE_MESSAGE_KEY],
+                        "light_prog_week_end_mode_state",
+                    )
+                elif SET_FILTRATION_PROG_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "filtration programming",
+                        message[SET_FILTRATION_PROG_STATUS_MESSAGE_KEY],
+                        "filtration_prog_status_state",
+                    )
+                elif SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "filtration programming thermoregulated",
+                        message[SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY],
+                        "filtration_prog_thermoregulated_status_state",
+                    )
+                elif SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "filtration programming mode week-end",
+                        message[SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY],
+                        "filtration_prog_week_end_status_state",
+                    )
+                elif SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "filtration programming first range",
+                        message[SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY],
+                        "filtration_prog_first_range_status_state",
+                    )
+                elif SET_FILTRATION_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "filtration programming second range",
+                        message[SET_FILTRATION_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY],
+                        "filtration_prog_second_range_status_state",
+                    )
+                elif SET_FILTRATION_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "filtration programming third range",
+                        message[SET_FILTRATION_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY],
+                        "filtration_prog_third_range_status_state",
+                    )
+                elif SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "filtration programming week-end first range",
+                        message[SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY],
+                        "filtration_prog_week_end_first_range_status_state",
+                    )
+                elif SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "filtration programming week-end second range",
+                        message[SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY],
+                        "filtration_prog_week_end_second_range_status_state",
+                    )
+                elif SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "filtration programming week-end third range",
+                        message[SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY],
+                        "filtration_prog_week_end_third_range_status_state",
+                    )
+                elif SET_AUX_PROG_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "auxiliary programming",
+                        message[SET_AUX_PROG_STATUS_MESSAGE_KEY],
+                        "aux_prog_status_state",
+                    )
+                elif SET_AUX_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "auxiliary programming week-end mode",
+                        message[SET_AUX_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY],
+                        "aux_prog_week_end_mode_status_state",
+                    )
+                elif SET_AUX_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "auxiliary programming first range",
+                        message[SET_AUX_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY],
+                        "aux_prog_first_range_status_state",
+                    )
+                elif SET_AUX_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "auxiliary programming second range",
+                        message[SET_AUX_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY],
+                        "aux_prog_second_range_status_state",
+                    )
+                elif SET_AUX_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "auxiliary programming third range",
+                        message[SET_AUX_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY],
+                        "aux_prog_third_range_status_state",
+                    )
+                elif SET_AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "auxiliary programming week-end first range",
+                        message[SET_AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY],
+                        "aux_prog_week_end_first_range_status_state",
+                    )
+                elif SET_AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "auxiliary programming week-end second range",
+                        message[SET_AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY],
+                        "aux_prog_week_end_second_range_status_state",
+                    )
+                elif SET_AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
+                    self.handle_toogleable_request(
+                        connection,
+                        address,
+                        "auxiliary programming week-end third range",
+                        message[SET_AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY],
+                        "aux_prog_week_end_third_range_status_state",
+                    )
                 elif SET_LIGHT_COLOR_MESSAGE_KEY in message:
                     self.handle_set_item_request(
                         connection,
@@ -661,6 +1388,277 @@ class FakeTildBox:
                         WATER_TEMPERATURE_OFFSET_CODES,
                         "water_temperature_offset_code",
                     )
+                elif SET_LIGHT_PROG_STATUS_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "light programming status",
+                        message[SET_LIGHT_PROG_STATUS_MESSAGE_KEY],
+                        LIGHT_PROG_STATUS_CODES,
+                        "light_prog_status_code",
+                    )
+                elif SET_LIGHT_PROG_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "light programming start hour",
+                        message[SET_LIGHT_PROG_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "light_prog_start_hour_code",
+                    )
+                elif SET_LIGHT_PROG_DURATION_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "light programming duration",
+                        message[SET_LIGHT_PROG_DURATION_MESSAGE_KEY],
+                        PROG_RANGE_DURATION_WITH_OFF_CODES,
+                        "light_prog_duration_code",
+                    )
+                elif SET_LIGHT_PROG_WEEK_END_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "light programming week-end start hour",
+                        message[SET_LIGHT_PROG_WEEK_END_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "light_prog_week_end_start_hour_code",
+                    )
+                elif SET_LIGHT_PROG_WEEK_END_DURATION_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "light programming week-end duration",
+                        message[SET_LIGHT_PROG_WEEK_END_DURATION_MESSAGE_KEY],
+                        PROG_RANGE_DURATION_WITH_OFF_CODES,
+                        "light_prog_week_end_duration_code",
+                    )
+                elif SET_LIGHT_SEQUENCE_SPEED_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "light sequence speed",
+                        message[SET_LIGHT_SEQUENCE_SPEED_MESSAGE_KEY],
+                        LIGHT_SEQUENCE_SPEED_CODES,
+                        "light_sequence_speed_code",
+                    )
+                elif SET_FILTRATION_PROG_FIRST_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming first range start hour",
+                        message[SET_FILTRATION_PROG_FIRST_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_first_range_start_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_FIRST_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming first range end hour",
+                        message[SET_FILTRATION_PROG_FIRST_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_first_range_end_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_SECOND_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming second range start hour",
+                        message[SET_FILTRATION_PROG_SECOND_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_second_range_start_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_SECOND_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming second range end hour",
+                        message[SET_FILTRATION_PROG_SECOND_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_second_range_end_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_THIRD_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming third range start hour",
+                        message[SET_FILTRATION_PROG_THIRD_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_third_range_start_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_THIRD_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming third range end hour",
+                        message[SET_FILTRATION_PROG_THIRD_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_third_range_end_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming week-end first range start hour",
+                        message[SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_week_end_first_range_start_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming week-end first range end hour",
+                        message[SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_week_end_first_range_end_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming week-end second range start hour",
+                        message[SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_week_end_second_range_start_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming week-end second range end hour",
+                        message[SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_week_end_second_range_end_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming week-end third range start hour",
+                        message[SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_week_end_third_range_start_hour_code",
+                    )
+                elif SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "filtration programming week-end third range end hour",
+                        message[SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "filtration_prog_week_end_third_range_end_hour_code",
+                    )
+                elif SET_AUX_PROG_FIRST_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming first range start hour",
+                        message[SET_AUX_PROG_FIRST_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_first_range_start_hour_code",
+                    )
+                elif SET_AUX_PROG_FIRST_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming first range end hour",
+                        message[SET_AUX_PROG_FIRST_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_first_range_end_hour_code",
+                    )
+                elif SET_AUX_PROG_SECOND_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming second range start hour",
+                        message[SET_AUX_PROG_SECOND_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_second_range_start_hour_code",
+                    )
+                elif SET_AUX_PROG_SECOND_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming second range end hour",
+                        message[SET_AUX_PROG_SECOND_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_second_range_end_hour_code",
+                    )
+                elif SET_AUX_PROG_THIRD_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming third range start hour",
+                        message[SET_AUX_PROG_THIRD_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_third_range_start_hour_code",
+                    )
+                elif SET_AUX_PROG_THIRD_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming third range end hour",
+                        message[SET_AUX_PROG_THIRD_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_third_range_end_hour_code",
+                    )
+                elif SET_AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming week-end first range start hour",
+                        message[SET_AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_week_end_first_range_start_hour_code",
+                    )
+                elif SET_AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming week-end first range end hour",
+                        message[SET_AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_week_end_first_range_end_hour_code",
+                    )
+                elif SET_AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming week-end second range start hour",
+                        message[SET_AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_week_end_second_range_start_hour_code",
+                    )
+                elif SET_AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming week-end second range end hour",
+                        message[SET_AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_week_end_second_range_end_hour_code",
+                    )
+                elif SET_AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming week-end third range start hour",
+                        message[SET_AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_week_end_third_range_start_hour_code",
+                    )
+                elif SET_AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_MESSAGE_KEY in message:
+                    self.handle_set_item_request(
+                        connection,
+                        address,
+                        "auxiliary programming week-end third range end hour",
+                        message[SET_AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_MESSAGE_KEY],
+                        HOUR_CODES,
+                        "aux_prog_week_end_third_range_end_hour_code",
+                    )
+
                 else:
                     print(
                         f"Handle unknown JSON request from {address[0]}:{address[1]}: '{message}'"
