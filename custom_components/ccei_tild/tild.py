@@ -191,6 +191,7 @@ def parse_sensors_data(data, system_host=None):
     """Parse sensors state data"""
     # Limit to last 160 characters to handle case when multiple state data strings are sent by the
     # Tild after requesting action
+    LOGGER.debug("Raw data received: %s", data)
     data = data[-160:] if len(data) > 160 else data
 
     state = {RAW_DATA: data, SYSTEM_HOST: system_host}
