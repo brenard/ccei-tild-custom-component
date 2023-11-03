@@ -99,7 +99,7 @@ from .const import (
 
 LOGGER = logging.getLogger(__name__)
 
-LIGHT_STATUS_CODES = {"C": ON, "8": OFF}
+LIGHT_STATUS_CODES = {"4": ON, "0": OFF}
 FILTRATION_STATUS_CODES = {"2": ON, "0": OFF}
 TREATMENT_STATUS_CODES = {"7": ON, "3": OFF}
 
