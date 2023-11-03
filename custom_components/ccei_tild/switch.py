@@ -11,6 +11,7 @@ from .const import (
     COORDINATOR,
     DOMAIN,
     FILTRATION_ENABLED,
+    FILTRATION_ENABLED_BY_LIGHT,
     FILTRATION_PROG_FIRST_RANGE_STATUS_ENABLED,
     FILTRATION_PROG_SECOND_RANGE_STATUS_ENABLED,
     FILTRATION_PROG_STATUS_ENABLED,
@@ -20,6 +21,7 @@ from .const import (
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_ENABLED,
     FILTRATION_PROG_WEEK_END_STATUS_ENABLED,
     FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_ENABLED,
+    FILTRATION_STATUS_CODE,
     LIGHT_PROG_MODE_DUSK_ENABLED,
     LIGHT_PROG_WEEK_END_MODE_ENABLED,
     THERMOREGULATED_FILTRATION_ENABLED,
@@ -76,6 +78,10 @@ class TildFiltrationSwitch(TildSwitchEntity):
     _attr_icon = "mdi:filter-cog-outline"
 
     _sensor_data_key = FILTRATION_ENABLED
+    _sensor_data_extra_keys = {
+        "raw_status_code": FILTRATION_STATUS_CODE,
+        "enabled_by_light": FILTRATION_ENABLED_BY_LIGHT,
+    }
 
     _client_toggle_method = "toggle_filtration"
 
