@@ -383,7 +383,7 @@ class CceiTildClient:
     async def _get_sensors_data(self):
         """Retrieve sensors state data"""
         LOGGER.debug("Call Tild for sensors data")
-        data = await self._call_tild("Begin")
+        data = await self._call_tild(GET_SENSORS_DATA_MESSAGE)
         if not data:
             LOGGER.debug("No data received from Tild for sensors data")
             return False
@@ -953,11 +953,9 @@ class CceiTildClient:
             assert state in codes.values(), f"Invalid {label} '{state}'"
             idx = list(codes.values()).index(state)
             code = list(codes.keys())[idx]
-        data = await self._call_tild({message_key: code})
-        if not data:
-            LOGGER.debug("Fail to set %s to %s (%s)", label, state, code)
-            return False
-        sensors_data = parse_sensors_data(data)
+        await self._call_tild({message_key: code})
+        await asyncio.sleep(1)
+        sensors_data = await self.get_sensors_data()
         if not sensors_data:
             LOGGER.error(
                 "Fail to parse sensors data after setting %s to %s (%s)",
