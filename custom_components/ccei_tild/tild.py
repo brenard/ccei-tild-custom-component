@@ -224,7 +224,7 @@ def parse_sensors_data(data, system_host=None):
     state[FILTRATION_ENABLED_BY_LIGHT] = FILTRATION_STATUS_CODE == FILTRATION_ENABLED_BY_LIGHT_CODE
     state[FILTRATION_EXPECTED_DURATION] = int(state[FILTRATION_EXPECTED_DURATION])
     state[WATER_TEMPERATURE_OFFSET] = WATER_TEMPERATURE_OFFSET_CODES.get(
-        state[WATER_TEMPERATURE_OFFSET_CODE]
+        int(state[WATER_TEMPERATURE_OFFSET_CODE])
     )
     state[WATER_RAW_TEMPERATURE] = (
         state[WATER_TEMPERATURE] - state[WATER_TEMPERATURE_OFFSET]
@@ -1112,7 +1112,7 @@ class FakeTildBox:
             LIGHT_TIMER_DURATION_CODE: self.light_timer_duration_code,
             FILTRATION_STATUS_CODE: self.get_filtration_status_code(),
             TREATMENT_STATUS_CODE: random.choice(list(TREATMENT_STATUS_CODES.keys())),
-            WATER_TEMPERATURE_OFFSET_CODE: self.water_temperature_offset_code,
+            WATER_TEMPERATURE_OFFSET_CODE: str(self.water_temperature_offset_code),
             FILTRATION_EXPECTED_DURATION: str(random.randrange(0, 8)),
         }
 

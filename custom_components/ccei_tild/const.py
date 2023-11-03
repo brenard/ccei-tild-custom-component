@@ -232,13 +232,13 @@ LIGHT_INTENSITY_CODES = {
 }
 
 WATER_TEMPERATURE_OFFSET_CODES = {
-    "6": -3,
-    "5": -2,
-    "4": -1,
-    "0": 0,
-    "1": 1,
-    "2": 2,
-    "3": 3,
+    6: -3,
+    5: -2,
+    4: -1,
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
 }
 
 DURATION_CODES = {
