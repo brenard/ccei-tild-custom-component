@@ -25,7 +25,6 @@ from .const import (
     LIGHT_PROG_MODE_DUSK_ENABLED,
     LIGHT_PROG_WEEK_END_MODE_ENABLED,
     THERMOREGULATED_FILTRATION_ENABLED,
-    TREATMENT_ENABLED,
 )
 from .entity import TildSwitchEntity
 
@@ -34,7 +33,6 @@ async def async_setup_entry(hass, entry, async_add_devices):
     """Set up sensor platform."""
     coordinator = hass.data[DOMAIN][COORDINATOR]
     switchs = [
-        TildTreatmentSwitch(coordinator, entry, hass),
         TildFiltrationSwitch(coordinator, entry, hass),
         TildThermoregulatedFiltrationSwitch(coordinator, entry, hass),
         TildLightProgrammingModeDuskSwitch(coordinator, entry, hass),
@@ -58,16 +56,6 @@ async def async_setup_entry(hass, entry, async_add_devices):
         TildAuxiliaryProgrammingWeekEndThirdRangeSwitch(coordinator, entry, hass),
     ]
     async_add_devices(switchs)
-
-
-class TildTreatmentSwitch(TildSwitchEntity):
-    """Manage the treament"""
-
-    _attr_id_key = "tild_treatment"
-    _attr_name = "Treatment"
-    _attr_icon = "mdi:spray-bottle"
-
-    _sensor_data_key = TREATMENT_ENABLED
 
 
 class TildFiltrationSwitch(TildSwitchEntity):
