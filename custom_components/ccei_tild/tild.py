@@ -231,7 +231,7 @@ def parse_sensors_data(data, system_host=None):
     state[LIGHT_COLOR] = LIGHT_COLORS_CODES.get(int(state[LIGHT_COLOR_CODE], 16))
     state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
     state[THERMOREGULATED_FILTRATION_CODE] = state[THERMOREGULATED_FILTRATION_ENABLED] = None
-    state[LIGHT_TIMER_DURATION] = DURATION_CODES.get(state[LIGHT_TIMER_DURATION_CODE])
+    state[LIGHT_TIMER_DURATION] = DURATION_CODES.get(int(state[LIGHT_TIMER_DURATION_CODE], 16))
     return state
 
 
@@ -1106,7 +1106,7 @@ class FakeTildBox:
             LIGHT_STATUS_CODE: self.get_light_status_code(),
             LIGHT_COLOR_CODE: f"{self.light_color_code:02x}",
             LIGHT_INTENSITY_CODE: str(self.light_intensity_code),
-            LIGHT_TIMER_DURATION_CODE: self.light_timer_duration_code,
+            LIGHT_TIMER_DURATION_CODE: f"{self.light_timer_duration_code:02x}",
             FILTRATION_STATUS_CODE: self.get_filtration_status_code(),
             TREATMENT_STATUS_CODE: random.choice(list(TREATMENT_STATUS_CODES.keys())),
             WATER_TEMPERATURE_OFFSET_CODE: str(self.water_temperature_offset_code),

@@ -240,12 +240,10 @@ WATER_TEMPERATURE_OFFSET_CODES = {
     3: 3,
 }
 
-DURATION_CODES = {
-    f"{idx:02x}".upper(): f"{int(idx*15/60):02}:{idx*15%60:02}" for idx in range(1, 96)
-}
+DURATION_CODES = {idx: f"{int(idx*15/60):02}:{idx*15%60:02}" for idx in range(1, 96)}
 
-HOUR_CODES = {"00": "00:00"}
+HOUR_CODES = {0: "00:00"}
 HOUR_CODES.update(DURATION_CODES)
 
-PROG_RANGE_DURATION_WITH_OFF_CODES = {"FF": OFF}
+PROG_RANGE_DURATION_WITH_OFF_CODES = {255: OFF}
 PROG_RANGE_DURATION_WITH_OFF_CODES.update(DURATION_CODES)
