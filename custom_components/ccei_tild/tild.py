@@ -39,6 +39,8 @@ from .const import (
     FILTRATION_PROG_SECOND_RANGE_ENABLED,
     FILTRATION_PROG_SECOND_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_SECOND_RANGE_START_HOUR_CODE,
+    FILTRATION_PROG_STATUS_CODE,
+    FILTRATION_PROG_STATUS_CODES,
     FILTRATION_PROG_THERMOREGULATED_ENABLED,
     FILTRATION_PROG_THERMOREGULATED_STATUS_CODE,
     FILTRATION_PROG_THERMOREGULATED_STATUS_CODES,
@@ -114,7 +116,8 @@ IDENTIFIED_FIELDS = {
     WATER_TEMPERATURE: [66, 67],
     WATER_TEMPERATURE_OFFSET_CODE: [155],
     FILTRATION_STATUS_CODE: [33],
-    FILTRATION_PROG_THERMOREGULATED_STATUS_CODE: [32],
+    FILTRATION_PROG_STATUS_CODE: [32],
+    FILTRATION_PROG_THERMOREGULATED_STATUS_CODE: [69],
     LIGHT_TIMER_DURATION_CODE: [72, 73],
 }
 
@@ -227,6 +230,9 @@ def parse_sensors_data(data, system_host=None):
     )
     state[LIGHT_COLOR] = LIGHT_COLORS_CODES.get(int(state[LIGHT_COLOR_CODE], 16))
     state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
+    state[FILTRATION_PROG_ENABLED] = FILTRATION_PROG_STATUS_CODES.get(
+        state[FILTRATION_PROG_STATUS_CODE]
+    )
     state[
         FILTRATION_PROG_THERMOREGULATED_ENABLED
     ] = FILTRATION_PROG_THERMOREGULATED_STATUS_CODES.get(
@@ -1113,6 +1119,11 @@ class FakeTildBox:
             LIGHT_TIMER_DURATION_CODE: f"{self.light_timer_duration_code:02x}",
             FILTRATION_STATUS_CODE: self._get_toggleable_status_code(
                 self.filtration_state, FILTRATION_STATUS_CODES, "filtration"
+            ),
+            FILTRATION_PROG_STATUS_CODE: self._get_toggleable_status_code(
+                self.filtration_prog_state,
+                FILTRATION_PROG_STATUS_CODES,
+                "filtration programming",
             ),
             FILTRATION_PROG_THERMOREGULATED_STATUS_CODE: self._get_toggleable_status_code(
                 self.filtration_prog_thermoregulated_state,
