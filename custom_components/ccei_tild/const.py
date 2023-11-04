@@ -29,14 +29,7 @@ SYSTEM_DATE_MONTH = "system_date_month"
 SYSTEM_DATE_DAY = "system_date_day"
 SYSTEM_DATE_HOUR = "system_date_hour"
 SYSTEM_DATE_MINUTE = "system_date_minute"
-FILTRATION_STATUS_CODE = "filtration_status_code"
-FILTRATION_ENABLED_BY_LIGHT = "filtration_enabled_by_light"
-FILTRATION_PROG_THERMOREGULATED_STATUS_CODE = "filtration_prog_thermoregulated_code"
-FILTRATION_PROG_THERMOREGULATED_ENABLED = "filtration_prog_thermoregulated_enabled"
-FILTRATION_PROG_RANGES_STATUS_CODE = "filtration_prog_ranges_status_code"
-FILTRATION_PROG_RANGES_STATUS_BIN_CODE = "filtration_prog_ranges_status_bin_code"
 LIGHT_ENABLED = "light_enabled"
-LIGHT_STATUS_CODE = "light_status_code"
 LIGHT_COLOR_CODE = "light_color_code"
 LIGHT_COLOR = "light_color"
 LIGHT_INTENSITY_CODE = "light_intensity_code"
@@ -60,9 +53,7 @@ LIGHT_PROG_STATUS_CODES = {
     1: PROGRAMMING,
     2: TIMER,
 }
-LIGHT_PROG_MODE_DUSK_STATUS_CODE = "light_prog_mode_dusk_status_code"
-LIGHT_PROG_MODE_DUSK_ENABLED = "light_prog_mode_dusk_enabled"
-LIGHT_PROG_WEEK_END_MODE_STATUS_CODE = "light_prog_week_end_mode_status_code"
+LIGHT_PROG_DUSK_MODE_ENABLED = "light_prog_dusk_mode_enabled"
 LIGHT_PROG_WEEK_END_MODE_ENABLED = "light_prog_week_end_mode_enabled"
 LIGHT_PROG_START_HOUR_CODE = "light_prog_start_hour_code"
 LIGHT_PROG_START_HOUR = "light_prog_start_hour"
@@ -74,33 +65,25 @@ LIGHT_PROG_WEEK_END_DURATION_CODE = "light_prog_week_end_duration_code"
 LIGHT_PROG_WEEK_END_DURATION = "light_prog_week_end_duration"
 LIGHT_SEQUENCE_SPEED_CODE = "light_color_speed_code"
 LIGHT_SEQUENCE_SPEED = "light_color_speed"
-FILTRATION_PROG_STATUS_CODE = "filtration_prog_status_code"
+FILTRATION_ENSLAVED_BY_LIGHT_ENABLED = "filtration_enslaved_by_light_enabled"
 FILTRATION_PROG_ENABLED = "filtration_prog_enabled"
-FILTRATION_PROG_THERMOREGULATED_STATUS_CODE = "filtration_prog_thermoregulated_status_code"
 FILTRATION_PROG_THERMOREGULATED_ENABLED = "filtration_prog_thermoregulated_enabled"
-FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE = "filtration_prog_week_end_mode_status_code"
 FILTRATION_PROG_WEEK_END_MODE_ENABLED = "filtration_prog_week_end_mode_enabled"
-FILTRATION_PROG_FIRST_RANGE_STATUS_CODE = "filtration_prog_first_range_status_code"
 FILTRATION_PROG_FIRST_RANGE_ENABLED = "filtration_prog_first_range_enabled"
 FILTRATION_PROG_FIRST_RANGE_START_HOUR_CODE = "filtration_prog_first_range_start_hour_code"
 FILTRATION_PROG_FIRST_RANGE_START_HOUR = "filtration_prog_first_range_start_hour"
 FILTRATION_PROG_FIRST_RANGE_END_HOUR_CODE = "filtration_prog_first_range_end_hour_code"
 FILTRATION_PROG_FIRST_RANGE_END_HOUR = "filtration_prog_first_range_end_hour"
-FILTRATION_PROG_SECOND_RANGE_STATUS_CODE = "filtration_prog_second_range_status_code"
 FILTRATION_PROG_SECOND_RANGE_ENABLED = "filtration_prog_second_range_enabled"
 FILTRATION_PROG_SECOND_RANGE_START_HOUR_CODE = "filtration_prog_second_range_start_hour_code"
 FILTRATION_PROG_SECOND_RANGE_START_HOUR = "filtration_prog_second_range_start_hour"
 FILTRATION_PROG_SECOND_RANGE_END_HOUR_CODE = "filtration_prog_second_range_end_hour_code"
 FILTRATION_PROG_SECOND_RANGE_END_HOUR = "filtration_prog_second_range_end_hour"
-FILTRATION_PROG_THIRD_RANGE_STATUS_CODE = "filtration_prog_third_range_status_code"
 FILTRATION_PROG_THIRD_RANGE_ENABLED = "filtration_prog_third_range_enabled"
 FILTRATION_PROG_THIRD_RANGE_START_HOUR_CODE = "filtration_prog_third_range_start_hour_code"
 FILTRATION_PROG_THIRD_RANGE_START_HOUR = "filtration_prog_third_range_start_hour"
 FILTRATION_PROG_THIRD_RANGE_END_HOUR_CODE = "filtration_prog_third_range_end_hour_code"
 FILTRATION_PROG_THIRD_RANGE_END_HOUR = "filtration_prog_third_range_end_hour"
-FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_CODE = (
-    "filtration_prog_week_end_first_range_status_code"
-)
 FILTRATION_PROG_WEEK_END_FIRST_RANGE_ENABLED = "filtration_prog_week_end_first_range_enabled"
 FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE = (
     "filtration_prog_week_end_first_range_start_hour_code"
@@ -110,9 +93,6 @@ FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE = (
     "filtration_prog_week_end_first_range_end_hour_code"
 )
 FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR = "filtration_prog_week_end_first_range_end_hour"
-FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_CODE = (
-    "filtration_prog_week_end_second_range_status_code"
-)
 FILTRATION_PROG_WEEK_END_SECOND_RANGE_ENABLED = "filtration_prog_week_end_second_range_enabled"
 FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE = (
     "filtration_prog_week_end_second_range_start_hour_code"
@@ -124,9 +104,6 @@ FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE = (
     "filtration_prog_week_end_second_range_end_hour_code"
 )
 FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR = "filtration_prog_week_end_second_range_end_hour"
-FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_CODE = (
-    "filtration_prog_week_end_third_range_status_code"
-)
 FILTRATION_PROG_WEEK_END_THIRD_RANGE_ENABLED = "filtration_prog_week_end_third_range_enabled"
 FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE = (
     "filtration_prog_week_end_third_range_start_hour_code"
@@ -136,46 +113,39 @@ FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE = (
     "filtration_prog_week_end_third_range_end_hour_code"
 )
 FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR = "filtration_prog_week_end_third_range_end_hour"
-AUX_PROG_STATUS_CODE = "aux_prog_status_code"
 AUX_PROG_ENABLED = "aux_prog_enabled"
-AUX_PROG_WEEK_END_MODE_STATUS_CODE = "aux_prog_week_end_mode_status_code"
 AUX_PROG_WEEK_END_MODE_ENABLED = "aux_prog_week_end_mode_enabled"
-AUX_PROG_FIRST_RANGE_STATUS_CODE = "aux_prog_first_range_status_code"
 AUX_PROG_FIRST_RANGE_ENABLED = "aux_prog_first_range_enabled"
 AUX_PROG_FIRST_RANGE_START_HOUR_CODE = "aux_prog_first_range_start_hour_code"
 AUX_PROG_FIRST_RANGE_START_HOUR = "aux_prog_first_range_start_hour"
 AUX_PROG_FIRST_RANGE_END_HOUR_CODE = "aux_prog_first_range_end_hour_code"
 AUX_PROG_FIRST_RANGE_END_HOUR = "aux_prog_first_range_end_hour"
-AUX_PROG_SECOND_RANGE_STATUS_CODE = "aux_prog_second_range_status_code"
 AUX_PROG_SECOND_RANGE_ENABLED = "aux_prog_second_range_enabled"
 AUX_PROG_SECOND_RANGE_START_HOUR_CODE = "aux_prog_second_range_start_hour_code"
 AUX_PROG_SECOND_RANGE_START_HOUR = "aux_prog_second_range_start_hour"
 AUX_PROG_SECOND_RANGE_END_HOUR_CODE = "aux_prog_second_range_end_hour_code"
 AUX_PROG_SECOND_RANGE_END_HOUR = "aux_prog_second_range_end_hour"
-AUX_PROG_THIRD_RANGE_STATUS_CODE = "aux_prog_third_range_status_code"
 AUX_PROG_THIRD_RANGE_ENABLED = "aux_prog_third_range_enabled"
 AUX_PROG_THIRD_RANGE_START_HOUR_CODE = "aux_prog_third_range_start_hour_code"
 AUX_PROG_THIRD_RANGE_START_HOUR = "aux_prog_third_range_start_hour"
 AUX_PROG_THIRD_RANGE_END_HOUR_CODE = "aux_prog_third_range_end_hour_code"
 AUX_PROG_THIRD_RANGE_END_HOUR = "aux_prog_third_range_end_hour"
-AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_CODE = "aux_prog_week_end_first_range_status_code"
 AUX_PROG_WEEK_END_FIRST_RANGE_ENABLED = "aux_prog_week_end_first_range_enabled"
 AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE = "aux_prog_week_end_first_range_start_hour_code"
 AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR = "aux_prog_week_end_first_range_start_hour"
 AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE = "aux_prog_week_end_first_range_end_hour_code"
 AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR = "aux_prog_week_end_first_range_end_hour"
-AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_CODE = "aux_prog_week_end_second_range_status_code"
 AUX_PROG_WEEK_END_SECOND_RANGE_ENABLED = "aux_prog_week_end_second_range_enabled"
 AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE = "aux_prog_week_end_second_range_start_hour_code"
 AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR = "aux_prog_week_end_second_range_start_hour"
 AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE = "aux_prog_week_end_second_range_end_hour_code"
 AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR = "aux_prog_week_end_second_range_end_hour"
-AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_CODE = "aux_prog_week_end_third_range_status_code"
 AUX_PROG_WEEK_END_THIRD_RANGE_ENABLED = "aux_prog_week_end_third_range_enabled"
 AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE = "aux_prog_week_end_third_range_start_hour_code"
 AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR = "aux_prog_week_end_third_range_start_hour"
 AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE = "aux_prog_week_end_third_range_end_hour_code"
 AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR = "aux_prog_week_end_third_range_end_hour"
+TOGGLEABLES_BIN_BITS_CODE_FORMAT = "toggleable_bin_bit{}"
 
 ATTR_COLOR = "color"
 ATTR_INTENSITY = "intensity"
@@ -232,10 +202,6 @@ WATER_TEMPERATURE_OFFSET_CODES = {
     2: 2,
     3: 3,
 }
-
-FILTRATION_PROG_STATUS_CODES = {"0": OFF, "2": ON}
-FILTRATION_PROG_THERMOREGULATED_STATUS_CODES = {"A": OFF, "B": ON}
-FILTRATION_PROG_WEEK_END_MODE_STATUS_CODES = {"5": OFF, "4": ON}
 
 DURATION_CODES = {idx: f"{int(idx*15/60):02}:{idx*15%60:02}" for idx in range(1, 96)}
 

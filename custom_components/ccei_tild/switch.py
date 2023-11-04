@@ -11,7 +11,7 @@ from .const import (
     COORDINATOR,
     DOMAIN,
     FILTRATION_ENABLED,
-    FILTRATION_ENABLED_BY_LIGHT,
+    FILTRATION_ENSLAVED_BY_LIGHT_ENABLED,
     FILTRATION_PROG_ENABLED,
     FILTRATION_PROG_FIRST_RANGE_ENABLED,
     FILTRATION_PROG_SECOND_RANGE_ENABLED,
@@ -21,8 +21,7 @@ from .const import (
     FILTRATION_PROG_WEEK_END_MODE_ENABLED,
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_ENABLED,
     FILTRATION_PROG_WEEK_END_THIRD_RANGE_ENABLED,
-    FILTRATION_STATUS_CODE,
-    LIGHT_PROG_MODE_DUSK_ENABLED,
+    LIGHT_PROG_DUSK_MODE_ENABLED,
     LIGHT_PROG_WEEK_END_MODE_ENABLED,
 )
 from .entity import TildSwitchEntity
@@ -65,23 +64,22 @@ class TildFiltrationSwitch(TildSwitchEntity):
 
     _sensor_data_key = FILTRATION_ENABLED
     _sensor_data_extra_keys = {
-        "raw_status_code": FILTRATION_STATUS_CODE,
-        "enabled_by_light": FILTRATION_ENABLED_BY_LIGHT,
+        "enslaved_by_light": FILTRATION_ENSLAVED_BY_LIGHT_ENABLED,
     }
 
     _client_toggle_method = "toggle_filtration_status"
 
 
 class TildLightProgrammingDuskModeSwitch(TildSwitchEntity):
-    """Manage the light programming mode dusk"""
+    """Manage the light programming dusk mode"""
 
-    _attr_id_key = "tild_light_prog_mode_dusk_status"
-    _attr_name = "Light programming mode dusk"
+    _attr_id_key = "tild_light_prog_dusk_mode_status"
+    _attr_name = "Light programming dusk mode"
     _attr_icon = "mdi:lightbulb-night"
 
-    _sensor_data_key = LIGHT_PROG_MODE_DUSK_ENABLED
+    _sensor_data_key = LIGHT_PROG_DUSK_MODE_ENABLED
 
-    _client_toggle_method = "toggle_light_prog_mode_dusk_status"
+    _client_toggle_method = "toggle_light_prog_dusk_mode_status"
 
 
 class TildLightProgrammingWeekEndModeSwitch(TildSwitchEntity):

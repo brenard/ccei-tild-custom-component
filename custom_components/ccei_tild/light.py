@@ -1,5 +1,5 @@
 """Sensor platform"""
-from .const import COORDINATOR, DOMAIN, LIGHT_ENABLED, LIGHT_STATUS_CODE
+from .const import COORDINATOR, DOMAIN, LIGHT_ENABLED
 from .entity import TildLightEntity
 
 
@@ -20,8 +20,5 @@ class TildLight(TildLightEntity):
     _attr_icon = "mdi:light-flood-up"
 
     _sensor_data_key = LIGHT_ENABLED
-    _sensor_data_extra_keys = {
-        "raw_status_code": LIGHT_STATUS_CODE,
-    }
 
     _client_toggle_method = "toggle_light_status"

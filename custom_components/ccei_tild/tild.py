@@ -33,21 +33,15 @@ from .const import (
     DOMAIN,
     DURATION_CODES,
     FILTRATION_ENABLED,
-    FILTRATION_ENABLED_BY_LIGHT,
+    FILTRATION_ENSLAVED_BY_LIGHT_ENABLED,
     FILTRATION_PROG_ENABLED,
     FILTRATION_PROG_FIRST_RANGE_ENABLED,
     FILTRATION_PROG_FIRST_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_FIRST_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_RANGES_STATUS_BIN_CODE,
-    FILTRATION_PROG_RANGES_STATUS_CODE,
     FILTRATION_PROG_SECOND_RANGE_ENABLED,
     FILTRATION_PROG_SECOND_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_SECOND_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_STATUS_CODE,
-    FILTRATION_PROG_STATUS_CODES,
     FILTRATION_PROG_THERMOREGULATED_ENABLED,
-    FILTRATION_PROG_THERMOREGULATED_STATUS_CODE,
-    FILTRATION_PROG_THERMOREGULATED_STATUS_CODES,
     FILTRATION_PROG_THIRD_RANGE_ENABLED,
     FILTRATION_PROG_THIRD_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_THIRD_RANGE_START_HOUR_CODE,
@@ -55,15 +49,12 @@ from .const import (
     FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
     FILTRATION_PROG_WEEK_END_MODE_ENABLED,
-    FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE,
-    FILTRATION_PROG_WEEK_END_MODE_STATUS_CODES,
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_ENABLED,
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
     FILTRATION_PROG_WEEK_END_THIRD_RANGE_ENABLED,
     FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
-    FILTRATION_STATUS_CODE,
     HOUR_CODES,
     LIGHT_COLOR,
     LIGHT_COLOR_CODE,
@@ -74,7 +65,7 @@ from .const import (
     LIGHT_INTENSITY_CODES,
     LIGHT_INTENSITY_CODES_TO_SEND,
     LIGHT_PROG_DURATION_CODE,
-    LIGHT_PROG_MODE_DUSK_ENABLED,
+    LIGHT_PROG_DUSK_MODE_ENABLED,
     LIGHT_PROG_START_HOUR_CODE,
     LIGHT_PROG_STATUS_CODE,
     LIGHT_PROG_STATUS_CODES,
@@ -83,7 +74,6 @@ from .const import (
     LIGHT_PROG_WEEK_END_START_HOUR_CODE,
     LIGHT_SEQUENCE_SPEED_CODE,
     LIGHT_SEQUENCE_SPEED_CODES,
-    LIGHT_STATUS_CODE,
     LIGHT_TIMER_DURATION,
     LIGHT_TIMER_DURATION_CODE,
     OFF,
@@ -97,6 +87,7 @@ from .const import (
     SYSTEM_DATE_MONTH,
     SYSTEM_DATE_YEAR,
     SYSTEM_HOST,
+    TOGGLEABLES_BIN_BITS_CODE_FORMAT,
     WATER_RAW_TEMPERATURE,
     WATER_TEMPERATURE,
     WATER_TEMPERATURE_OFFSET,
@@ -106,27 +97,57 @@ from .const import (
 
 LOGGER = logging.getLogger(__name__)
 
-LIGHT_STATUS_CODES = {"4": ON, "0": OFF}
-FILTRATION_STATUS_CODES = {"1": ON, "0": OFF, "3": ON}  # 3 = enslave to light
-FILTRATION_ENABLED_BY_LIGHT_CODE = "3"
-
 IDENTIFIED_FIELDS = {
     SYSTEM_DATE_YEAR: [132, 133],
     SYSTEM_DATE_MONTH: [130, 131],
     SYSTEM_DATE_DAY: [128, 129],
     SYSTEM_DATE_HOUR: [124, 125],
     SYSTEM_DATE_MINUTE: [122, 123],
-    LIGHT_STATUS_CODE: [70],
     LIGHT_COLOR_CODE: [64, 65],
     LIGHT_INTENSITY_CODE: [71],
     WATER_TEMPERATURE: [66, 67],
     WATER_TEMPERATURE_OFFSET_CODE: [155],
-    FILTRATION_STATUS_CODE: [33],
-    FILTRATION_PROG_STATUS_CODE: [32],
-    FILTRATION_PROG_THERMOREGULATED_STATUS_CODE: [69],
-    FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE: [68],
-    FILTRATION_PROG_RANGES_STATUS_CODE: [119],
     LIGHT_TIMER_DURATION_CODE: [72, 73],
+}
+
+# Toggleable binary bits
+TOGGLEABLES_BIN_BITS = {
+    32: [
+        None,
+        None,
+        FILTRATION_PROG_ENABLED,
+        None,
+    ],
+    33: [
+        None,
+        None,
+        FILTRATION_ENSLAVED_BY_LIGHT_ENABLED,
+        FILTRATION_ENABLED,
+    ],
+    68: [
+        None,
+        FILTRATION_PROG_WEEK_END_MODE_ENABLED,
+        None,
+        None,
+    ],
+    69: [
+        LIGHT_PROG_WEEK_END_MODE_ENABLED,
+        AUX_PROG_ENABLED,
+        FILTRATION_PROG_THERMOREGULATED_ENABLED,
+        None,
+    ],
+    70: [
+        LIGHT_PROG_DUSK_MODE_ENABLED,
+        LIGHT_ENABLED,
+        None,
+        None,
+    ],
+    119: [
+        None,
+        FILTRATION_PROG_THIRD_RANGE_ENABLED,
+        FILTRATION_PROG_SECOND_RANGE_ENABLED,
+        FILTRATION_PROG_FIRST_RANGE_ENABLED,
+    ],
 }
 
 GET_SENSORS_DATA_MESSAGE = "Begin"
@@ -141,7 +162,7 @@ SET_LIGHT_SEQUENCE_SPEED_MESSAGE_KEY = "pspd"  # 0, 1 or 2
 
 SET_LIGHT_PROG_STATUS_MESSAGE_KEY = "mprj"  # 0 = off, 1 = prog or 2 = timer
 SET_LIGHT_TIMER_DURATION_MESSAGE_KEY = "pret"  # duration code or 255 = OFF
-SET_LIGHT_PROG_MODE_DUSK_MESSAGE_KEY = "aprj"  # 0 or 1
+SET_LIGHT_PROG_DUSK_MODE_MESSAGE_KEY = "aprj"  # 0 or 1
 SET_LIGHT_PROG_WEEK_END_MODE_MESSAGE_KEY = "mprw"  # 0 or 1
 SET_LIGHT_PROG_START_HOUR_MESSAGE_KEY = "prjs"  # hour code
 SET_LIGHT_PROG_DURATION_MESSAGE_KEY = "prjl"  # duration code or 255 = OFF
@@ -207,6 +228,24 @@ def parse_sensors_data(data, system_host=None):
     for key, fields in IDENTIFIED_FIELDS.items():
         state[key] = "".join(map(lambda x: data[x], fields))
 
+    for bit, fields in TOGGLEABLES_BIN_BITS.items():
+        bit_key = TOGGLEABLES_BIN_BITS_CODE_FORMAT.format(bit)
+        state[bit_key] = BitArray(hex=f"0x{data[bit]}").bin
+        LOGGER.debug("Toggleables bit %d = %s (%s)", bit, data[bit], state[bit_key])
+        for idx, field in enumerate(fields):
+            if not field:
+                LOGGER.debug("Toggleables bit %d / field %d: unknown", bit, idx)
+                continue
+            state[field] = ON if int(state[bit_key][idx]) else OFF
+            LOGGER.debug(
+                "Toggleables bit %d / field %d = %s: %s => %s",
+                bit,
+                idx,
+                field,
+                state[bit_key][idx],
+                state[field],
+            )
+
     state[SYSTEM_DATE] = datetime(
         year=int(state[SYSTEM_DATE_YEAR]) + 2000,
         month=int(state[SYSTEM_DATE_MONTH]),
@@ -225,9 +264,6 @@ def parse_sensors_data(data, system_host=None):
         del state[field]
 
     state[WATER_TEMPERATURE] = int(state[WATER_TEMPERATURE], 16)
-    state[LIGHT_ENABLED] = LIGHT_STATUS_CODES.get(state[LIGHT_STATUS_CODE])
-    state[FILTRATION_ENABLED] = FILTRATION_STATUS_CODES.get(state[FILTRATION_STATUS_CODE])
-    state[FILTRATION_ENABLED_BY_LIGHT] = FILTRATION_STATUS_CODE == FILTRATION_ENABLED_BY_LIGHT_CODE
     state[WATER_TEMPERATURE_OFFSET] = WATER_TEMPERATURE_OFFSET_CODES.get(
         int(state[WATER_TEMPERATURE_OFFSET_CODE])
     )
@@ -238,29 +274,6 @@ def parse_sensors_data(data, system_host=None):
     )
     state[LIGHT_COLOR] = LIGHT_COLORS_CODES.get(int(state[LIGHT_COLOR_CODE], 16))
     state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
-    state[FILTRATION_PROG_ENABLED] = FILTRATION_PROG_STATUS_CODES.get(
-        state[FILTRATION_PROG_STATUS_CODE]
-    )
-    state[
-        FILTRATION_PROG_THERMOREGULATED_ENABLED
-    ] = FILTRATION_PROG_THERMOREGULATED_STATUS_CODES.get(
-        state[FILTRATION_PROG_THERMOREGULATED_STATUS_CODE]
-    )
-    state[FILTRATION_PROG_WEEK_END_MODE_ENABLED] = FILTRATION_PROG_WEEK_END_MODE_STATUS_CODES.get(
-        state[FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE]
-    )
-    state[FILTRATION_PROG_RANGES_STATUS_BIN_CODE] = BitArray(
-        hex=f"0x{state[FILTRATION_PROG_RANGES_STATUS_CODE]}"
-    ).bin
-    state[FILTRATION_PROG_FIRST_RANGE_ENABLED] = (
-        ON if int(state[FILTRATION_PROG_RANGES_STATUS_BIN_CODE][-1]) else OFF
-    )
-    state[FILTRATION_PROG_SECOND_RANGE_ENABLED] = (
-        ON if int(state[FILTRATION_PROG_RANGES_STATUS_BIN_CODE][-2]) else OFF
-    )
-    state[FILTRATION_PROG_THIRD_RANGE_ENABLED] = (
-        ON if int(state[FILTRATION_PROG_RANGES_STATUS_BIN_CODE][-3]) else OFF
-    )
     state[LIGHT_TIMER_DURATION] = DURATION_CODES.get(int(state[LIGHT_TIMER_DURATION_CODE], 16))
     return state
 
@@ -503,12 +516,12 @@ class CceiTildClient:
             message_key=SET_LIGHT_PROG_STATUS_MESSAGE_KEY,
         )
 
-    async def toggle_light_prog_mode_dusk_status(self, state=None):
-        """Turn on/off the Tild light programming mode dusk"""
+    async def toggle_light_prog_dusk_mode_status(self, state=None):
+        """Turn on/off the Tild light programming dusk mode"""
         return await self._toggle_item_state(
-            label="light programming mode dusk",
-            sensor_key=LIGHT_PROG_MODE_DUSK_ENABLED,
-            message_key=SET_LIGHT_PROG_MODE_DUSK_MESSAGE_KEY,
+            label="light programming dusk mode",
+            sensor_key=LIGHT_PROG_DUSK_MODE_ENABLED,
+            message_key=SET_LIGHT_PROG_DUSK_MODE_MESSAGE_KEY,
             state=state,
         )
 
@@ -1036,39 +1049,64 @@ class FakeTildBox:
     port = 30302
     sock = None
 
+    toogleables_message_keys = {
+        SET_LIGHT_STATUS_MESSAGE_KEY: LIGHT_ENABLED,
+        SET_LIGHT_PROG_DUSK_MODE_MESSAGE_KEY: LIGHT_PROG_DUSK_MODE_ENABLED,
+        SET_LIGHT_PROG_WEEK_END_MODE_MESSAGE_KEY: LIGHT_PROG_WEEK_END_MODE_ENABLED,
+        SET_FILTRATION_STATUS_MESSAGE_KEY: FILTRATION_ENABLED,
+        SET_FILTRATION_PROG_STATUS_MESSAGE_KEY: FILTRATION_PROG_ENABLED,
+        SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY: (
+            FILTRATION_PROG_THERMOREGULATED_ENABLED
+        ),
+        SET_FILTRATION_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY: FILTRATION_PROG_WEEK_END_MODE_ENABLED,
+        SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY: FILTRATION_PROG_FIRST_RANGE_ENABLED,
+        SET_FILTRATION_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY: FILTRATION_PROG_SECOND_RANGE_ENABLED,
+        SET_FILTRATION_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY: FILTRATION_PROG_THIRD_RANGE_ENABLED,
+        SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY: (
+            FILTRATION_PROG_WEEK_END_FIRST_RANGE_ENABLED
+        ),
+        SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY: (
+            FILTRATION_PROG_WEEK_END_SECOND_RANGE_ENABLED
+        ),
+        SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY: (
+            FILTRATION_PROG_WEEK_END_THIRD_RANGE_ENABLED
+        ),
+        SET_AUX_PROG_STATUS_MESSAGE_KEY: AUX_PROG_ENABLED,
+        SET_AUX_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY: AUX_PROG_WEEK_END_MODE_ENABLED,
+        SET_AUX_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY: AUX_PROG_FIRST_RANGE_ENABLED,
+        SET_AUX_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY: AUX_PROG_SECOND_RANGE_ENABLED,
+        SET_AUX_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY: AUX_PROG_THIRD_RANGE_ENABLED,
+        SET_AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY: AUX_PROG_WEEK_END_FIRST_RANGE_ENABLED,
+        SET_AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY: (
+            AUX_PROG_WEEK_END_SECOND_RANGE_ENABLED
+        ),
+        SET_AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY: AUX_PROG_WEEK_END_THIRD_RANGE_ENABLED,
+    }
+
     def __init__(self, host=None, port=None):
         if host:
             self.host = host
         if port:
             self.port = port if port is int else int(port)
+        print(f"Start fake Tild service on {self.host}:{self.port}")
 
-        self.light_state = random.choice([ON, OFF])
+        # Initialize toggleables state
+        self.toogleables_states = {
+            field: random.choice([ON, OFF])
+            for bit, fields in TOGGLEABLES_BIN_BITS.items()
+            for field in fields
+            if field
+        }
+        print(
+            "Toggleables initialized:\n"
+            + "\n".join([f"- {item}: {state}" for item, state in self.toogleables_states.items()])
+        )
+
         self.light_color_code = random.choice(list(LIGHT_COLORS_CODES.keys()))
         self.light_intensity_code = random.choice(list(LIGHT_INTENSITY_CODES.keys()))
         self.light_timer_duration_code = random.choice(list(DURATION_CODES.keys()))
-        self.filtration_state = random.choice([ON, OFF])
-        self.filtration_prog_thermoregulated_state = random.choice([ON, OFF])
         self.water_temperature = random.randrange(20, 30)
         self.water_temperature_offset_code = random.choice(list(WATER_TEMPERATURE_OFFSET_CODES))
-        self.light_prog_mode_dusk_state = random.choice([ON, OFF])
-        self.light_prog_week_end_mode_state = random.choice([ON, OFF])
-        self.filtration_prog_state = random.choice([ON, OFF])
-        self.filtration_prog_thermoregulated_state = random.choice([ON, OFF])
-        self.filtration_prog_week_end_mode_state = random.choice([ON, OFF])
-        self.filtration_prog_first_range_state = random.choice([ON, OFF])
-        self.filtration_prog_second_range_state = random.choice([ON, OFF])
-        self.filtration_prog_third_range_state = random.choice([ON, OFF])
-        self.filtration_prog_week_end_first_range_state = random.choice([ON, OFF])
-        self.filtration_prog_week_end_second_range_state = random.choice([ON, OFF])
-        self.filtration_prog_week_end_third_range_state = random.choice([ON, OFF])
-        self.aux_prog_state = random.choice([ON, OFF])
-        self.aux_prog_week_end_mode_state = random.choice([ON, OFF])
-        self.aux_prog_first_range_state = random.choice([ON, OFF])
-        self.aux_prog_second_range_state = random.choice([ON, OFF])
-        self.aux_prog_third_range_state = random.choice([ON, OFF])
-        self.aux_prog_week_end_first_range_state = random.choice([ON, OFF])
-        self.aux_prog_week_end_second_range_state = random.choice([ON, OFF])
-        self.aux_prog_week_end_third_range_state = random.choice([ON, OFF])
         self.light_prog_status_code = random.choice(list(LIGHT_PROG_STATUS_CODES))
         self.light_prog_start_hour_code = random.choice(list(HOUR_CODES))
         self.light_prog_duration_code = random.choice(list(PROG_RANGE_DURATION_WITH_OFF_CODES))
@@ -1102,29 +1140,6 @@ class FakeTildBox:
         self.aux_prog_week_end_third_range_start_hour_code = random.choice(list(HOUR_CODES))
         self.aux_prog_week_end_third_range_end_hour_code = random.choice(list(HOUR_CODES))
 
-    @staticmethod
-    def _get_toggleable_status_code(state, codes, label):
-        """Retrieve toggleable status code according the current state"""
-        for c, s in codes.items():
-            if s == state:
-                return c
-        LOGGER.warning("No %s status code found for %s", label, "on" if state else "off")
-        return "X"
-
-    def get_filtration_prog_ranges_status_code(self):
-        """
-        Retreive the filtration programming ranges status code according to their current state
-        """
-        bin_status_code = [
-            "0",
-            "1" if self.filtration_prog_third_range_state is ON else "0",
-            "1" if self.filtration_prog_second_range_state is ON else "0",
-            "1" if self.filtration_prog_first_range_state is ON else "0",
-        ]
-        bin_status_code = "".join(bin_status_code)
-        print(f"Filtration prog ranges bin status code : {bin_status_code}")
-        return BitArray(bin=bin_status_code).hex
-
     def get_state_data(self):
         """Generate state data string"""
         # Water temperature evolution
@@ -1138,31 +1153,9 @@ class FakeTildBox:
             SYSTEM_DATE_HOUR: f"{now.hour:02}",
             SYSTEM_DATE_MINUTE: f"{now.minute:02}",
             WATER_TEMPERATURE: f"{self.water_temperature:02x}",
-            LIGHT_STATUS_CODE: self._get_toggleable_status_code(
-                self.light_state, LIGHT_STATUS_CODES, "light"
-            ),
             LIGHT_COLOR_CODE: f"{self.light_color_code:02x}",
             LIGHT_INTENSITY_CODE: str(self.light_intensity_code),
             LIGHT_TIMER_DURATION_CODE: f"{self.light_timer_duration_code:02x}",
-            FILTRATION_STATUS_CODE: self._get_toggleable_status_code(
-                self.filtration_state, FILTRATION_STATUS_CODES, "filtration"
-            ),
-            FILTRATION_PROG_STATUS_CODE: self._get_toggleable_status_code(
-                self.filtration_prog_state,
-                FILTRATION_PROG_STATUS_CODES,
-                "filtration programming",
-            ),
-            FILTRATION_PROG_THERMOREGULATED_STATUS_CODE: self._get_toggleable_status_code(
-                self.filtration_prog_thermoregulated_state,
-                FILTRATION_PROG_THERMOREGULATED_STATUS_CODES,
-                "filtration thermoregulated programming",
-            ),
-            FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE: self._get_toggleable_status_code(
-                self.filtration_prog_week_end_mode_state,
-                FILTRATION_PROG_WEEK_END_MODE_STATUS_CODES,
-                "filtration programming week-end mode",
-            ),
-            FILTRATION_PROG_RANGES_STATUS_CODE: self.get_filtration_prog_ranges_status_code(),
             WATER_TEMPERATURE_OFFSET_CODE: str(self.water_temperature_offset_code),
         }
 
@@ -1174,18 +1167,32 @@ class FakeTildBox:
             assert field in fields
             data[pos[0] : pos[-1] + 1] = list(fields[field])
 
+        for bit, fields in TOGGLEABLES_BIN_BITS.items():
+            print(f"Computing toggleables bit {bit}:")
+            bin_status_code = ["0", "0", "0", "0"]
+            for idx, field in enumerate(fields):
+                if field is None:
+                    print(f"- {idx}: unknown => 0")
+                    continue
+                print(f"- {idx}: {field}: {self.toogleables_states[field]}")
+                bin_status_code[idx] = "1" if self.toogleables_states[field] is ON else "0"
+            bin_status_code = "".join(bin_status_code)
+
+            data[bit] = BitArray(bin=bin_status_code).hex
+            print(f" => toggleables bit {bit} = {data[bit]} ({bin_status_code})")
+
         return "".join(data)
 
-    def handle_toogleable_request(self, connection, address, label, code, attr):
+    def handle_toogleable_request(self, connection, address, code, sensor_key):
         """Handle a request to set an Tild toogleable item"""
-        print(f"Handle set {label} request to '{code}' from {address[0]}:{address[1]}")
+        print(f"Handle set {sensor_key} request to '{code}' from {address[0]}:{address[1]}")
         state = {1: ON, 0: OFF}.get(code)
         if state is None:
-            print(f"Invalid {label} state '{code}'")
+            print(f"Invalid {sensor_key} state '{code}'")
             connection.send(b"ERROR: Invalid state")
         else:
-            setattr(self, attr, state)
-            print(f"{label} turned {'on' if state is ON else 'off'}")
+            self.toogleables_states[sensor_key] = state
+            print(f"{sensor_key} turned {'on' if state is ON else 'off'}")
             connection.send(self.get_state_data().encode("utf8"))
 
     def handle_set_item_request(
@@ -1223,7 +1230,7 @@ class FakeTildBox:
 
     def run(self):
         """Run service"""
-        print(f"Start fake Tild service on {self.host}:{self.port}")
+        print(f"Fake Tild service on {self.host}:{self.port} is running")
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
@@ -1250,182 +1257,16 @@ class FakeTildBox:
                     connection.send(b"ERROR: unexcepected JSON message")
                     connection.close()
                     continue
-                if SET_LIGHT_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "light",
-                        message[SET_LIGHT_STATUS_MESSAGE_KEY],
-                        "light_state",
-                    )
-                elif SET_FILTRATION_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "fitration",
-                        message[SET_FILTRATION_STATUS_MESSAGE_KEY],
-                        "filtration_state",
-                    )
-                elif SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "filtration thermoregulated programming",
-                        message[SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY],
-                        "filtration_prog_thermoregulated_state",
-                    )
-                elif SET_LIGHT_PROG_MODE_DUSK_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "light programming mode dusk",
-                        message[SET_LIGHT_PROG_MODE_DUSK_MESSAGE_KEY],
-                        "light_prog_mode_dusk_state",
-                    )
-                elif SET_LIGHT_PROG_WEEK_END_MODE_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "light programming week-end mode",
-                        message[SET_LIGHT_PROG_WEEK_END_MODE_MESSAGE_KEY],
-                        "light_prog_week_end_mode_state",
-                    )
-                elif SET_FILTRATION_PROG_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "filtration programming",
-                        message[SET_FILTRATION_PROG_STATUS_MESSAGE_KEY],
-                        "filtration_prog_state",
-                    )
-                elif SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "filtration thermoregulated programming",
-                        message[SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY],
-                        "filtration_prog_thermoregulated_state",
-                    )
-                elif SET_FILTRATION_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "filtration programming week-end mode",
-                        message[SET_FILTRATION_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_week_end_mode_state",
-                    )
-                elif SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "filtration programming first range",
-                        message[SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_first_range_state",
-                    )
-                elif SET_FILTRATION_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "filtration programming second range",
-                        message[SET_FILTRATION_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_second_range_state",
-                    )
-                elif SET_FILTRATION_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "filtration programming third range",
-                        message[SET_FILTRATION_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_third_range_state",
-                    )
-                elif SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "filtration programming week-end first range",
-                        message[SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_week_end_first_range_state",
-                    )
-                elif SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "filtration programming week-end second range",
-                        message[SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_week_end_second_range_state",
-                    )
-                elif SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "filtration programming week-end third range",
-                        message[SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_week_end_third_range_state",
-                    )
-                elif SET_AUX_PROG_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "auxiliary programming",
-                        message[SET_AUX_PROG_STATUS_MESSAGE_KEY],
-                        "aux_prog_state",
-                    )
-                elif SET_AUX_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "auxiliary programming week-end mode",
-                        message[SET_AUX_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY],
-                        "aux_prog_week_end_mode_state",
-                    )
-                elif SET_AUX_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "auxiliary programming first range",
-                        message[SET_AUX_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_first_range_state",
-                    )
-                elif SET_AUX_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "auxiliary programming second range",
-                        message[SET_AUX_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_second_range_state",
-                    )
-                elif SET_AUX_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "auxiliary programming third range",
-                        message[SET_AUX_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_third_range_state",
-                    )
-                elif SET_AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "auxiliary programming week-end first range",
-                        message[SET_AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_week_end_first_range_state",
-                    )
-                elif SET_AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "auxiliary programming week-end second range",
-                        message[SET_AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_week_end_second_range_state",
-                    )
-                elif SET_AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
-                    self.handle_toogleable_request(
-                        connection,
-                        address,
-                        "auxiliary programming week-end third range",
-                        message[SET_AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_week_end_third_range_state",
-                    )
+
+                is_toggleable_request = False
+                for message_key, sensor_key in self.toogleables_message_keys.items():
+                    if message_key in message:
+                        is_toggleable_request = True
+                        self.handle_toogleable_request(
+                            connection, address, message[message_key], sensor_key
+                        )
+                if is_toggleable_request:
+                    pass
                 elif SET_LIGHT_COLOR_MESSAGE_KEY in message:
                     self.handle_set_item_request(
                         connection,
