@@ -17,8 +17,8 @@ from .const import (
     FILTRATION_PROG_SECOND_RANGE_ENABLED,
     FILTRATION_PROG_THERMOREGULATED_ENABLED,
     FILTRATION_PROG_THIRD_RANGE_ENABLED,
-    FILTRATION_PROG_WEEK_END_ENABLED,
     FILTRATION_PROG_WEEK_END_FIRST_RANGE_ENABLED,
+    FILTRATION_PROG_WEEK_END_MODE_ENABLED,
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_ENABLED,
     FILTRATION_PROG_WEEK_END_THIRD_RANGE_ENABLED,
     FILTRATION_STATUS_CODE,
@@ -33,11 +33,11 @@ async def async_setup_entry(hass, entry, async_add_devices):
     coordinator = hass.data[DOMAIN][COORDINATOR]
     switchs = [
         TildFiltrationSwitch(coordinator, entry, hass),
-        TildLightProgrammingModeDuskSwitch(coordinator, entry, hass),
-        TildLightProgrammingModeWeekEndSwitch(coordinator, entry, hass),
+        TildLightProgrammingDuskModeSwitch(coordinator, entry, hass),
+        TildLightProgrammingWeekEndModeSwitch(coordinator, entry, hass),
         TildFiltrationProgrammingSwitch(coordinator, entry, hass),
         TildFiltrationProgrammingThermoregulatedSwitch(coordinator, entry, hass),
-        TildFiltrationProgrammingModeWeekEndSwitch(coordinator, entry, hass),
+        TildFiltrationProgrammingWeekEndModeSwitch(coordinator, entry, hass),
         TildFiltrationProgrammingFirstRangeSwitch(coordinator, entry, hass),
         TildFiltrationProgrammingSecondRangeSwitch(coordinator, entry, hass),
         TildFiltrationProgrammingThirdRangeSwitch(coordinator, entry, hass),
@@ -69,31 +69,31 @@ class TildFiltrationSwitch(TildSwitchEntity):
         "enabled_by_light": FILTRATION_ENABLED_BY_LIGHT,
     }
 
-    _client_toggle_method = "toggle_filtration"
+    _client_toggle_method = "toggle_filtration_status"
 
 
-class TildLightProgrammingModeDuskSwitch(TildSwitchEntity):
+class TildLightProgrammingDuskModeSwitch(TildSwitchEntity):
     """Manage the light programming mode dusk"""
 
-    _attr_id_key = "tild_light_prog_mode_dusk"
+    _attr_id_key = "tild_light_prog_mode_dusk_status"
     _attr_name = "Light programming mode dusk"
     _attr_icon = "mdi:lightbulb-night"
 
     _sensor_data_key = LIGHT_PROG_MODE_DUSK_ENABLED
 
-    _client_toggle_method = "toggle_light_prog_mode_dusk"
+    _client_toggle_method = "toggle_light_prog_mode_dusk_status"
 
 
-class TildLightProgrammingModeWeekEndSwitch(TildSwitchEntity):
-    """Manage the light programming mode week-end"""
+class TildLightProgrammingWeekEndModeSwitch(TildSwitchEntity):
+    """Manage the light programming week-end mode"""
 
-    _attr_id_key = "tild_light_prog_week_end_mode"
-    _attr_name = "Light programming mode week-end"
+    _attr_id_key = "tild_light_prog_week_end_mode_status"
+    _attr_name = "Light programming week-end mode"
     _attr_icon = "mdi:calendar-weekend"
 
     _sensor_data_key = LIGHT_PROG_WEEK_END_MODE_ENABLED
 
-    _client_toggle_method = "toggle_light_prog_week_end_mode"
+    _client_toggle_method = "toggle_light_prog_week_end_mode_status"
 
 
 class TildFiltrationProgrammingSwitch(TildSwitchEntity):
@@ -120,16 +120,16 @@ class TildFiltrationProgrammingThermoregulatedSwitch(TildSwitchEntity):
     _client_toggle_method = "toggle_filtration_prog_thermoregulated_status"
 
 
-class TildFiltrationProgrammingModeWeekEndSwitch(TildSwitchEntity):
-    """Manage the filtration programming mode week-end"""
+class TildFiltrationProgrammingWeekEndModeSwitch(TildSwitchEntity):
+    """Manage the filtration programming week-end mode"""
 
-    _attr_id_key = "tild_filtration_prog_week_end_status"
-    _attr_name = "Filtration programming mode week-end"
+    _attr_id_key = "tild_filtration_prog_week_end_mode status"
+    _attr_name = "Filtration programming week-end mode"
     _attr_icon = "mdi:calendar-weekend"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_ENABLED
+    _sensor_data_key = FILTRATION_PROG_WEEK_END_MODE_ENABLED
 
-    _client_toggle_method = "toggle_filtration_prog_week_end_status"
+    _client_toggle_method = "toggle_filtration_prog_week_end_mode_status"
 
 
 class TildFiltrationProgrammingFirstRangeSwitch(TildSwitchEntity):

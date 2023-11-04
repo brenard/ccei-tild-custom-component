@@ -24,4 +24,4 @@ class TildLight(TildLightEntity):
         "raw_status_code": LIGHT_STATUS_CODE,
     }
 
-    _client_toggle_method = "toggle_light"
+    _client_toggle_method = "toggle_light_status"

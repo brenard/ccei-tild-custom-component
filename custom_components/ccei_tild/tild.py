@@ -47,10 +47,12 @@ from .const import (
     FILTRATION_PROG_THIRD_RANGE_ENABLED,
     FILTRATION_PROG_THIRD_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_THIRD_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_WEEK_END_ENABLED,
     FILTRATION_PROG_WEEK_END_FIRST_RANGE_ENABLED,
     FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
+    FILTRATION_PROG_WEEK_END_MODE_ENABLED,
+    FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE,
+    FILTRATION_PROG_WEEK_END_MODE_STATUS_CODES,
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_ENABLED,
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
@@ -118,6 +120,7 @@ IDENTIFIED_FIELDS = {
     FILTRATION_STATUS_CODE: [33],
     FILTRATION_PROG_STATUS_CODE: [32],
     FILTRATION_PROG_THERMOREGULATED_STATUS_CODE: [69],
+    FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE: [68],
     LIGHT_TIMER_DURATION_CODE: [72, 73],
 }
 
@@ -143,7 +146,7 @@ SET_LIGHT_PROG_WEEK_END_DURATION_MESSAGE_KEY = "prwl"  # duration code or 255 = 
 SET_FILTRATION_STATUS_MESSAGE_KEY = "sfil"  # 0 or 1
 SET_FILTRATION_PROG_STATUS_MESSAGE_KEY = "mfil"  # 0 or 1
 SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY = "afil"  # 0 or 1
-SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY = "mpfw"  # 0 or 1
+SET_FILTRATION_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY = "mpfw"  # 0 or 1
 
 SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY = "fip1"  # 0 or 1
 SET_FILTRATION_PROG_FIRST_RANGE_START_HOUR_MESSAGE_KEY = "fis1"  # hour code
@@ -237,6 +240,9 @@ def parse_sensors_data(data, system_host=None):
         FILTRATION_PROG_THERMOREGULATED_ENABLED
     ] = FILTRATION_PROG_THERMOREGULATED_STATUS_CODES.get(
         state[FILTRATION_PROG_THERMOREGULATED_STATUS_CODE]
+    )
+    state[FILTRATION_PROG_WEEK_END_MODE_ENABLED] = FILTRATION_PROG_WEEK_END_MODE_STATUS_CODES.get(
+        state[FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE]
     )
     state[LIGHT_TIMER_DURATION] = DURATION_CODES.get(int(state[LIGHT_TIMER_DURATION_CODE], 16))
     return state
@@ -411,7 +417,7 @@ class CceiTildClient:
             log_sensors_data_diff(self.last_sensors_data[RAW_DATA], new_data[RAW_DATA])
         self.last_sensors_data = new_data
 
-    async def toggle_light(self, state=None):
+    async def toggle_light_status(self, state=None):
         """Turn on/off the Tild light"""
         return await self._toggle_item_state(
             label="light",
@@ -420,21 +426,12 @@ class CceiTildClient:
             state=state,
         )
 
-    async def toggle_filtration(self, state=None):
+    async def toggle_filtration_status(self, state=None):
         """Turn on/off the Tild filtration"""
         return await self._toggle_item_state(
             label="filtration",
             sensor_key=FILTRATION_ENABLED,
             message_key=SET_FILTRATION_STATUS_MESSAGE_KEY,
-            state=state,
-        )
-
-    async def toggle_filtration_prog_thermoregulated(self, state=None):
-        """Turn on/off the Tild thermoregulated filtration"""
-        return await self._toggle_item_state(
-            label="thermoregulated filtration",
-            sensor_key=FILTRATION_PROG_THERMOREGULATED_ENABLED,
-            message_key=SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY,
             state=state,
         )
 
@@ -489,7 +486,7 @@ class CceiTildClient:
             message_key=SET_LIGHT_PROG_STATUS_MESSAGE_KEY,
         )
 
-    async def toggle_light_prog_mode_dusk(self, state=None):
+    async def toggle_light_prog_mode_dusk_status(self, state=None):
         """Turn on/off the Tild light programming mode dusk"""
         return await self._toggle_item_state(
             label="light programming mode dusk",
@@ -498,10 +495,10 @@ class CceiTildClient:
             state=state,
         )
 
-    async def toggle_light_prog_week_end_mode(self, state=None):
-        """Turn on/off the Tild light programming mode week-end"""
+    async def toggle_light_prog_week_end_mode_status(self, state=None):
+        """Turn on/off the Tild light programming week-end mode"""
         return await self._toggle_item_state(
-            label="light programming mode week-end",
+            label="light programming week-end mode",
             sensor_key=LIGHT_PROG_WEEK_END_MODE_ENABLED,
             message_key=SET_LIGHT_PROG_WEEK_END_MODE_MESSAGE_KEY,
             state=state,
@@ -575,12 +572,12 @@ class CceiTildClient:
             state=state,
         )
 
-    async def toggle_filtration_prog_week_end_status(self, state=None):
-        """Turn on/off the Tild filtration programming mode week-end"""
+    async def toggle_filtration_prog_week_end_mode_status(self, state=None):
+        """Turn on/off the Tild filtration programming week-end mode"""
         return await self._toggle_item_state(
-            label="filtration programming mode week-end",
-            sensor_key=FILTRATION_PROG_WEEK_END_ENABLED,
-            message_key=SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY,
+            label="filtration programming week-end mode",
+            sensor_key=FILTRATION_PROG_WEEK_END_MODE_ENABLED,
+            message_key=SET_FILTRATION_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY,
             state=state,
         )
 
@@ -1034,14 +1031,13 @@ class FakeTildBox:
         self.light_timer_duration_code = random.choice(list(DURATION_CODES.keys()))
         self.filtration_state = random.choice([ON, OFF])
         self.filtration_prog_thermoregulated_state = random.choice([ON, OFF])
-        self.filtration_prog_thermoregulated_state = random.choice([ON, OFF])
         self.water_temperature = random.randrange(20, 30)
         self.water_temperature_offset_code = random.choice(list(WATER_TEMPERATURE_OFFSET_CODES))
         self.light_prog_mode_dusk_state = random.choice([ON, OFF])
         self.light_prog_week_end_mode_state = random.choice([ON, OFF])
         self.filtration_prog_state = random.choice([ON, OFF])
         self.filtration_prog_thermoregulated_state = random.choice([ON, OFF])
-        self.filtration_prog_week_end_state = random.choice([ON, OFF])
+        self.filtration_prog_week_end_mode_state = random.choice([ON, OFF])
         self.filtration_prog_first_range_state = random.choice([ON, OFF])
         self.filtration_prog_second_range_state = random.choice([ON, OFF])
         self.filtration_prog_third_range_state = random.choice([ON, OFF])
@@ -1129,6 +1125,11 @@ class FakeTildBox:
                 self.filtration_prog_thermoregulated_state,
                 FILTRATION_PROG_THERMOREGULATED_STATUS_CODES,
                 "filtration thermoregulated programming",
+            ),
+            FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE: self._get_toggleable_status_code(
+                self.filtration_prog_week_end_mode_state,
+                FILTRATION_PROG_WEEK_END_MODE_STATUS_CODES,
+                "filtration programming week-end mode",
             ),
             WATER_TEMPERATURE_OFFSET_CODE: str(self.water_temperature_offset_code),
         }
@@ -1253,7 +1254,7 @@ class FakeTildBox:
                     self.handle_toogleable_request(
                         connection,
                         address,
-                        "light programming mode week-end",
+                        "light programming week-end mode",
                         message[SET_LIGHT_PROG_WEEK_END_MODE_MESSAGE_KEY],
                         "light_prog_week_end_mode_state",
                     )
@@ -1273,13 +1274,13 @@ class FakeTildBox:
                         message[SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY],
                         "filtration_prog_thermoregulated_state",
                     )
-                elif SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY in message:
+                elif SET_FILTRATION_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
                         connection,
                         address,
-                        "filtration programming mode week-end",
-                        message[SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY],
-                        "filtration_prog_week_end_state",
+                        "filtration programming week-end mode",
+                        message[SET_FILTRATION_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY],
+                        "filtration_prog_week_end_mode_state",
                     )
                 elif SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(

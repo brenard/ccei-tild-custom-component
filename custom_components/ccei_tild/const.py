@@ -76,8 +76,8 @@ FILTRATION_PROG_STATUS_CODE = "filtration_prog_status_code"
 FILTRATION_PROG_ENABLED = "filtration_prog_enabled"
 FILTRATION_PROG_THERMOREGULATED_STATUS_CODE = "filtration_prog_thermoregulated_status_code"
 FILTRATION_PROG_THERMOREGULATED_ENABLED = "filtration_prog_thermoregulated_enabled"
-FILTRATION_PROG_WEEK_END_STATUS_CODE = "filtration_prog_week_end_status_code"
-FILTRATION_PROG_WEEK_END_ENABLED = "filtration_prog_week_end_enabled"
+FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE = "filtration_prog_week_end_mode_status_code"
+FILTRATION_PROG_WEEK_END_MODE_ENABLED = "filtration_prog_week_end_mode_enabled"
 FILTRATION_PROG_FIRST_RANGE_STATUS_CODE = "filtration_prog_first_range_status_code"
 FILTRATION_PROG_FIRST_RANGE_ENABLED = "filtration_prog_first_range_enabled"
 FILTRATION_PROG_FIRST_RANGE_START_HOUR_CODE = "filtration_prog_first_range_start_hour_code"
@@ -233,6 +233,7 @@ WATER_TEMPERATURE_OFFSET_CODES = {
 
 FILTRATION_PROG_STATUS_CODES = {"0": OFF, "2": ON}
 FILTRATION_PROG_THERMOREGULATED_STATUS_CODES = {"A": OFF, "B": ON}
+FILTRATION_PROG_WEEK_END_MODE_STATUS_CODES = {"5": OFF, "4": ON}
 
 DURATION_CODES = {idx: f"{int(idx*15/60):02}:{idx*15%60:02}" for idx in range(1, 96)}
 
