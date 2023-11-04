@@ -142,6 +142,18 @@ TOGGLEABLES_BIN_BITS = {
         None,
         None,
     ],
+    92: [
+        None,
+        None,
+        AUX_PROG_WEEK_END_THIRD_RANGE_ENABLED,
+        AUX_PROG_WEEK_END_SECOND_RANGE_ENABLED,
+    ],
+    93: [
+        AUX_PROG_WEEK_END_FIRST_RANGE_ENABLED,
+        AUX_PROG_THIRD_RANGE_ENABLED,
+        AUX_PROG_SECOND_RANGE_ENABLED,
+        AUX_PROG_FIRST_RANGE_ENABLED,
+    ],
     119: [
         None,
         FILTRATION_PROG_THIRD_RANGE_ENABLED,
