@@ -64,6 +64,7 @@ from .const import (
     LIGHT_INTENSITY_CODE,
     LIGHT_INTENSITY_CODES,
     LIGHT_INTENSITY_CODES_TO_SEND,
+    LIGHT_PROG_DURATION,
     LIGHT_PROG_DURATION_CODE,
     LIGHT_PROG_DUSK_MODE_ENABLED,
     LIGHT_PROG_START_HOUR_CODE,
@@ -108,6 +109,7 @@ IDENTIFIED_FIELDS = {
     WATER_TEMPERATURE: [66, 67],
     WATER_TEMPERATURE_OFFSET_CODE: [155],
     LIGHT_TIMER_DURATION_CODE: [72, 73],
+    LIGHT_PROG_DURATION_CODE: [26, 27],
 }
 
 # Toggleable binary bits
@@ -287,6 +289,9 @@ def parse_sensors_data(data, system_host=None):
     state[LIGHT_COLOR] = LIGHT_COLORS_CODES.get(int(state[LIGHT_COLOR_CODE], 16))
     state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
     state[LIGHT_TIMER_DURATION] = DURATION_CODES.get(int(state[LIGHT_TIMER_DURATION_CODE], 16))
+    state[LIGHT_PROG_DURATION] = PROG_RANGE_DURATION_WITH_OFF_CODES.get(
+        int(state[LIGHT_PROG_DURATION_CODE], 16)
+    )
     return state
 
 
@@ -1168,6 +1173,7 @@ class FakeTildBox:
             LIGHT_COLOR_CODE: f"{self.light_color_code:02x}",
             LIGHT_INTENSITY_CODE: str(self.light_intensity_code),
             LIGHT_TIMER_DURATION_CODE: f"{self.light_timer_duration_code:02x}",
+            LIGHT_PROG_DURATION_CODE: f"{self.light_prog_duration_code:02x}",
             WATER_TEMPERATURE_OFFSET_CODE: str(self.water_temperature_offset_code),
         }
 
