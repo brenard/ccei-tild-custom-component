@@ -325,6 +325,9 @@ def diff_sensors_data(ref_raw_data, *other_raw_data):
                 if k in result["diff_keys"]
                 else [v, result["parsed_data"][raw_data][k]]
             )
+    result["identified_pos"] = dict(sorted(result["identified_pos"].items()))
+    result["diff"] = dict(sorted(result["diff"].items()))
+    result["diff_keys"] = dict(sorted(result["diff_keys"].items()))
 
     result["identified_pos_diff"] = [
         pos for pos in sorted(result["diff"]) if pos in result["identified_pos"]
@@ -451,7 +454,7 @@ class CceiTildClient:
         state = parse_sensors_data(data, self.host)
         LOGGER.debug(
             "State:%s",
-            "\n - {}".format("\n - ".join([f"{key}={value}" for key, value in state.items()])),
+            "\n - {}".format("\n - ".join([f"{key}={state[key]}" for key in sorted(state)])),
         )
         self.log_sensors_data_diff(state)
         return state
@@ -1116,7 +1119,14 @@ class FakeTildBox:
         }
         print(
             "Toggleables initialized:\n"
-            + "\n".join([f"- {item}: {state}" for item, state in self.toogleables_states.items()])
+            + (
+                "\n".join(
+                    [
+                        f"- {item}: {self.toogleables_states[item]}"
+                        for item in sorted(self.toogleables_states)
+                    ]
+                )
+            )
         )
 
         self.light_color_code = random.choice(list(LIGHT_COLORS_CODES.keys()))
