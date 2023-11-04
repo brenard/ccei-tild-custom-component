@@ -6,6 +6,8 @@ import random
 import socket
 from datetime import datetime
 
+from bitstring import BitArray
+
 from .const import (
     AUX_PROG_ENABLED,
     AUX_PROG_FIRST_RANGE_ENABLED,
@@ -36,6 +38,8 @@ from .const import (
     FILTRATION_PROG_FIRST_RANGE_ENABLED,
     FILTRATION_PROG_FIRST_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_FIRST_RANGE_START_HOUR_CODE,
+    FILTRATION_PROG_RANGES_STATUS_BIN_CODE,
+    FILTRATION_PROG_RANGES_STATUS_CODE,
     FILTRATION_PROG_SECOND_RANGE_ENABLED,
     FILTRATION_PROG_SECOND_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_SECOND_RANGE_START_HOUR_CODE,
@@ -121,6 +125,7 @@ IDENTIFIED_FIELDS = {
     FILTRATION_PROG_STATUS_CODE: [32],
     FILTRATION_PROG_THERMOREGULATED_STATUS_CODE: [69],
     FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE: [68],
+    FILTRATION_PROG_RANGES_STATUS_CODE: [119],
     LIGHT_TIMER_DURATION_CODE: [72, 73],
 }
 
@@ -243,6 +248,18 @@ def parse_sensors_data(data, system_host=None):
     )
     state[FILTRATION_PROG_WEEK_END_MODE_ENABLED] = FILTRATION_PROG_WEEK_END_MODE_STATUS_CODES.get(
         state[FILTRATION_PROG_WEEK_END_MODE_STATUS_CODE]
+    )
+    state[FILTRATION_PROG_RANGES_STATUS_BIN_CODE] = BitArray(
+        hex=f"0x{state[FILTRATION_PROG_RANGES_STATUS_CODE]}"
+    ).bin
+    state[FILTRATION_PROG_FIRST_RANGE_ENABLED] = (
+        ON if int(state[FILTRATION_PROG_RANGES_STATUS_BIN_CODE][-1]) else OFF
+    )
+    state[FILTRATION_PROG_SECOND_RANGE_ENABLED] = (
+        ON if int(state[FILTRATION_PROG_RANGES_STATUS_BIN_CODE][-2]) else OFF
+    )
+    state[FILTRATION_PROG_THIRD_RANGE_ENABLED] = (
+        ON if int(state[FILTRATION_PROG_RANGES_STATUS_BIN_CODE][-3]) else OFF
     )
     state[LIGHT_TIMER_DURATION] = DURATION_CODES.get(int(state[LIGHT_TIMER_DURATION_CODE], 16))
     return state
@@ -1094,6 +1111,20 @@ class FakeTildBox:
         LOGGER.warning("No %s status code found for %s", label, "on" if state else "off")
         return "X"
 
+    def get_filtration_prog_ranges_status_code(self):
+        """
+        Retreive the filtration programming ranges status code according to their current state
+        """
+        bin_status_code = [
+            "0",
+            "1" if self.filtration_prog_third_range_state is ON else "0",
+            "1" if self.filtration_prog_second_range_state is ON else "0",
+            "1" if self.filtration_prog_first_range_state is ON else "0",
+        ]
+        bin_status_code = "".join(bin_status_code)
+        print(f"Filtration prog ranges bin status code : {bin_status_code}")
+        return BitArray(bin=bin_status_code).hex
+
     def get_state_data(self):
         """Generate state data string"""
         # Water temperature evolution
@@ -1131,6 +1162,7 @@ class FakeTildBox:
                 FILTRATION_PROG_WEEK_END_MODE_STATUS_CODES,
                 "filtration programming week-end mode",
             ),
+            FILTRATION_PROG_RANGES_STATUS_CODE: self.get_filtration_prog_ranges_status_code(),
             WATER_TEMPERATURE_OFFSET_CODE: str(self.water_temperature_offset_code),
         }
 
