@@ -62,6 +62,7 @@ from .const import (
     LIGHT_INTENSITY,
     LIGHT_INTENSITY_CODE,
     LIGHT_INTENSITY_CODES,
+    LIGHT_INTENSITY_CODES_TO_SEND,
     LIGHT_PROG_DURATION_CODE,
     LIGHT_PROG_MODE_DUSK_ENABLED,
     LIGHT_PROG_START_HOUR_CODE,
@@ -448,6 +449,7 @@ class CceiTildClient:
             sensor_key=LIGHT_INTENSITY_CODE,
             state=intensity,
             codes=LIGHT_INTENSITY_CODES,
+            codes_to_send=LIGHT_INTENSITY_CODES_TO_SEND,
             message_key=SET_LIGHT_INTENSITY_MESSAGE_KEY,
         )
 
@@ -943,7 +945,14 @@ class CceiTildClient:
         )
 
     async def _set_item_state(
-        self, label, sensor_key, state, codes, message_key, sensor_key_is_state=False
+        self,
+        label,
+        sensor_key,
+        state,
+        codes,
+        message_key,
+        sensor_key_is_state=False,
+        codes_to_send=None,
     ):
         """Set item on Tild"""
         if state in codes:
@@ -953,7 +962,12 @@ class CceiTildClient:
             assert state in codes.values(), f"Invalid {label} '{state}'"
             idx = list(codes.values()).index(state)
             code = list(codes.keys())[idx]
-        await self._call_tild({message_key: code})
+        if codes_to_send:
+            assert state in codes_to_send, f"Unknown code to send for state '{state}' of {label}"
+            code_to_send = codes_to_send[state]
+        else:
+            code_to_send = code
+        await self._call_tild({message_key: code_to_send})
         await asyncio.sleep(1)
         sensors_data = await self.get_sensors_data()
         if not sensors_data:
@@ -1134,9 +1148,31 @@ class FakeTildBox:
             print(f"{label} turned {'on' if state is ON else 'off'}")
             connection.send(self.get_state_data().encode("utf8"))
 
-    def handle_set_item_request(self, connection, address, label, code, codes, attr):
+    def handle_set_item_request(
+        self, connection, address, label, code, codes, attr, codes_to_send=None
+    ):
         """Handle a request to set an Tild item"""
         print(f"Handle set {label} request to '{code}' from {address[0]}:{address[1]}")
+        if codes_to_send:
+            state = [s for s, c in codes_to_send.items() if c == code]
+            if not state:
+                print(f"Invalid {label} code '{code}' (not in codes to send mapping)")
+                connection.send(
+                    f"ERROR: Invalid {label} code '{code}' (not in codes to send mapping)".encode()
+                )
+                return
+            state = state[0]
+            sent_code = code
+            code = [c for c, s in codes.items() if s == state]
+            if not code:
+                print(f"No corresponding code found for sent code '{sent_code}' of {label}")
+                connection.send(
+                    f"ERROR: No corresponding code found for sent code '{sent_code}' of "
+                    f"{label}".encode()
+                )
+                return
+            code = code[0]
+            print(f"{label}: map sent code '{sent_code}' to '{code}' ({state})")
         if code not in codes:
             print(f"Invalid {label} code '{code}'")
             connection.send(f"ERROR: Invalid {label} code '{code}'".encode())
@@ -1367,6 +1403,7 @@ class FakeTildBox:
                         message[SET_LIGHT_INTENSITY_MESSAGE_KEY],
                         LIGHT_INTENSITY_CODES,
                         "light_intensity_code",
+                        codes_to_send=LIGHT_INTENSITY_CODES_TO_SEND,
                     )
                 elif SET_LIGHT_TIMER_DURATION_MESSAGE_KEY in message:
                     self.handle_set_item_request(

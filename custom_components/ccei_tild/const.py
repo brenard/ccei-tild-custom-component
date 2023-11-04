@@ -230,6 +230,13 @@ LIGHT_INTENSITY_CODES = {
     "C": 100,
 }
 
+LIGHT_INTENSITY_CODES_TO_SEND = {
+    25: 0,
+    50: 1,
+    75: 2,
+    100: 3,
+}
+
 WATER_TEMPERATURE_OFFSET_CODES = {
     6: -3,
     5: -2,
