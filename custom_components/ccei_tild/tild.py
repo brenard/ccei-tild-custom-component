@@ -7,52 +7,54 @@ import socket
 from datetime import datetime
 
 from .const import (
+    AUX_PROG_ENABLED,
+    AUX_PROG_FIRST_RANGE_ENABLED,
     AUX_PROG_FIRST_RANGE_END_HOUR_CODE,
     AUX_PROG_FIRST_RANGE_START_HOUR_CODE,
-    AUX_PROG_FIRST_RANGE_STATUS_ENABLED,
+    AUX_PROG_SECOND_RANGE_ENABLED,
     AUX_PROG_SECOND_RANGE_END_HOUR_CODE,
     AUX_PROG_SECOND_RANGE_START_HOUR_CODE,
-    AUX_PROG_SECOND_RANGE_STATUS_ENABLED,
-    AUX_PROG_STATUS_ENABLED,
+    AUX_PROG_THIRD_RANGE_ENABLED,
     AUX_PROG_THIRD_RANGE_END_HOUR_CODE,
     AUX_PROG_THIRD_RANGE_START_HOUR_CODE,
-    AUX_PROG_THIRD_RANGE_STATUS_ENABLED,
+    AUX_PROG_WEEK_END_FIRST_RANGE_ENABLED,
     AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
     AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
-    AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_ENABLED,
-    AUX_PROG_WEEK_END_MODE_STATUS_ENABLED,
+    AUX_PROG_WEEK_END_MODE_ENABLED,
+    AUX_PROG_WEEK_END_SECOND_RANGE_ENABLED,
     AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
     AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
-    AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_ENABLED,
+    AUX_PROG_WEEK_END_THIRD_RANGE_ENABLED,
     AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
     AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
-    AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_ENABLED,
     COORDINATOR,
     DOMAIN,
     DURATION_CODES,
     FILTRATION_ENABLED,
     FILTRATION_ENABLED_BY_LIGHT,
+    FILTRATION_PROG_ENABLED,
+    FILTRATION_PROG_FIRST_RANGE_ENABLED,
     FILTRATION_PROG_FIRST_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_FIRST_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_FIRST_RANGE_STATUS_ENABLED,
+    FILTRATION_PROG_SECOND_RANGE_ENABLED,
     FILTRATION_PROG_SECOND_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_SECOND_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_SECOND_RANGE_STATUS_ENABLED,
-    FILTRATION_PROG_STATUS_ENABLED,
-    FILTRATION_PROG_THERMOREGULATED_STATUS_ENABLED,
+    FILTRATION_PROG_THERMOREGULATED_ENABLED,
+    FILTRATION_PROG_THERMOREGULATED_STATUS_CODE,
+    FILTRATION_PROG_THERMOREGULATED_STATUS_CODES,
+    FILTRATION_PROG_THIRD_RANGE_ENABLED,
     FILTRATION_PROG_THIRD_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_THIRD_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_THIRD_RANGE_STATUS_ENABLED,
+    FILTRATION_PROG_WEEK_END_ENABLED,
+    FILTRATION_PROG_WEEK_END_FIRST_RANGE_ENABLED,
     FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_ENABLED,
+    FILTRATION_PROG_WEEK_END_SECOND_RANGE_ENABLED,
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_ENABLED,
-    FILTRATION_PROG_WEEK_END_STATUS_ENABLED,
+    FILTRATION_PROG_WEEK_END_THIRD_RANGE_ENABLED,
     FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
     FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_ENABLED,
     FILTRATION_STATUS_CODE,
     HOUR_CODES,
     LIGHT_COLOR,
@@ -87,8 +89,6 @@ from .const import (
     SYSTEM_DATE_MONTH,
     SYSTEM_DATE_YEAR,
     SYSTEM_HOST,
-    THERMOREGULATED_FILTRATION_CODE,
-    THERMOREGULATED_FILTRATION_ENABLED,
     WATER_RAW_TEMPERATURE,
     WATER_TEMPERATURE,
     WATER_TEMPERATURE_OFFSET,
@@ -114,6 +114,7 @@ IDENTIFIED_FIELDS = {
     WATER_TEMPERATURE: [66, 67],
     WATER_TEMPERATURE_OFFSET_CODE: [155],
     FILTRATION_STATUS_CODE: [33],
+    FILTRATION_PROG_THERMOREGULATED_STATUS_CODE: [32],
     LIGHT_TIMER_DURATION_CODE: [72, 73],
 }
 
@@ -226,7 +227,11 @@ def parse_sensors_data(data, system_host=None):
     )
     state[LIGHT_COLOR] = LIGHT_COLORS_CODES.get(int(state[LIGHT_COLOR_CODE], 16))
     state[LIGHT_INTENSITY] = LIGHT_INTENSITY_CODES.get(state[LIGHT_INTENSITY_CODE])
-    state[THERMOREGULATED_FILTRATION_CODE] = state[THERMOREGULATED_FILTRATION_ENABLED] = None
+    state[
+        FILTRATION_PROG_THERMOREGULATED_ENABLED
+    ] = FILTRATION_PROG_THERMOREGULATED_STATUS_CODES.get(
+        state[FILTRATION_PROG_THERMOREGULATED_STATUS_CODE]
+    )
     state[LIGHT_TIMER_DURATION] = DURATION_CODES.get(int(state[LIGHT_TIMER_DURATION_CODE], 16))
     return state
 
@@ -418,11 +423,11 @@ class CceiTildClient:
             state=state,
         )
 
-    async def toggle_thermoregulated_filtration(self, state=None):
+    async def toggle_filtration_prog_thermoregulated(self, state=None):
         """Turn on/off the Tild thermoregulated filtration"""
         return await self._toggle_item_state(
             label="thermoregulated filtration",
-            sensor_key=THERMOREGULATED_FILTRATION_ENABLED,
+            sensor_key=FILTRATION_PROG_THERMOREGULATED_ENABLED,
             message_key=SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -550,16 +555,16 @@ class CceiTildClient:
         """Turn on/off the Tild filtration programming"""
         return await self._toggle_item_state(
             label="filtration programming",
-            sensor_key=FILTRATION_PROG_STATUS_ENABLED,
+            sensor_key=FILTRATION_PROG_ENABLED,
             message_key=SET_FILTRATION_PROG_STATUS_MESSAGE_KEY,
             state=state,
         )
 
     async def toggle_filtration_prog_thermoregulated_status(self, state=None):
-        """Turn on/off the Tild filtration programming thermoregulated"""
+        """Turn on/off the Tild filtration thermoregulated programming"""
         return await self._toggle_item_state(
-            label="filtration programming thermoregulated",
-            sensor_key=FILTRATION_PROG_THERMOREGULATED_STATUS_ENABLED,
+            label="filtration thermoregulated programming",
+            sensor_key=FILTRATION_PROG_THERMOREGULATED_ENABLED,
             message_key=SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -568,7 +573,7 @@ class CceiTildClient:
         """Turn on/off the Tild filtration programming mode week-end"""
         return await self._toggle_item_state(
             label="filtration programming mode week-end",
-            sensor_key=FILTRATION_PROG_WEEK_END_STATUS_ENABLED,
+            sensor_key=FILTRATION_PROG_WEEK_END_ENABLED,
             message_key=SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -577,7 +582,7 @@ class CceiTildClient:
         """Turn on/off the Tild filtration programming first range"""
         return await self._toggle_item_state(
             label="filtration programming first range",
-            sensor_key=FILTRATION_PROG_FIRST_RANGE_STATUS_ENABLED,
+            sensor_key=FILTRATION_PROG_FIRST_RANGE_ENABLED,
             message_key=SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -606,7 +611,7 @@ class CceiTildClient:
         """Turn on/off the Tild filtration programming second range"""
         return await self._toggle_item_state(
             label="filtration programming second range",
-            sensor_key=FILTRATION_PROG_SECOND_RANGE_STATUS_ENABLED,
+            sensor_key=FILTRATION_PROG_SECOND_RANGE_ENABLED,
             message_key=SET_FILTRATION_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -635,7 +640,7 @@ class CceiTildClient:
         """Turn on/off the Tild filtration programming third range"""
         return await self._toggle_item_state(
             label="filtration programming third range",
-            sensor_key=FILTRATION_PROG_THIRD_RANGE_STATUS_ENABLED,
+            sensor_key=FILTRATION_PROG_THIRD_RANGE_ENABLED,
             message_key=SET_FILTRATION_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -664,7 +669,7 @@ class CceiTildClient:
         """Turn on/off the Tild filtration programming week-end first range"""
         return await self._toggle_item_state(
             label="filtration programming week-end first range",
-            sensor_key=FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_ENABLED,
+            sensor_key=FILTRATION_PROG_WEEK_END_FIRST_RANGE_ENABLED,
             message_key=SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -693,7 +698,7 @@ class CceiTildClient:
         """Turn on/off the Tild filtration programming week-end second range"""
         return await self._toggle_item_state(
             label="filtration programming week-end second range",
-            sensor_key=FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_ENABLED,
+            sensor_key=FILTRATION_PROG_WEEK_END_SECOND_RANGE_ENABLED,
             message_key=SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -722,7 +727,7 @@ class CceiTildClient:
         """Turn on/off the Tild filtration programming week-end third range"""
         return await self._toggle_item_state(
             label="filtration programming week-end third range",
-            sensor_key=FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_ENABLED,
+            sensor_key=FILTRATION_PROG_WEEK_END_THIRD_RANGE_ENABLED,
             message_key=SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -751,7 +756,7 @@ class CceiTildClient:
         """Turn on/off the Tild auxiliary programming"""
         return await self._toggle_item_state(
             label="auxiliary programming",
-            sensor_key=AUX_PROG_STATUS_ENABLED,
+            sensor_key=AUX_PROG_ENABLED,
             message_key=SET_AUX_PROG_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -760,7 +765,7 @@ class CceiTildClient:
         """Turn on/off the Tild auxiliary programming week-end mode"""
         return await self._toggle_item_state(
             label="auxiliary programming week-end mode",
-            sensor_key=AUX_PROG_WEEK_END_MODE_STATUS_ENABLED,
+            sensor_key=AUX_PROG_WEEK_END_MODE_ENABLED,
             message_key=SET_AUX_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -769,7 +774,7 @@ class CceiTildClient:
         """Turn on/off the Tild auxiliary programming first range"""
         return await self._toggle_item_state(
             label="auxiliary programming first range",
-            sensor_key=AUX_PROG_FIRST_RANGE_STATUS_ENABLED,
+            sensor_key=AUX_PROG_FIRST_RANGE_ENABLED,
             message_key=SET_AUX_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -798,7 +803,7 @@ class CceiTildClient:
         """Turn on/off the Tild auxiliary programming second range"""
         return await self._toggle_item_state(
             label="auxiliary programming second range",
-            sensor_key=AUX_PROG_SECOND_RANGE_STATUS_ENABLED,
+            sensor_key=AUX_PROG_SECOND_RANGE_ENABLED,
             message_key=SET_AUX_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -827,7 +832,7 @@ class CceiTildClient:
         """Turn on/off the Tild auxiliary programming third range"""
         return await self._toggle_item_state(
             label="auxiliary programming third range",
-            sensor_key=AUX_PROG_THIRD_RANGE_STATUS_ENABLED,
+            sensor_key=AUX_PROG_THIRD_RANGE_ENABLED,
             message_key=SET_AUX_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -856,7 +861,7 @@ class CceiTildClient:
         """Turn on/off the Tild auxiliary programming week-end first range"""
         return await self._toggle_item_state(
             label="auxiliary programming week-end first range",
-            sensor_key=AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_ENABLED,
+            sensor_key=AUX_PROG_WEEK_END_FIRST_RANGE_ENABLED,
             message_key=SET_AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -885,7 +890,7 @@ class CceiTildClient:
         """Turn on/off the Tild auxiliary programming week-end second range"""
         return await self._toggle_item_state(
             label="auxiliary programming week-end second range",
-            sensor_key=AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_ENABLED,
+            sensor_key=AUX_PROG_WEEK_END_SECOND_RANGE_ENABLED,
             message_key=SET_AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -914,7 +919,7 @@ class CceiTildClient:
         """Turn on/off the Tild auxiliary programming week-end third range"""
         return await self._toggle_item_state(
             label="auxiliary programming week-end third range",
-            sensor_key=AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_ENABLED,
+            sensor_key=AUX_PROG_WEEK_END_THIRD_RANGE_ENABLED,
             message_key=SET_AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY,
             state=state,
         )
@@ -1022,28 +1027,29 @@ class FakeTildBox:
         self.light_intensity_code = random.choice(list(LIGHT_INTENSITY_CODES.keys()))
         self.light_timer_duration_code = random.choice(list(DURATION_CODES.keys()))
         self.filtration_state = random.choice([ON, OFF])
-        self.thermoregulated_filtration_state = random.choice([ON, OFF])
+        self.filtration_prog_thermoregulated_state = random.choice([ON, OFF])
+        self.filtration_prog_thermoregulated_state = random.choice([ON, OFF])
         self.water_temperature = random.randrange(20, 30)
         self.water_temperature_offset_code = random.choice(list(WATER_TEMPERATURE_OFFSET_CODES))
         self.light_prog_mode_dusk_state = random.choice([ON, OFF])
         self.light_prog_week_end_mode_state = random.choice([ON, OFF])
-        self.filtration_prog_status_state = random.choice([ON, OFF])
-        self.filtration_prog_thermoregulated_status_state = random.choice([ON, OFF])
-        self.filtration_prog_week_end_status_state = random.choice([ON, OFF])
-        self.filtration_prog_first_range_status_state = random.choice([ON, OFF])
-        self.filtration_prog_second_range_status_state = random.choice([ON, OFF])
-        self.filtration_prog_third_range_status_state = random.choice([ON, OFF])
-        self.filtration_prog_week_end_first_range_status_state = random.choice([ON, OFF])
-        self.filtration_prog_week_end_second_range_status_state = random.choice([ON, OFF])
-        self.filtration_prog_week_end_third_range_status_state = random.choice([ON, OFF])
-        self.aux_prog_status_state = random.choice([ON, OFF])
-        self.aux_prog_week_end_mode_status_state = random.choice([ON, OFF])
-        self.aux_prog_first_range_status_state = random.choice([ON, OFF])
-        self.aux_prog_second_range_status_state = random.choice([ON, OFF])
-        self.aux_prog_third_range_status_state = random.choice([ON, OFF])
-        self.aux_prog_week_end_first_range_status_state = random.choice([ON, OFF])
-        self.aux_prog_week_end_second_range_status_state = random.choice([ON, OFF])
-        self.aux_prog_week_end_third_range_status_state = random.choice([ON, OFF])
+        self.filtration_prog_state = random.choice([ON, OFF])
+        self.filtration_prog_thermoregulated_state = random.choice([ON, OFF])
+        self.filtration_prog_week_end_state = random.choice([ON, OFF])
+        self.filtration_prog_first_range_state = random.choice([ON, OFF])
+        self.filtration_prog_second_range_state = random.choice([ON, OFF])
+        self.filtration_prog_third_range_state = random.choice([ON, OFF])
+        self.filtration_prog_week_end_first_range_state = random.choice([ON, OFF])
+        self.filtration_prog_week_end_second_range_state = random.choice([ON, OFF])
+        self.filtration_prog_week_end_third_range_state = random.choice([ON, OFF])
+        self.aux_prog_state = random.choice([ON, OFF])
+        self.aux_prog_week_end_mode_state = random.choice([ON, OFF])
+        self.aux_prog_first_range_state = random.choice([ON, OFF])
+        self.aux_prog_second_range_state = random.choice([ON, OFF])
+        self.aux_prog_third_range_state = random.choice([ON, OFF])
+        self.aux_prog_week_end_first_range_state = random.choice([ON, OFF])
+        self.aux_prog_week_end_second_range_state = random.choice([ON, OFF])
+        self.aux_prog_week_end_third_range_state = random.choice([ON, OFF])
         self.light_prog_status_code = random.choice(list(LIGHT_PROG_STATUS_CODES))
         self.light_prog_start_hour_code = random.choice(list(HOUR_CODES))
         self.light_prog_duration_code = random.choice(list(PROG_RANGE_DURATION_WITH_OFF_CODES))
@@ -1077,26 +1083,13 @@ class FakeTildBox:
         self.aux_prog_week_end_third_range_start_hour_code = random.choice(list(HOUR_CODES))
         self.aux_prog_week_end_third_range_end_hour_code = random.choice(list(HOUR_CODES))
 
-    def get_light_status_code(self):
-        """Retrieve light status code according current state"""
-        for code, state in LIGHT_STATUS_CODES.items():
-            if state == self.light_state:
-                return code
-        LOGGER.warning(
-            "No light status code found for %s",
-            "on" if self.light_state else "off",
-        )
-        return "X"
-
-    def get_filtration_status_code(self):
-        """Retrieve filtration status code according current state"""
-        for code, state in FILTRATION_STATUS_CODES.items():
-            if state == self.filtration_state:
-                return code
-        LOGGER.warning(
-            "No filtration status code found for %s",
-            "on" if self.filtration_state else "off",
-        )
+    @staticmethod
+    def _get_toggleable_status_code(state, codes, label):
+        """Retrieve toggleable status code according the current state"""
+        for c, s in codes.items():
+            if s == state:
+                return c
+        LOGGER.warning("No %s status code found for %s", label, "on" if state else "off")
         return "X"
 
     def get_state_data(self):
@@ -1112,11 +1105,20 @@ class FakeTildBox:
             SYSTEM_DATE_HOUR: f"{now.hour:02}",
             SYSTEM_DATE_MINUTE: f"{now.minute:02}",
             WATER_TEMPERATURE: f"{self.water_temperature:02x}",
-            LIGHT_STATUS_CODE: self.get_light_status_code(),
+            LIGHT_STATUS_CODE: self._get_toggleable_status_code(
+                self.light_state, LIGHT_STATUS_CODES, "light"
+            ),
             LIGHT_COLOR_CODE: f"{self.light_color_code:02x}",
             LIGHT_INTENSITY_CODE: str(self.light_intensity_code),
             LIGHT_TIMER_DURATION_CODE: f"{self.light_timer_duration_code:02x}",
-            FILTRATION_STATUS_CODE: self.get_filtration_status_code(),
+            FILTRATION_STATUS_CODE: self._get_toggleable_status_code(
+                self.filtration_state, FILTRATION_STATUS_CODES, "filtration"
+            ),
+            FILTRATION_PROG_THERMOREGULATED_STATUS_CODE: self._get_toggleable_status_code(
+                self.filtration_prog_thermoregulated_state,
+                FILTRATION_PROG_THERMOREGULATED_STATUS_CODES,
+                "filtration thermoregulated programming",
+            ),
             WATER_TEMPERATURE_OFFSET_CODE: str(self.water_temperature_offset_code),
         }
 
@@ -1224,9 +1226,9 @@ class FakeTildBox:
                     self.handle_toogleable_request(
                         connection,
                         address,
-                        "filtration programming thermoregulated",
+                        "filtration thermoregulated programming",
                         message[SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY],
-                        "thermoregulated_filtration_state",
+                        "filtration_prog_thermoregulated_state",
                     )
                 elif SET_LIGHT_PROG_MODE_DUSK_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1250,15 +1252,15 @@ class FakeTildBox:
                         address,
                         "filtration programming",
                         message[SET_FILTRATION_PROG_STATUS_MESSAGE_KEY],
-                        "filtration_prog_status_state",
+                        "filtration_prog_state",
                     )
                 elif SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
                         connection,
                         address,
-                        "filtration programming thermoregulated",
+                        "filtration thermoregulated programming",
                         message[SET_FILTRATION_PROG_THERMOREGULATED_STATUS_MESSAGE_KEY],
-                        "filtration_prog_thermoregulated_status_state",
+                        "filtration_prog_thermoregulated_state",
                     )
                 elif SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1266,7 +1268,7 @@ class FakeTildBox:
                         address,
                         "filtration programming mode week-end",
                         message[SET_FILTRATION_PROG_WEEK_END_STATUS_MESSAGE_KEY],
-                        "filtration_prog_week_end_status_state",
+                        "filtration_prog_week_end_state",
                     )
                 elif SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1274,7 +1276,7 @@ class FakeTildBox:
                         address,
                         "filtration programming first range",
                         message[SET_FILTRATION_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_first_range_status_state",
+                        "filtration_prog_first_range_state",
                     )
                 elif SET_FILTRATION_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1282,7 +1284,7 @@ class FakeTildBox:
                         address,
                         "filtration programming second range",
                         message[SET_FILTRATION_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_second_range_status_state",
+                        "filtration_prog_second_range_state",
                     )
                 elif SET_FILTRATION_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1290,7 +1292,7 @@ class FakeTildBox:
                         address,
                         "filtration programming third range",
                         message[SET_FILTRATION_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_third_range_status_state",
+                        "filtration_prog_third_range_state",
                     )
                 elif SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1298,7 +1300,7 @@ class FakeTildBox:
                         address,
                         "filtration programming week-end first range",
                         message[SET_FILTRATION_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_week_end_first_range_status_state",
+                        "filtration_prog_week_end_first_range_state",
                     )
                 elif SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1306,7 +1308,7 @@ class FakeTildBox:
                         address,
                         "filtration programming week-end second range",
                         message[SET_FILTRATION_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_week_end_second_range_status_state",
+                        "filtration_prog_week_end_second_range_state",
                     )
                 elif SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1314,7 +1316,7 @@ class FakeTildBox:
                         address,
                         "filtration programming week-end third range",
                         message[SET_FILTRATION_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY],
-                        "filtration_prog_week_end_third_range_status_state",
+                        "filtration_prog_week_end_third_range_state",
                     )
                 elif SET_AUX_PROG_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1322,7 +1324,7 @@ class FakeTildBox:
                         address,
                         "auxiliary programming",
                         message[SET_AUX_PROG_STATUS_MESSAGE_KEY],
-                        "aux_prog_status_state",
+                        "aux_prog_state",
                     )
                 elif SET_AUX_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1330,7 +1332,7 @@ class FakeTildBox:
                         address,
                         "auxiliary programming week-end mode",
                         message[SET_AUX_PROG_WEEK_END_MODE_STATUS_MESSAGE_KEY],
-                        "aux_prog_week_end_mode_status_state",
+                        "aux_prog_week_end_mode_state",
                     )
                 elif SET_AUX_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1338,7 +1340,7 @@ class FakeTildBox:
                         address,
                         "auxiliary programming first range",
                         message[SET_AUX_PROG_FIRST_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_first_range_status_state",
+                        "aux_prog_first_range_state",
                     )
                 elif SET_AUX_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1346,7 +1348,7 @@ class FakeTildBox:
                         address,
                         "auxiliary programming second range",
                         message[SET_AUX_PROG_SECOND_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_second_range_status_state",
+                        "aux_prog_second_range_state",
                     )
                 elif SET_AUX_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1354,7 +1356,7 @@ class FakeTildBox:
                         address,
                         "auxiliary programming third range",
                         message[SET_AUX_PROG_THIRD_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_third_range_status_state",
+                        "aux_prog_third_range_state",
                     )
                 elif SET_AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1362,7 +1364,7 @@ class FakeTildBox:
                         address,
                         "auxiliary programming week-end first range",
                         message[SET_AUX_PROG_WEEK_END_FIRST_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_week_end_first_range_status_state",
+                        "aux_prog_week_end_first_range_state",
                     )
                 elif SET_AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1370,7 +1372,7 @@ class FakeTildBox:
                         address,
                         "auxiliary programming week-end second range",
                         message[SET_AUX_PROG_WEEK_END_SECOND_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_week_end_second_range_status_state",
+                        "aux_prog_week_end_second_range_state",
                     )
                 elif SET_AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY in message:
                     self.handle_toogleable_request(
@@ -1378,7 +1380,7 @@ class FakeTildBox:
                         address,
                         "auxiliary programming week-end third range",
                         message[SET_AUX_PROG_WEEK_END_THIRD_RANGE_STATUS_MESSAGE_KEY],
-                        "aux_prog_week_end_third_range_status_state",
+                        "aux_prog_week_end_third_range_state",
                     )
                 elif SET_LIGHT_COLOR_MESSAGE_KEY in message:
                     self.handle_set_item_request(
