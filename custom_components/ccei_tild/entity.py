@@ -20,6 +20,8 @@ LOGGER = logging.getLogger(__name__)
 class TildEntity(CoordinatorEntity):
     """Representation of a CCEI Tild entity."""
 
+    _attr_has_entity_name = True
+
     _attr_id_key = None
     _entity_id_format = None
     _sensor_data_key = None
@@ -85,6 +87,11 @@ class TildEntity(CoordinatorEntity):
                 else None
             )
         return attrs
+
+    @property
+    def translation_key(self):
+        """Return the translation key to translate the entity's name and states."""
+        return self._sensor_data_key
 
 
 class TildSensorEntity(TildEntity):

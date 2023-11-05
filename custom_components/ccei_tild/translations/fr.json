@@ -1,25 +1,241 @@
 {
-    "title": "CCEI Tild",
-    "config": {
-        "step": {
-            "user": {
-                "description": "Merci de configurer la connexion à votre boitier CCEI Tild.",
-                "data": {
-                    "host": "Adresse IP (ou nom d'hôte) de votre boitier Tild",
-                    "refresh_rate": "Fréquence de rafraîchissement (en minutes)"
-                }
-            }
+  "title": "CCEI Tild",
+  "config": {
+    "step": {
+      "user": {
+        "description": "Merci de configurer la connexion à votre boitier CCEI Tild.",
+        "data": {
+          "host": "Adresse IP (ou nom d'hôte) de votre boitier Tild",
+          "refresh_rate": "Fréquence de rafraîchissement (en minutes)"
         }
-    },
-    "options": {
-        "step": {
-            "init": {
-                "description": "Merci de reconfigurer la connexion à votre boitier CCEI Tild.",
-                "data": {
-                    "host": "Adresse IP (ou nom d'hôte) de votre boitier Tild",
-                    "refresh_rate": "Fréquence de rafraîchissement (en minutes)"
-                }
-            }
-        }
+      }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Merci de reconfigurer la connexion à votre boitier CCEI Tild.",
+        "data": {
+          "host": "Adresse IP (ou nom d'hôte) de votre boitier Tild",
+          "refresh_rate": "Fréquence de rafraîchissement (en minutes)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "light_intensity": {
+        "name": "Intensité de la lumière"
+      },
+      "light_color": {
+        "name": "Couleur de la lumière",
+        "state": {
+          "Hot": "Chaud",
+          "Cold": "Froid",
+          "Blue": "Bleu",
+          "Lagoon": "Lagon",
+          "Cyan": "Cyan",
+          "Purple": "Violet",
+          "Magenta": "Magenta",
+          "Pink": "Rose",
+          "Red": "Rouge",
+          "Orange": "Orange",
+          "Green": "Vert",
+          "Favorite color": "Couleur favorite",
+          "Gradient sequence": "Séquence dégradée",
+          "Rainbow sequence": "Séquence arc-en-ciel",
+          "Parade sequence": "Séquence défilé",
+          "Techno sequence": "Séquence techno",
+          "Horizon sequence": "Séquence horizon",
+          "Random sequence": "Séquence aléatoire",
+          "Magic sequence": "Séquence magique"
+        }
+      },
+      "light_timer_duration": {
+        "name": "Minuterie lumière - Durée d'allumage"
+      },
+      "water_temperature_offset": {
+        "name": "Ajustement de la température de l'eau relevée"
+      },
+      "light_prog_status": {
+        "name": "Programmation lumière - Mode",
+        "state": {
+          "off": "Éteint",
+          "programming": "Programmation",
+          "timer": "Minuterie"
+        }
+      },
+      "light_prog_start_hour": {
+        "name": "Programmation lumière - Heure d'allumage"
+      },
+      "light_prog_duration": {
+        "name": "Programmation lumière - Durée d'allumage"
+      },
+      "light_prog_week_end_start_hour": {
+        "name": "Programmation lumière - Week-end - Heure d'allumage"
+      },
+      "light_prog_week_end_duration": {
+        "name": "Programmation lumière - Week-end - Durée d'allumage"
+      },
+      "light_sequence_speed": {
+        "name": "Lumière - Vitesse des séquences"
+      },
+      "filtration_prog_first_range_start_hour": {
+        "name": "Programmation filtration - 1er créneau - Heure d'allumage"
+      },
+      "filtration_prog_first_range_end_hour": {
+        "name": "Programmation filtration - 1er créneau - Heure d'extinction"
+      },
+      "filtration_prog_second_range_start_hour": {
+        "name": "Programmation filtration - 2nd créneau - Heure d'allumage"
+      },
+      "filtration_prog_second_range_end_hour": {
+        "name": "Programmation filtration - 2nd créneau - Heure d'extinction"
+      },
+      "filtration_prog_third_range_start_hour": {
+        "name": "Programmation filtration - 3ème créneau - Heure d'allumage"
+      },
+      "filtration_prog_third_range_end_hour": {
+        "name": "Programmation filtration - 3ème créneau - Heure d'extinction"
+      },
+      "filtration_prog_week_end_first_range_start_hour": {
+        "name": "Programmation filtration - 1er créneau du week-end - Heure d'allumage"
+      },
+      "filtration_prog_week_end_first_range_end_hour": {
+        "name": "Programmation filtration - 1er créneau du week-end - Heure d'extinction"
+      },
+      "filtration_prog_week_end_second_range_start_hour": {
+        "name": "Programmation filtration - 2nd créneau du week-end - Heure d'allumage"
+      },
+      "filtration_prog_week_end_second_range_end_hour": {
+        "name": "Programmation filtration - 2nd créneau du week-end - Heure d'extinction"
+      },
+      "filtration_prog_week_end_third_range_start_hour": {
+        "name": "Programmation filtration - 3ème créneau du week-end - Heure d'allumage"
+      },
+      "filtration_prog_week_end_third_range_end_hour": {
+        "name": "Programmation filtration - 3ème créneau du week-end - Heure d'extinction"
+      },
+      "aux_prog_first_range_start_hour": {
+        "name": "Programmation auxiliaire - 1er créneau - Heure d'allumage"
+      },
+      "aux_prog_first_range_end_hour": {
+        "name": "Programmation auxiliaire - 1er créneau - Heure d'extinction"
+      },
+      "aux_prog_second_range_start_hour": {
+        "name": "Programmation auxiliaire - 2nd créneau - Heure d'allumage"
+      },
+      "aux_prog_second_range_end_hour": {
+        "name": "Programmation auxiliaire - 2nd créneau - Heure d'extinction"
+      },
+      "aux_prog_third_range_start_hour": {
+        "name": "Programmation auxiliaire - 3ème créneau - Heure d'allumage"
+      },
+      "aux_prog_third_range_end_hour": {
+        "name": "Programmation auxiliaire - 3ème créneau - Heure d'extinction"
+      },
+      "aux_prog_week_end_first_range_start_hour": {
+        "name": "Programmation auxiliaire - 1er créneau week-end - Heure d'allumage"
+      },
+      "aux_prog_week_end_first_range_end_hour": {
+        "name": "Programmation auxiliaire - 1er créneau week-end - Heure d'extinction"
+      },
+      "aux_prog_week_end_second_range_start_hour": {
+        "name": "Programmation auxiliaire - 2nd créneau week-end - Heure d'allumage"
+      },
+      "aux_prog_week_end_second_range_end_hour": {
+        "name": "Programmation auxiliaire - 2nd créneau week-end - Heure d'extinction"
+      },
+      "aux_prog_week_end_third_range_start_hour": {
+        "name": "Programmation auxiliaire - 3ème créneau week-end - Heure d'allumage"
+      },
+      "aux_prog_week_end_third_range_end_hour": {
+        "name": "Programmation auxiliaire - 3ème créneau week-end - Heure d'extinction"
+      }
+    },
+    "switch": {
+      "filtration_enabled": {
+        "name": "Filtration"
+      },
+      "light_prog_dusk_mode_enabled": {
+        "name": "Programmation lumière - Mode crépusculaire"
+      },
+      "light_prog_week_end_mode_enabled": {
+        "name": "Programmation lumière - Mode week-end"
+      },
+      "filtration_prog_enabled": {
+        "name": "Programmation filtration"
+      },
+      "filtration_prog_thermoregulated_enabled": {
+        "name": "Programmation filtration - Mode thermorégulé"
+      },
+      "filtration_prog_week_end_mode_enabled": {
+        "name": "Programmation filtration - Mode week-end"
+      },
+      "filtration_prog_first_range_enabled": {
+        "name": "Programmation filtration - 1er créneau"
+      },
+      "filtration_prog_second_range_enabled": {
+        "name": "Programmation filtration - 2nd créneau"
+      },
+      "filtration_prog_third_range_enabled": {
+        "name": "Programmation filtration - 3ème créneau"
+      },
+      "filtration_prog_week_end_first_range_enabled": {
+        "name": "Programmation filtration - 1er créneau week-end"
+      },
+      "filtration_prog_week_end_second_range_enabled": {
+        "name": "Programmation filtration - 2nd créneau week-end"
+      },
+      "filtration_prog_week_end_third_range_enabled": {
+        "name": "Programmation filtration - 3ème créneau week-end"
+      },
+      "aux_prog_enabled": {
+        "name": "Programmation auxiliaire"
+      },
+      "aux_prog_week_end_mode_enabled": {
+        "name": "Programmation auxiliaire - Mode week-end"
+      },
+      "aux_prog_first_range_enabled": {
+        "name": "Programmation auxiliaire - 1er créneau"
+      },
+      "aux_prog_second_range_enabled": {
+        "name": "Programmation auxiliaire - 2nd créneau"
+      },
+      "aux_prog_third_range_enabled": {
+        "name": "Programmation auxiliaire - 3ème créneau"
+      },
+      "aux_prog_week_end_first_range_enabled": {
+        "name": "Programmation auxiliaire - 1er créneau week-end"
+      },
+      "aux_prog_week_end_second_range_enabled": {
+        "name": "Programmation auxiliaire - 2nd créneau week-end"
+      },
+      "aux_prog_week_end_third_range_enabled": {
+        "name": "Programmation auxiliaire - 3ème créneau week-end"
+      }
+    },
+    "light": {
+      "light_enabled": {
+        "name": "Lumière"
+      }
+    },
+    "sensor": {
+      "system_host": {
+        "name": "Adresse"
+      },
+      "system_date": {
+        "name": "Date & heure système"
+      },
+      "water_temperature": {
+        "name": "Température de l'eau"
+      },
+      "water_raw_temperature": {
+        "name": "Température brute de l'eau"
+      },
+      "raw_data": {
+        "name": "Données d'état brutes"
+      }
+    }
+  }
 }

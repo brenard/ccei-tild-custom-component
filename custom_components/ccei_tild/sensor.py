@@ -30,7 +30,6 @@ async def async_setup_entry(hass, entry, async_add_devices):
 class TildSystemHostAddressSensor(TildSensorEntity):
     """Monitors the system host address"""
 
-    _attr_name = "System host address"
     _attr_icon = "mdi:ip-network"
 
     _sensor_data_key = SYSTEM_HOST
@@ -39,7 +38,6 @@ class TildSystemHostAddressSensor(TildSensorEntity):
 class TildSystemDateSensor(TildSensorEntity):
     """Monitors the system date"""
 
-    _attr_name = "System date"
     _attr_icon = "mdi:clock"
 
     _sensor_data_key = SYSTEM_DATE
@@ -48,7 +46,6 @@ class TildSystemDateSensor(TildSensorEntity):
 class TildWaterTemperatureSensor(TildSensorEntity):
     """Monitors the water temperature"""
 
-    _attr_name = "Water temperature"
     _attr_unit_of_measurement = TEMP_CELSIUS
     _attr_icon = "mdi:pool-thermometer"
 
@@ -58,7 +55,6 @@ class TildWaterTemperatureSensor(TildSensorEntity):
 class TildWaterRawTemperatureSensor(TildSensorEntity):
     """Monitors the water raw temperature"""
 
-    _attr_name = "Water raw temperature"
     _attr_unit_of_measurement = TEMP_CELSIUS
     _attr_icon = "mdi:pool-thermometer"
 
@@ -69,7 +65,6 @@ class TildRawStatusDataSensor(TildSensorEntity):
     """Monitors the raw Tild status data"""
 
     _attr_id_key = "tild_raw_status_data"
-    _attr_name = "Raw status data"
     _attr_icon = "mdi:data-matrix"
 
     _sensor_data_key = RAW_DATA

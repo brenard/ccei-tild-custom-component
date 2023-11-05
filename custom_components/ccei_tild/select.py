@@ -121,7 +121,6 @@ async def async_setup_entry(hass, entry, async_add_devices):
 class TildLightIntensitySelect(TildSelectEntity):
     """Select the light intensity"""
 
-    _attr_name = "Light intensity"
     _attr_unit_of_measurement = PERCENTAGE
     _attr_icon = "mdi:brightness-percent"
 
@@ -133,7 +132,6 @@ class TildLightIntensitySelect(TildSelectEntity):
 class TildLightColorSelect(TildSelectEntity):
     """Select the light color"""
 
-    _attr_name = "Light color"
     _attr_icon = "mdi:palette"
 
     _sensor_data_key = LIGHT_COLOR
@@ -143,7 +141,6 @@ class TildLightColorSelect(TildSelectEntity):
 class TildLightTimerDurationSelect(TildSelectEntity):
     """Select the light timer duration"""
 
-    _attr_name = "Light timer duration"
     _attr_icon = "mdi:timer-cog-outline"
 
     _sensor_data_key = LIGHT_TIMER_DURATION
@@ -153,7 +150,6 @@ class TildLightTimerDurationSelect(TildSelectEntity):
 class TildWaterTemperatureOffsetSelect(TildSelectEntity):
     """Select the water temperature offset"""
 
-    _attr_name = "Water temperature offset"
     _attr_unit_of_measurement = TEMP_CELSIUS
     _attr_icon = "mdi:thermometer-water"
 
@@ -165,7 +161,6 @@ class TildWaterTemperatureOffsetSelect(TildSelectEntity):
 class TildLightProgrammingStatusSelect(TildSelectEntity):
     """Select the light programming status"""
 
-    _attr_name = "Light programming status"
     _attr_icon = "mdi:home-lightbulb-outline"
 
     _sensor_data_key = LIGHT_PROG_STATUS
@@ -175,7 +170,6 @@ class TildLightProgrammingStatusSelect(TildSelectEntity):
 class TildLightProgrammingStartHourSelect(TildSelectEntity):
     """Select the light programming start hour"""
 
-    _attr_name = "Light programming start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = LIGHT_PROG_START_HOUR
@@ -185,7 +179,6 @@ class TildLightProgrammingStartHourSelect(TildSelectEntity):
 class TildLightProgrammingDurationSelect(TildSelectEntity):
     """Select the light programming duration"""
 
-    _attr_name = "Light programming duration"
     _attr_icon = "mdi:clock-time-eight-outline"
 
     _sensor_data_key = LIGHT_PROG_DURATION
@@ -195,7 +188,6 @@ class TildLightProgrammingDurationSelect(TildSelectEntity):
 class TildLightProgrammingWeekEndStartHourSelect(TildSelectEntity):
     """Select the light programming week-end start hour"""
 
-    _attr_name = "Light programming week-end start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = LIGHT_PROG_WEEK_END_START_HOUR
@@ -205,7 +197,6 @@ class TildLightProgrammingWeekEndStartHourSelect(TildSelectEntity):
 class TildLightProgrammingWeekEndDurationSelect(TildSelectEntity):
     """Select the light programming week-end duration"""
 
-    _attr_name = "Light programming week-end duration"
     _attr_icon = "mdi:clock-time-eight-outline"
 
     _sensor_data_key = LIGHT_PROG_WEEK_END_DURATION
@@ -215,7 +206,6 @@ class TildLightProgrammingWeekEndDurationSelect(TildSelectEntity):
 class TildLightSequenceSpeedSelect(TildSelectEntity):
     """Select the light sequence speed"""
 
-    _attr_name = "Light sequence speed"
     _attr_icon = "mdi:speedometer"
 
     _sensor_data_key = LIGHT_SEQUENCE_SPEED
@@ -226,7 +216,6 @@ class TildLightSequenceSpeedSelect(TildSelectEntity):
 class TildFiltrationProgrammingFirstRangeStartHourSelect(TildSelectEntity):
     """Select the filtration programming first range start hour"""
 
-    _attr_name = "Filtration programming first range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = FIL_PROG_FIRST_RANGE_START_HOUR
@@ -236,7 +225,6 @@ class TildFiltrationProgrammingFirstRangeStartHourSelect(TildSelectEntity):
 class TildFiltrationProgrammingFirstRangeEndHourSelect(TildSelectEntity):
     """Select the filtration programming first range end hour"""
 
-    _attr_name = "Filtration programming first range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = FIL_PROG_FIRST_RANGE_END_HOUR
@@ -246,7 +234,6 @@ class TildFiltrationProgrammingFirstRangeEndHourSelect(TildSelectEntity):
 class TildFiltrationProgrammingSecondRangeStartHourSelect(TildSelectEntity):
     """Select the filtration programming second range start hour"""
 
-    _attr_name = "Filtration programming second range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = FIL_PROG_SECOND_RANGE_START_HOUR
@@ -256,7 +243,6 @@ class TildFiltrationProgrammingSecondRangeStartHourSelect(TildSelectEntity):
 class TildFiltrationProgrammingSecondRangeEndHourSelect(TildSelectEntity):
     """Select the filtration programming second range end hour"""
 
-    _attr_name = "Filtration programming second range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = FIL_PROG_SECOND_RANGE_END_HOUR
@@ -269,7 +255,6 @@ class TildFiltrationProgrammingSecondRangeEndHourSelect(TildSelectEntity):
 class TildFiltrationProgrammingThirdRangeStartHourSelect(TildSelectEntity):
     """Select the filtration programming third range start hour"""
 
-    _attr_name = "Filtration programming third range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = FIL_PROG_THIRD_RANGE_START_HOUR
@@ -282,7 +267,6 @@ class TildFiltrationProgrammingThirdRangeStartHourSelect(TildSelectEntity):
 class TildFiltrationProgrammingThirdRangeEndHourSelect(TildSelectEntity):
     """Select the filtration programming third range end hour"""
 
-    _attr_name = "Filtration programming third range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = FIL_PROG_THIRD_RANGE_END_HOUR
@@ -292,7 +276,6 @@ class TildFiltrationProgrammingThirdRangeEndHourSelect(TildSelectEntity):
 class TildFiltrationProgrammingWeekEndFirstRangeStartHourSelect(TildSelectEntity):
     """Select the filtration programming week-end first range start hour"""
 
-    _attr_name = "Filtration programming week-end first range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = FIL_PROG_WEEK_END_FIRST_RANGE_START_HOUR
@@ -302,7 +285,6 @@ class TildFiltrationProgrammingWeekEndFirstRangeStartHourSelect(TildSelectEntity
 class TildFiltrationProgrammingWeekEndFirstRangeEndHourSelect(TildSelectEntity):
     """Select the filtration programming week-end first range end hour"""
 
-    _attr_name = "Filtration programming week-end first range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = FIL_PROG_WEEK_END_FIRST_RANGE_END_HOUR
@@ -312,7 +294,6 @@ class TildFiltrationProgrammingWeekEndFirstRangeEndHourSelect(TildSelectEntity):
 class TildFiltrationProgrammingWeekEndSecondRangeStartHourSelect(TildSelectEntity):
     """Select the filtration programming week-end second range start hour"""
 
-    _attr_name = "Filtration programming week-end second range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = FIL_PROG_WEEK_END_SECOND_RANGE_START_HOUR
@@ -322,7 +303,6 @@ class TildFiltrationProgrammingWeekEndSecondRangeStartHourSelect(TildSelectEntit
 class TildFiltrationProgrammingWeekEndSecondRangeEndHourSelect(TildSelectEntity):
     """Select the filtration programming week-end second range end hour"""
 
-    _attr_name = "Filtration programming week-end second range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = FIL_PROG_WEEK_END_SECOND_RANGE_END_HOUR
@@ -332,7 +312,6 @@ class TildFiltrationProgrammingWeekEndSecondRangeEndHourSelect(TildSelectEntity)
 class TildFiltrationProgrammingWeekEndThirdRangeStartHourSelect(TildSelectEntity):
     """Select the filtration programming week-end third range start hour"""
 
-    _attr_name = "Filtration programming week-end third range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = FIL_PROG_WEEK_END_THIRD_RANGE_START_HOUR
@@ -342,7 +321,6 @@ class TildFiltrationProgrammingWeekEndThirdRangeStartHourSelect(TildSelectEntity
 class TildFiltrationProgrammingWeekEndThirdRangeEndHourSelect(TildSelectEntity):
     """Select the filtration programming week-end third range end hour"""
 
-    _attr_name = "Filtration programming week-end third range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = FIL_PROG_WEEK_END_THIRD_RANGE_END_HOUR
@@ -352,7 +330,6 @@ class TildFiltrationProgrammingWeekEndThirdRangeEndHourSelect(TildSelectEntity):
 class TildAuxiliaryProgrammingFirstRangeStartHourSelect(TildSelectEntity):
     """Select the auxiliary programming first range start hour"""
 
-    _attr_name = "Auxiliary programming first range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_FIRST_RANGE_START_HOUR
@@ -362,7 +339,6 @@ class TildAuxiliaryProgrammingFirstRangeStartHourSelect(TildSelectEntity):
 class TildAuxiliaryProgrammingFirstRangeEndHourSelect(TildSelectEntity):
     """Select the auxiliary programming first range end hour"""
 
-    _attr_name = "Auxiliary programming first range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_FIRST_RANGE_END_HOUR
@@ -372,7 +348,6 @@ class TildAuxiliaryProgrammingFirstRangeEndHourSelect(TildSelectEntity):
 class TildAuxiliaryProgrammingSecondRangeStartHourSelect(TildSelectEntity):
     """Select the auxiliary programming second range start hour"""
 
-    _attr_name = "Auxiliary programming second range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_SECOND_RANGE_START_HOUR
@@ -382,7 +357,6 @@ class TildAuxiliaryProgrammingSecondRangeStartHourSelect(TildSelectEntity):
 class TildAuxiliaryProgrammingSecondRangeEndHourSelect(TildSelectEntity):
     """Select the auxiliary programming second range end hour"""
 
-    _attr_name = "Auxiliary programming second range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_SECOND_RANGE_END_HOUR
@@ -392,7 +366,6 @@ class TildAuxiliaryProgrammingSecondRangeEndHourSelect(TildSelectEntity):
 class TildAuxiliaryProgrammingThirdRangeStartHourSelect(TildSelectEntity):
     """Select the auxiliary programming third range start hour"""
 
-    _attr_name = "Auxiliary programming third range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_THIRD_RANGE_START_HOUR
@@ -402,7 +375,6 @@ class TildAuxiliaryProgrammingThirdRangeStartHourSelect(TildSelectEntity):
 class TildAuxiliaryProgrammingThirdRangeEndHourSelect(TildSelectEntity):
     """Select the auxiliary programming third range end hour"""
 
-    _attr_name = "Auxiliary programming third range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_THIRD_RANGE_END_HOUR
@@ -412,7 +384,6 @@ class TildAuxiliaryProgrammingThirdRangeEndHourSelect(TildSelectEntity):
 class TildAuxiliaryProgrammingWeekEndFirstRangeStartHourSelect(TildSelectEntity):
     """Select the auxiliary programming week-end first range start hour"""
 
-    _attr_name = "Auxiliary programming week-end first range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR
@@ -422,7 +393,6 @@ class TildAuxiliaryProgrammingWeekEndFirstRangeStartHourSelect(TildSelectEntity)
 class TildAuxiliaryProgrammingWeekEndFirstRangeEndHourSelect(TildSelectEntity):
     """Select the auxiliary programming week-end first range end hour"""
 
-    _attr_name = "Auxiliary programming week-end first range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR
@@ -432,7 +402,6 @@ class TildAuxiliaryProgrammingWeekEndFirstRangeEndHourSelect(TildSelectEntity):
 class TildAuxiliaryProgrammingWeekEndSecondRangeStartHourSelect(TildSelectEntity):
     """Select the auxiliary programming week-end second range start hour"""
 
-    _attr_name = "Auxiliary programming week-end second range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR
@@ -442,7 +411,6 @@ class TildAuxiliaryProgrammingWeekEndSecondRangeStartHourSelect(TildSelectEntity
 class TildAuxiliaryProgrammingWeekEndSecondRangeEndHourSelect(TildSelectEntity):
     """Select the auxiliary programming week-end second range end hour"""
 
-    _attr_name = "Auxiliary programming week-end second range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR
@@ -452,7 +420,6 @@ class TildAuxiliaryProgrammingWeekEndSecondRangeEndHourSelect(TildSelectEntity):
 class TildAuxiliaryProgrammingWeekEndThirdRangeStartHourSelect(TildSelectEntity):
     """Select the auxiliary programming week-end third range start hour"""
 
-    _attr_name = "Auxiliary programming week-end third range start hour"
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR
@@ -462,7 +429,6 @@ class TildAuxiliaryProgrammingWeekEndThirdRangeStartHourSelect(TildSelectEntity)
 class TildAuxiliaryProgrammingWeekEndThirdRangeEndHourSelect(TildSelectEntity):
     """Select the auxiliary programming week-end third range end hour"""
 
-    _attr_name = "Auxiliary programming week-end third range end hour"
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR

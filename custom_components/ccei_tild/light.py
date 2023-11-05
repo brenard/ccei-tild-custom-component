@@ -16,9 +16,6 @@ class TildLight(TildLightEntity):
     """Manage the light"""
 
     _attr_id_key = "tild_light"
-    _attr_name = "Light"
     _attr_icon = "mdi:light-flood-up"
 
     _sensor_data_key = LIGHT_ENABLED
-
-    _client_toggle_method = "toggle_light_status"

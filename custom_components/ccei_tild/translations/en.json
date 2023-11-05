@@ -2,8 +2,8 @@
   "title": "CCEI Tild",
   "config": {
     "step": {
-      "user": {
-        "description": "Please configure the connection with your CCEI Tild box.",
+      "init": {
+        "description": "Please reconfigure the connection with your CCEI Tild box.",
         "data": {
           "host": "Tild box IP address (or hostname)",
           "refresh_rate": "Refresh rate (in minutes)"
@@ -11,14 +11,198 @@
       }
     }
   },
-  "config": {
-    "step": {
-      "init": {
-        "description": "Please reconfigure the connection with your CCEI Tild box.",
-        "data": {
-          "host": "Tild box IP address (or hostname)",
-          "refresh_rate": "Refresh rate (in minutes)"
+  "entity": {
+    "select": {
+      "light_intensity": {
+        "name": "Light intensity"
+      },
+      "light_color": {
+        "name": "Light color"
+      },
+      "light_timer_duration": {
+        "name": "Light timer duration"
+      },
+      "water_temperature_offset": {
+        "name": "Water temperature offset"
+      },
+      "light_prog_status": {
+        "name": "Light programming - Mode",
+        "state": {
+          "off": "Off",
+          "programming": "Programmng",
+          "timer": "Timer"
         }
+      },
+      "light_prog_start_hour": {
+        "name": "Light programming - Start hour"
+      },
+      "light_prog_duration": {
+        "name": "Light programming - Duration"
+      },
+      "light_prog_week_end_start_hour": {
+        "name": "Light programming - week-end - Start hour"
+      },
+      "light_prog_week_end_duration": {
+        "name": "Light programming - week-end - Duration"
+      },
+      "light_sequence_speed": {
+        "name": "Light sequence speed"
+      },
+      "filtration_prog_first_range_start_hour": {
+        "name": "Filtration programming - 1st range - Start hour"
+      },
+      "filtration_prog_first_range_end_hour": {
+        "name": "Filtration programming - 1st range - End hour"
+      },
+      "filtration_prog_second_range_start_hour": {
+        "name": "Filtration programming - 2nd range - Start hour"
+      },
+      "filtration_prog_second_range_end_hour": {
+        "name": "Filtration programming - 2nd range - End hour"
+      },
+      "filtration_prog_third_range_start_hour": {
+        "name": "Filtration programming - 3rd range - Start hour"
+      },
+      "filtration_prog_third_range_end_hour": {
+        "name": "Filtration programming - 3rd range - End hour"
+      },
+      "filtration_prog_week_end_first_range_start_hour": {
+        "name": "Filtration programming - 1st week-end range - Start hour"
+      },
+      "filtration_prog_week_end_first_range_end_hour": {
+        "name": "Filtration programming - 1st week-end range - End hour"
+      },
+      "filtration_prog_week_end_second_range_start_hour": {
+        "name": "Filtration programming - 2nd week-end range - Start hour"
+      },
+      "filtration_prog_week_end_second_range_end_hour": {
+        "name": "Filtration programming - 2nd week-end range - End hour"
+      },
+      "filtration_prog_week_end_third_range_start_hour": {
+        "name": "Filtration programming - 3rd week-end range - Start hour"
+      },
+      "filtration_prog_week_end_third_range_end_hour": {
+        "name": "Filtration programming - 3rd week-end range - End hour"
+      },
+      "aux_prog_first_range_start_hour": {
+        "name": "Auxiliary programming - 1st range - Start hour"
+      },
+      "aux_prog_first_range_end_hour": {
+        "name": "Auxiliary programming - 1st range - End hour"
+      },
+      "aux_prog_second_range_start_hour": {
+        "name": "Auxiliary programming - 2nd range - Start hour"
+      },
+      "aux_prog_second_range_end_hour": {
+        "name": "Auxiliary programming - 2nd range - End hour"
+      },
+      "aux_prog_third_range_start_hour": {
+        "name": "Auxiliary programming - 3rd range - Start hour"
+      },
+      "aux_prog_third_range_end_hour": {
+        "name": "Auxiliary programming - 3rd range - End hour"
+      },
+      "aux_prog_week_end_first_range_start_hour": {
+        "name": "Auxiliary programming - 1st week-end range - Start hour"
+      },
+      "aux_prog_week_end_first_range_end_hour": {
+        "name": "Auxiliary programming - 1st week-end range - End hour"
+      },
+      "aux_prog_week_end_second_range_start_hour": {
+        "name": "Auxiliary programming - 2nd week-end range - Start hour"
+      },
+      "aux_prog_week_end_second_range_end_hour": {
+        "name": "Auxiliary programming - 2nd week-end range - End hour"
+      },
+      "aux_prog_week_end_third_range_start_hour": {
+        "name": "Auxiliary programming - 3rd week-end range - Start hour"
+      },
+      "aux_prog_week_end_third_range_end_hour": {
+        "name": "Auxiliary programming - 3rd week-end range - End hour"
+      }
+    },
+    "switch": {
+      "filtration_enabled": {
+        "name": "Filtration"
+      },
+      "light_prog_dusk_mode_enabled": {
+        "name": "Light programming - Dusk mode"
+      },
+      "light_prog_week_end_mode_enabled": {
+        "name": "Light programming - Week-end mode"
+      },
+      "filtration_prog_enabled": {
+        "name": "Filtration programming"
+      },
+      "filtration_prog_thermoregulated_enabled": {
+        "name": "Filtration programming - Thermoregulated mode"
+      },
+      "filtration_prog_week_end_mode_enabled": {
+        "name": "Filtration programming - Week-end mode"
+      },
+      "filtration_prog_first_range_enabled": {
+        "name": "Filtration programming - 1st range"
+      },
+      "filtration_prog_second_range_enabled": {
+        "name": "Filtration programming - 2nd range"
+      },
+      "filtration_prog_third_range_enabled": {
+        "name": "Filtration programming - 3rd range"
+      },
+      "filtration_prog_week_end_first_range_enabled": {
+        "name": "Filtration programming - 1st week-end range"
+      },
+      "filtration_prog_week_end_second_range_enabled": {
+        "name": "Filtration programming - 2nd week-end range"
+      },
+      "filtration_prog_week_end_third_range_enabled": {
+        "name": "Filtration programming - 3rd week-end range"
+      },
+      "aux_prog_enabled": {
+        "name": "Auxiliary programming"
+      },
+      "aux_prog_week_end_mode_enabled": {
+        "name": "Auxiliary programming - Week-end mode"
+      },
+      "aux_prog_first_range_enabled": {
+        "name": "Auxiliary programming - 1st range"
+      },
+      "aux_prog_second_range_enabled": {
+        "name": "Auxiliary programming - 2nd range"
+      },
+      "aux_prog_third_range_enabled": {
+        "name": "Auxiliary programming - 3rd range"
+      },
+      "aux_prog_week_end_first_range_enabled": {
+        "name": "Auxiliary programming - 1st week-end range"
+      },
+      "aux_prog_week_end_second_range_enabled": {
+        "name": "Auxiliary programming - 2nd week-end range"
+      },
+      "aux_prog_week_end_third_range_enabled": {
+        "name": "Auxiliary programming - 3rd week-end range"
+      }
+    },
+    "light": {
+      "light_enabled": {
+        "name": "Light"
+      }
+    },
+    "sensor": {
+      "system_host": {
+        "name": "Address"
+      },
+      "system_date": {
+        "name": "System date"
+      },
+      "water_temperature": {
+        "name": "Water temperature"
+      },
+      "water_raw_temperature": {
+        "name": "Water raw temperature"
+      },
+      "raw_data": {
+        "name": "Raw status data"
       }
     }
   }

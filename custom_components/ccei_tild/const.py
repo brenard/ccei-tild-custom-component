@@ -59,8 +59,8 @@ LIGHT_PROG_WEEK_END_START_HOUR_CODE = "light_prog_week_end_start_hour_code"
 LIGHT_PROG_WEEK_END_START_HOUR = "light_prog_week_end_start_hour"
 LIGHT_PROG_WEEK_END_DURATION_CODE = "light_prog_week_end_duration_code"
 LIGHT_PROG_WEEK_END_DURATION = "light_prog_week_end_duration"
-LIGHT_SEQUENCE_SPEED_CODE = "light_color_speed_code"
-LIGHT_SEQUENCE_SPEED = "light_color_speed"
+LIGHT_SEQUENCE_SPEED_CODE = "light_sequence_speed_code"
+LIGHT_SEQUENCE_SPEED = "light_sequence_speed"
 FIL_ENSLAVED_BY_LIGHT_ENABLED = "filtration_enslaved_by_light_enabled"
 FIL_PROG_ENABLED = "filtration_prog_enabled"
 FIL_PROG_THERMOREGULATED_ENABLED = "filtration_prog_thermoregulated_enabled"
@@ -151,14 +151,14 @@ LIGHT_COLORS_CODES = {
     8: "Red",
     9: "Orange",
     10: "Green",
-    11: "Favorite",
+    11: "Favorite color",
     16: "Gradient sequence",
-    17: "Rainbow",
-    18: "Parade",
-    19: "Techno",
-    20: "Horizon",
-    21: "Random",
-    22: "Magic",
+    17: "Rainbow sequence",
+    18: "Parade sequence",
+    19: "Techno sequence",
+    20: "Horizon sequence",
+    21: "Random sequence",
+    22: "Magic sequence",
 }
 
 LIGHT_SEQUENCE_SPEED_CODES = {
