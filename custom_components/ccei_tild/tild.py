@@ -459,6 +459,11 @@ def parse_sensors_data(data, system_host=None):
     state[RAW_DATA] = data
     state[SYSTEM_HOST] = system_host
 
+    # Add None state for non-idendified properties
+    for prop in PROPERTIES_CODES:
+        if prop not in state:
+            state[prop] = None
+
     return state
 
 
