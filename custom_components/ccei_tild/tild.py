@@ -183,7 +183,7 @@ TOGGLEABLES_BIN_BITS = {
     68: [
         None,
         None,
-        None,
+        AUX_PROG_WEEK_END_MODE_ENABLED,
         FIL_PROG_WEEK_END_MODE_ENABLED,
     ],
     69: [
