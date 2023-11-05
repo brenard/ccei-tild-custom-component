@@ -167,12 +167,6 @@ IDENTIFIED_PROPERTIES_POSITIONS = {
 
 # Toggleable binary bits
 TOGGLEABLES_BIN_BITS = {
-    32: [
-        None,
-        None,
-        FIL_PROG_ENABLED,
-        None,
-    ],
     33: [
         None,
         None,
@@ -181,15 +175,15 @@ TOGGLEABLES_BIN_BITS = {
     ],
     68: [
         None,
+        None,
+        None,
         FIL_PROG_WEEK_END_MODE_ENABLED,
-        None,
-        None,
     ],
     69: [
         LIGHT_PROG_WEEK_END_MODE_ENABLED,
         AUX_PROG_ENABLED,
         FIL_PROG_THERMOREGULATED_ENABLED,
-        None,
+        FIL_PROG_ENABLED,
     ],
     70: [
         LIGHT_PROG_DUSK_MODE_ENABLED,
