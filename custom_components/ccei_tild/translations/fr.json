@@ -21,19 +21,5 @@
                 }
             }
         }
-    },
-    "services": {
-        "refresh": {
-            "name": "Rafraîchir les données des capteurs",
-            "description": "Forcer le rafraîchissement des données des capteurs immédiatement."
-        },
-        "set_light_color": {
-            "name": "Définir la couleur de la lumière",
-            "description": "Permet de définir la couleur de la lumière depuis la liste des couleurs supportées."
-        },
-        "set_light_intensity": {
-            "name": "Définir l'intensité de la lumière",
-            "description": "Permet de définir l'intensité de la lumière depuis la liste des intensités supportées."
-        }
     }
 }

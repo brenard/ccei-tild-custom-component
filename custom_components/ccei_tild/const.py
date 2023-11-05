@@ -14,13 +14,9 @@ CONF_REFRESH_RATE = "refresh_rate"
 CONF_REFRESH_RATE_DEFAULT = 5
 COORDINATOR = "coordinator"
 CLIENT = "client"
-SERVICE = "service"
 
 SENSORS_DATA = "sensors_data"
 LAST_REFRESH = "last_refresh"
-REFRESH_SERVICE_NAME = "refresh"
-SET_LIGHT_COLOR_SERVICE_NAME = "set_light_color"
-SET_LIGHT_INTENSITY_SERVICE_NAME = "set_light_intensity"
 
 SYSTEM_HOST = "system_host"
 SYSTEM_DATE = "system_date"
