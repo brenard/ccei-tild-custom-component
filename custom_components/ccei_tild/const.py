@@ -137,7 +137,7 @@ AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE = "aux_prog_week_end_third_range_s
 AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR = "aux_prog_week_end_third_range_start_hour"
 AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE = "aux_prog_week_end_third_range_end_hour_code"
 AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR = "aux_prog_week_end_third_range_end_hour"
-TOGGLEABLES_BIN_BITS_CODE_FORMAT = "toggleable_bin_bit{}"
+BIN_BITS_CODE_FORMAT = "bin_bit{}"
 
 ATTR_COLOR = "color"
 ATTR_INTENSITY = "intensity"
@@ -173,16 +173,9 @@ LIGHT_SEQUENCE_SPEED_CODES = {
 
 LIGHT_INTENSITY_CODES = {
     0: 25,
-    4: 50,
-    8: 75,
-    12: 100,
-}
-
-LIGHT_INTENSITY_CODES_TO_SEND = {
-    25: 0,
-    50: 1,
-    75: 2,
-    100: 3,
+    1: 50,
+    2: 75,
+    3: 100,
 }
 
 WATER_TEMPERATURE_OFFSET_CODES = {

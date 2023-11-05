@@ -41,6 +41,7 @@ from .const import (
     AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
     AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR,
     AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
+    BIN_BITS_CODE_FORMAT,
     COORDINATOR,
     DOMAIN,
     FIL_ENABLED,
@@ -86,7 +87,6 @@ from .const import (
     LIGHT_INTENSITY,
     LIGHT_INTENSITY_CODE,
     LIGHT_INTENSITY_CODES,
-    LIGHT_INTENSITY_CODES_TO_SEND,
     LIGHT_PROG_DURATION,
     LIGHT_PROG_DURATION_CODE,
     LIGHT_PROG_DUSK_MODE_ENABLED,
@@ -117,7 +117,6 @@ from .const import (
     SYSTEM_DATE_MONTH,
     SYSTEM_DATE_YEAR,
     SYSTEM_HOST,
-    TOGGLEABLES_BIN_BITS_CODE_FORMAT,
     WATER_RAW_TEMPERATURE,
     WATER_TEMPERATURE,
     WATER_TEMPERATURE_OFFSET,
@@ -163,6 +162,13 @@ IDENTIFIED_PROPERTIES_POSITIONS = {
     AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE: [58, 59],
     AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE: [60, 61],
     AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE: [62, 63],
+}
+
+IDENTIFIED_PROPERTIES_BIN_POSITIONS = {
+    71: {
+        LIGHT_INTENSITY_CODE: [0, 1],
+        LIGHT_PROG_STATUS_CODE: [2, 3],
+    },
 }
 
 # Toggleable binary bits
@@ -370,7 +376,7 @@ DEDUCED_PROPERTIES = {
     AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR: AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
 }
 
-PROPERTIES_CODES_TO_SEND = {LIGHT_INTENSITY_CODE: LIGHT_INTENSITY_CODES_TO_SEND}
+PROPERTIES_CODES_TO_SEND = {}
 
 PROPERTIES_RAW_VALUE = [
     SYSTEM_DATE_YEAR,
@@ -394,8 +400,8 @@ def parse_sensors_data(data, system_host=None):
 
     # Compute initial state from idendified properties positions
     state = {
-        key: "".join(map(lambda x: data[x], properties))
-        for key, properties in IDENTIFIED_PROPERTIES_POSITIONS.items()
+        key: "".join(map(lambda x: data[x], pos))
+        for key, pos in IDENTIFIED_PROPERTIES_POSITIONS.items()
     }
 
     # Convert properties values to integer base 10 (expect properties with raw value)
@@ -423,9 +429,20 @@ def parse_sensors_data(data, system_host=None):
     ]:
         del state[prop]
 
+    # Compute binary properties state
+    for bit, properties in IDENTIFIED_PROPERTIES_BIN_POSITIONS.items():
+        bit_key = BIN_BITS_CODE_FORMAT.format(bit)
+        state[bit_key] = BitArray(hex=f"0x{data[bit]}").bin
+        LOGGER.debug("Binary properties bit %d = %s (%s)", bit, data[bit], state[bit_key])
+        for prop, pos in properties.items():
+            # pylint: disable=cell-var-from-loop
+            bin_value = "".join(map(lambda x: state[bit_key][x], pos))
+            state[prop] = int(bin_value, 2)
+            LOGGER.debug("- property %s = %s (%s)", prop, state[prop], bin_value)
+
     # Compute toggleables state
     for bit, properties in TOGGLEABLES_BIN_BITS.items():
-        bit_key = TOGGLEABLES_BIN_BITS_CODE_FORMAT.format(bit)
+        bit_key = BIN_BITS_CODE_FORMAT.format(bit)
         state[bit_key] = BitArray(hex=f"0x{data[bit]}").bin
         # LOGGER.debug("Toggleables bit %d = %s (%s)", bit, data[bit], state[bit_key])
         for idx, prop in enumerate(properties):
@@ -753,6 +770,18 @@ class FakeTildBox:
                 prop in properties
             ), f"Property {prop} identified on position {','.join(map(str, pos))} is not provided"
             data[pos[0] : pos[-1] + 1] = list(properties[prop])
+
+        for bit, properties in IDENTIFIED_PROPERTIES_BIN_POSITIONS.items():
+            print(f"Computing binary properties bit {bit}:")
+            bin_status_code = ["0", "0", "0", "0"]
+            for prop, pos in properties.items():
+                bin_code = f"{self.properties_state[prop]:02b}"
+                bin_status_code[pos[0] : pos[-1] + 1] = list(bin_code)
+                print(f"- {prop}: {bin_code} ({self.properties_state[prop]})")
+            bin_status_code = "".join(bin_status_code)
+
+            data[bit] = f"{int(bin_status_code, 2):x}".upper()
+            print(f" => binary properties bit {bit} = {data[bit]} ({bin_status_code})")
 
         for bit, properties in TOGGLEABLES_BIN_BITS.items():
             print(f"Computing toggleables bit {bit}:")
