@@ -1,0 +1,214 @@
+title: Tild
+views:
+  - path: pool
+    icon: mdi:pool
+    badges: []
+    cards:
+      - type: entities
+        entities:
+          - entity: light.tild_light
+          - entity: select.tild_light_color
+          - entity: select.tild_light_intensity
+          - entity: select.tild_light_sequence_speed
+        title: Light
+      - type: tile
+        entity: switch.tild_filtration
+      - type: tile
+        entity: switch.tild_aux_prog_status
+  - title: Settings
+    path: settings
+    icon: mdi:cog
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: conditional
+            conditions:
+              - entity: switch.tild_filtration_prog_status
+                state: 'off'
+            card:
+              type: entities
+              title: Filtration
+              entities:
+                - entity: switch.tild_filtration
+                - entity: switch.tild_filtration_prog_status
+              show_header_toggle: false
+          - type: conditional
+            conditions:
+              - entity: switch.tild_filtration_prog_status
+                state: 'on'
+            card:
+              type: entities
+              title: Filtration
+              entities:
+                - entity: switch.tild_filtration_prog_status
+              show_header_toggle: false
+          - type: conditional
+            conditions:
+              - entity: switch.tild_filtration_prog_status
+                state: 'on'
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.tild_filtration_prog_thermoregulated_status
+                    - entity: switch.tild_filtration_prog_week_end_mode_status
+                - type: vertical-stack
+                  cards:
+                    - type: entities
+                      entities:
+                        - entity: switch.tild_filtration_prog_first_range_status
+                    - type: conditional
+                      conditions:
+                        - entity: switch.tild_filtration_prog_first_range_status
+                          state: 'on'
+                      card:
+                        type: entities
+                        entities:
+                          - entity: select.tild_filtration_prog_first_range_start_hour
+                          - entity: select.tild_filtration_prog_first_range_end_hour
+                        show_header_toggle: false
+                    - type: entities
+                      entities:
+                        - entity: switch.tild_filtration_prog_second_range_status
+                    - type: conditional
+                      conditions:
+                        - entity: switch.tild_filtration_prog_second_range_status
+                          state: 'on'
+                      card:
+                        type: entities
+                        entities:
+                          - entity: >-
+                              select.tild_filtration_prog_second_range_start_hour
+                          - entity: select.tild_filtration_prog_second_range_end_hour
+                        show_header_toggle: false
+                    - type: entities
+                      entities:
+                        - entity: switch.tild_filtration_prog_third_range_status
+                    - type: conditional
+                      conditions:
+                        - entity: switch.tild_filtration_prog_third_range_status
+                          state: 'on'
+                      card:
+                        type: entities
+                        entities:
+                          - entity: select.tild_filtration_prog_third_range_start_hour
+                          - entity: select.tild_filtration_prog_third_range_end_hour
+                        show_header_toggle: false
+                    - type: conditional
+                      conditions:
+                        - entity: switch.tild_filtration_prog_week_end_mode_status
+                          state: 'on'
+                      card:
+                        type: vertical-stack
+                        cards:
+                          - type: entities
+                            entities:
+                              - entity: >-
+                                  switch.tild_filtration_prog_week_end_first_range_status
+                          - type: conditional
+                            conditions:
+                              - entity: >-
+                                  switch.tild_filtration_prog_week_end_first_range_status
+                                state: 'on'
+                            card:
+                              type: entities
+                              entities:
+                                - entity: >-
+                                    select.tild_filtration_prog_week_end_first_range_start_hour
+                                - entity: >-
+                                    select.tild_filtration_prog_week_end_first_range_end_hour
+                              show_header_toggle: false
+                          - type: entities
+                            entities:
+                              - entity: >-
+                                  switch.tild_filtration_prog_week_end_second_range_status
+                          - type: conditional
+                            conditions:
+                              - entity: >-
+                                  switch.tild_filtration_prog_week_end_second_range_status
+                                state: 'on'
+                            card:
+                              type: entities
+                              entities:
+                                - entity: >-
+                                    select.tild_filtration_prog_week_end_second_range_start_hour
+                                - entity: >-
+                                    select.tild_filtration_prog_week_end_second_range_end_hour
+                              show_header_toggle: false
+                          - type: entities
+                            entities:
+                              - entity: >-
+                                  switch.tild_filtration_prog_week_end_third_range_status
+                          - type: conditional
+                            conditions:
+                              - entity: >-
+                                  switch.tild_filtration_prog_week_end_third_range_status
+                                state: 'on'
+                            card:
+                              type: entities
+                              entities:
+                                - entity: >-
+                                    select.tild_filtration_prog_week_end_third_range_start_hour
+                                - entity: >-
+                                    select.tild_filtration_prog_week_end_third_range_end_hour
+                              show_header_toggle: false
+      - type: vertical-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: select.tild_light_prog_status
+            title: Light
+          - type: conditional
+            conditions:
+              - entity: select.tild_light_prog_status
+                state: timer
+            card:
+              type: entities
+              entities:
+                - entity: select.tild_light_timer_duration
+              show_header_toggle: false
+              title: Timer
+          - type: conditional
+            conditions:
+              - entity: select.tild_light_prog_status
+                state: programming
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.tild_light_prog_dusk_mode_status
+                    - entity: switch.tild_light_prog_week_end_mode_status
+                  show_header_toggle: false
+                  title: Programming
+                - type: conditional
+                  conditions:
+                    - entity: switch.tild_light_prog_dusk_mode_status
+                      state: 'off'
+                  card:
+                    type: entities
+                    entities:
+                      - entity: select.tild_light_prog_start_hour
+                - type: entities
+                  entities:
+                    - entity: select.tild_light_prog_duration
+                - type: conditional
+                  conditions:
+                    - entity: switch.tild_light_prog_week_end_mode_status
+                      state: 'on'
+                  card:
+                    type: vertical-stack
+                    cards:
+                      - type: conditional
+                        conditions:
+                          - entity: switch.tild_light_prog_dusk_mode_status
+                            state: 'off'
+                        card:
+                          type: entities
+                          entities:
+                            - entity: select.tild_light_prog_week_end_start_hour
+                      - type: entities
+                        entities:
+                          - entity: select.tild_light_prog_week_end_duration
