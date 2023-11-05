@@ -166,56 +166,45 @@ IDENTIFIED_PROPERTIES_POSITIONS = {
 }
 
 IDENTIFIED_PROPERTIES_BIN_POSITIONS = {
+    33: {
+        FIL_ENSLAVED_BY_LIGHT_ENABLED: [2],
+        FIL_ENABLED: [3],
+    },
+    68: {
+        AUX_PROG_WEEK_END_MODE_ENABLED: [2],
+        FIL_PROG_WEEK_END_MODE_ENABLED: [3],
+    },
+    69: {
+        LIGHT_PROG_WEEK_END_MODE_ENABLED: [0],
+        AUX_PROG_ENABLED: [1],
+        FIL_PROG_THERMOREGULATED_ENABLED: [2],
+        FIL_PROG_ENABLED: [3],
+    },
+    70: {
+        LIGHT_PROG_DUSK_MODE_ENABLED: [0],
+        LIGHT_ENABLED: [1],
+        LIGHT_SEQUENCE_SPEED_CODE: [2, 3],
+    },
     71: {
         LIGHT_INTENSITY_CODE: [0, 1],
         LIGHT_PROG_STATUS_CODE: [2, 3],
     },
-}
-
-# Toggleable binary bits
-TOGGLEABLES_BIN_BITS = {
-    33: [
-        None,
-        None,
-        FIL_ENSLAVED_BY_LIGHT_ENABLED,
-        FIL_ENABLED,
-    ],
-    68: [
-        None,
-        None,
-        AUX_PROG_WEEK_END_MODE_ENABLED,
-        FIL_PROG_WEEK_END_MODE_ENABLED,
-    ],
-    69: [
-        LIGHT_PROG_WEEK_END_MODE_ENABLED,
-        AUX_PROG_ENABLED,
-        FIL_PROG_THERMOREGULATED_ENABLED,
-        FIL_PROG_ENABLED,
-    ],
-    70: [
-        LIGHT_PROG_DUSK_MODE_ENABLED,
-        LIGHT_ENABLED,
-        None,
-        None,
-    ],
-    92: [
-        None,
-        None,
-        AUX_PROG_WEEK_END_THIRD_RANGE_ENABLED,
-        AUX_PROG_WEEK_END_SECOND_RANGE_ENABLED,
-    ],
-    93: [
-        AUX_PROG_WEEK_END_FIRST_RANGE_ENABLED,
-        AUX_PROG_THIRD_RANGE_ENABLED,
-        AUX_PROG_SECOND_RANGE_ENABLED,
-        AUX_PROG_FIRST_RANGE_ENABLED,
-    ],
-    119: [
-        FIL_PROG_WEEK_END_FIRST_RANGE_ENABLED,
-        FIL_PROG_THIRD_RANGE_ENABLED,
-        FIL_PROG_SECOND_RANGE_ENABLED,
-        FIL_PROG_FIRST_RANGE_ENABLED,
-    ],
+    92: {
+        AUX_PROG_WEEK_END_THIRD_RANGE_ENABLED: [2],
+        AUX_PROG_WEEK_END_SECOND_RANGE_ENABLED: [3],
+    },
+    93: {
+        AUX_PROG_WEEK_END_FIRST_RANGE_ENABLED: [0],
+        AUX_PROG_THIRD_RANGE_ENABLED: [1],
+        AUX_PROG_SECOND_RANGE_ENABLED: [2],
+        AUX_PROG_FIRST_RANGE_ENABLED: [3],
+    },
+    119: {
+        FIL_PROG_WEEK_END_FIRST_RANGE_ENABLED: [0],
+        FIL_PROG_THIRD_RANGE_ENABLED: [1],
+        FIL_PROG_SECOND_RANGE_ENABLED: [2],
+        FIL_PROG_FIRST_RANGE_ENABLED: [3],
+    },
 }
 
 GET_SENSORS_DATA_MESSAGE = "Begin"
@@ -437,26 +426,9 @@ def parse_sensors_data(data, system_host=None):
             # pylint: disable=cell-var-from-loop
             bin_value = "".join(map(lambda x: state[bit_key][x], pos))
             state[prop] = int(bin_value, 2)
+            if PROPERTIES_CODES.get(prop) == ON_OFF_CODES:
+                state[prop] = ON if state[prop] else OFF
             LOGGER.debug("- property %s = %s (%s)", prop, state[prop], bin_value)
-
-    # Compute toggleables state
-    for bit, properties in TOGGLEABLES_BIN_BITS.items():
-        bit_key = BIN_BITS_CODE_FORMAT.format(bit)
-        state[bit_key] = BitArray(hex=f"0x{data[bit]}").bin
-        # LOGGER.debug("Toggleables bit %d = %s (%s)", bit, data[bit], state[bit_key])
-        for idx, prop in enumerate(properties):
-            if not prop:
-                # LOGGER.debug("Toggleables bit %d / property %d: unknown", bit, idx)
-                continue
-            state[prop] = ON if int(state[bit_key][idx]) else OFF
-            # LOGGER.debug(
-            #     "Toggleables bit %d / property %d = %s: %s => %s",
-            #     bit,
-            #     idx,
-            #     prop,
-            #     state[bit_key][idx],
-            #     state[prop],
-            # )
 
     # Compute deduced properties
     for prop, code_prop in DEDUCED_PROPERTIES.items():
@@ -697,10 +669,6 @@ class FakeTildBox:
     port = 30302
     sock = None
 
-    toggleable_properties = [
-        prop for bit, properties in TOGGLEABLES_BIN_BITS.items() for prop in properties
-    ]
-
     message_key_to_property = {
         message_key: prop for prop, message_key in PROPERTIES_MESSAGE_KEY.items()
     }
@@ -749,8 +717,6 @@ class FakeTildBox:
         data = ["0" for idx in range(1, 160)]  # pylint: disable=unused-variable
 
         for prop, pos in IDENTIFIED_PROPERTIES_POSITIONS.items():
-            if prop in self.toggleable_properties:
-                continue
             if prop in self.properties_state:
                 data[pos[0] : pos[-1] + 1] = list(
                     f"{self.properties_state[prop]:02x}"
@@ -767,27 +733,17 @@ class FakeTildBox:
             print(f"Computing binary properties bit {bit}:")
             bin_status_code = ["0", "0", "0", "0"]
             for prop, pos in properties.items():
-                bin_code = f"{self.properties_state[prop]:02b}"
+                bin_code = (
+                    f"{self.properties_state[prop]:b}"
+                    if len(pos) == 1
+                    else f"{self.properties_state[prop]:02b}"
+                )
                 bin_status_code[pos[0] : pos[-1] + 1] = list(bin_code)
                 print(f"- {prop}: {bin_code} ({self.properties_state[prop]})")
             bin_status_code = "".join(bin_status_code)
 
             data[bit] = f"{int(bin_status_code, 2):x}".upper()
             print(f" => binary properties bit {bit} = {data[bit]} ({bin_status_code})")
-
-        for bit, properties in TOGGLEABLES_BIN_BITS.items():
-            print(f"Computing toggleables bit {bit}:")
-            bin_status_code = ["0", "0", "0", "0"]
-            for idx, prop in enumerate(properties):
-                if prop is None:
-                    print(f"- {idx}: unknown => 0")
-                    continue
-                print(f"- {idx}: {prop}: {self.properties_state[prop]}")
-                bin_status_code[idx] = str(self.properties_state[prop])
-            bin_status_code = "".join(bin_status_code)
-
-            data[bit] = BitArray(bin=bin_status_code).hex
-            print(f" => toggleables bit {bit} = {data[bit]} ({bin_status_code})")
 
         return "".join(data)
 
