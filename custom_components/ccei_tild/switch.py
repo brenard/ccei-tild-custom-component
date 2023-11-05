@@ -10,17 +10,17 @@ from .const import (
     AUX_PROG_WEEK_END_THIRD_RANGE_ENABLED,
     COORDINATOR,
     DOMAIN,
-    FILTRATION_ENABLED,
-    FILTRATION_ENSLAVED_BY_LIGHT_ENABLED,
-    FILTRATION_PROG_ENABLED,
-    FILTRATION_PROG_FIRST_RANGE_ENABLED,
-    FILTRATION_PROG_SECOND_RANGE_ENABLED,
-    FILTRATION_PROG_THERMOREGULATED_ENABLED,
-    FILTRATION_PROG_THIRD_RANGE_ENABLED,
-    FILTRATION_PROG_WEEK_END_FIRST_RANGE_ENABLED,
-    FILTRATION_PROG_WEEK_END_MODE_ENABLED,
-    FILTRATION_PROG_WEEK_END_SECOND_RANGE_ENABLED,
-    FILTRATION_PROG_WEEK_END_THIRD_RANGE_ENABLED,
+    FIL_ENABLED,
+    FIL_ENSLAVED_BY_LIGHT_ENABLED,
+    FIL_PROG_ENABLED,
+    FIL_PROG_FIRST_RANGE_ENABLED,
+    FIL_PROG_SECOND_RANGE_ENABLED,
+    FIL_PROG_THERMOREGULATED_ENABLED,
+    FIL_PROG_THIRD_RANGE_ENABLED,
+    FIL_PROG_WEEK_END_FIRST_RANGE_ENABLED,
+    FIL_PROG_WEEK_END_MODE_ENABLED,
+    FIL_PROG_WEEK_END_SECOND_RANGE_ENABLED,
+    FIL_PROG_WEEK_END_THIRD_RANGE_ENABLED,
     LIGHT_PROG_DUSK_MODE_ENABLED,
     LIGHT_PROG_WEEK_END_MODE_ENABLED,
 )
@@ -62,12 +62,10 @@ class TildFiltrationSwitch(TildSwitchEntity):
     _attr_name = "Filtration"
     _attr_icon = "mdi:filter-cog-outline"
 
-    _sensor_data_key = FILTRATION_ENABLED
+    _sensor_data_key = FIL_ENABLED
     _sensor_data_extra_keys = {
-        "enslaved_by_light": FILTRATION_ENSLAVED_BY_LIGHT_ENABLED,
+        "enslaved_by_light": FIL_ENSLAVED_BY_LIGHT_ENABLED,
     }
-
-    _client_toggle_method = "toggle_filtration_status"
 
 
 class TildLightProgrammingDuskModeSwitch(TildSwitchEntity):
@@ -79,8 +77,6 @@ class TildLightProgrammingDuskModeSwitch(TildSwitchEntity):
 
     _sensor_data_key = LIGHT_PROG_DUSK_MODE_ENABLED
 
-    _client_toggle_method = "toggle_light_prog_dusk_mode_status"
-
 
 class TildLightProgrammingWeekEndModeSwitch(TildSwitchEntity):
     """Manage the light programming week-end mode"""
@@ -91,8 +87,6 @@ class TildLightProgrammingWeekEndModeSwitch(TildSwitchEntity):
 
     _sensor_data_key = LIGHT_PROG_WEEK_END_MODE_ENABLED
 
-    _client_toggle_method = "toggle_light_prog_week_end_mode_status"
-
 
 class TildFiltrationProgrammingSwitch(TildSwitchEntity):
     """Manage the filtration programming"""
@@ -101,9 +95,7 @@ class TildFiltrationProgrammingSwitch(TildSwitchEntity):
     _attr_name = "Filtration programming"
     _attr_icon = "mdi:filter-cog-outline"
 
-    _sensor_data_key = FILTRATION_PROG_ENABLED
-
-    _client_toggle_method = "toggle_filtration_prog_status"
+    _sensor_data_key = FIL_PROG_ENABLED
 
 
 class TildFiltrationProgrammingThermoregulatedSwitch(TildSwitchEntity):
@@ -113,9 +105,7 @@ class TildFiltrationProgrammingThermoregulatedSwitch(TildSwitchEntity):
     _attr_name = "Filtration thermoregulated programming"
     _attr_icon = "mdi:thermometer-auto"
 
-    _sensor_data_key = FILTRATION_PROG_THERMOREGULATED_ENABLED
-
-    _client_toggle_method = "toggle_filtration_prog_thermoregulated_status"
+    _sensor_data_key = FIL_PROG_THERMOREGULATED_ENABLED
 
 
 class TildFiltrationProgrammingWeekEndModeSwitch(TildSwitchEntity):
@@ -125,9 +115,7 @@ class TildFiltrationProgrammingWeekEndModeSwitch(TildSwitchEntity):
     _attr_name = "Filtration programming week-end mode"
     _attr_icon = "mdi:calendar-weekend"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_MODE_ENABLED
-
-    _client_toggle_method = "toggle_filtration_prog_week_end_mode_status"
+    _sensor_data_key = FIL_PROG_WEEK_END_MODE_ENABLED
 
 
 class TildFiltrationProgrammingFirstRangeSwitch(TildSwitchEntity):
@@ -137,9 +125,7 @@ class TildFiltrationProgrammingFirstRangeSwitch(TildSwitchEntity):
     _attr_name = "Filtration programming first range"
     _attr_icon = "mdi:calendar-filter"
 
-    _sensor_data_key = FILTRATION_PROG_FIRST_RANGE_ENABLED
-
-    _client_toggle_method = "toggle_filtration_prog_first_range_status"
+    _sensor_data_key = FIL_PROG_FIRST_RANGE_ENABLED
 
 
 class TildFiltrationProgrammingSecondRangeSwitch(TildSwitchEntity):
@@ -149,9 +135,7 @@ class TildFiltrationProgrammingSecondRangeSwitch(TildSwitchEntity):
     _attr_name = "Filtration programming second range"
     _attr_icon = "mdi:calendar-filter"
 
-    _sensor_data_key = FILTRATION_PROG_SECOND_RANGE_ENABLED
-
-    _client_toggle_method = "toggle_filtration_prog_second_range_status"
+    _sensor_data_key = FIL_PROG_SECOND_RANGE_ENABLED
 
 
 class TildFiltrationProgrammingThirdRangeSwitch(TildSwitchEntity):
@@ -161,9 +145,7 @@ class TildFiltrationProgrammingThirdRangeSwitch(TildSwitchEntity):
     _attr_name = "Filtration programming third range"
     _attr_icon = "mdi:calendar-filter"
 
-    _sensor_data_key = FILTRATION_PROG_THIRD_RANGE_ENABLED
-
-    _client_toggle_method = "toggle_filtration_prog_third_range_status"
+    _sensor_data_key = FIL_PROG_THIRD_RANGE_ENABLED
 
 
 class TildFiltrationProgrammingWeekEndFirstRangeSwitch(TildSwitchEntity):
@@ -173,9 +155,7 @@ class TildFiltrationProgrammingWeekEndFirstRangeSwitch(TildSwitchEntity):
     _attr_name = "Filtration programming week-end first range"
     _attr_icon = "mdi:calendar-filter"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_FIRST_RANGE_ENABLED
-
-    _client_toggle_method = "toggle_filtration_prog_week_end_first_range_status"
+    _sensor_data_key = FIL_PROG_WEEK_END_FIRST_RANGE_ENABLED
 
 
 class TildFiltrationProgrammingWeekEndSecondRangeSwitch(TildSwitchEntity):
@@ -185,9 +165,7 @@ class TildFiltrationProgrammingWeekEndSecondRangeSwitch(TildSwitchEntity):
     _attr_name = "Filtration programming week-end second range"
     _attr_icon = "mdi:calendar-filter"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_SECOND_RANGE_ENABLED
-
-    _client_toggle_method = "toggle_filtration_prog_week_end_second_range_status"
+    _sensor_data_key = FIL_PROG_WEEK_END_SECOND_RANGE_ENABLED
 
 
 class TildFiltrationProgrammingWeekEndThirdRangeSwitch(TildSwitchEntity):
@@ -197,9 +175,7 @@ class TildFiltrationProgrammingWeekEndThirdRangeSwitch(TildSwitchEntity):
     _attr_name = "Filtration programming week-end third range"
     _attr_icon = "mdi:calendar-filter"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_THIRD_RANGE_ENABLED
-
-    _client_toggle_method = "toggle_filtration_prog_week_end_third_range_status"
+    _sensor_data_key = FIL_PROG_WEEK_END_THIRD_RANGE_ENABLED
 
 
 class TildAuxiliaryProgrammingSwitch(TildSwitchEntity):
@@ -211,8 +187,6 @@ class TildAuxiliaryProgrammingSwitch(TildSwitchEntity):
 
     _sensor_data_key = AUX_PROG_ENABLED
 
-    _client_toggle_method = "toggle_aux_prog_status"
-
 
 class TildAuxiliaryProgrammingWeekEndModeSwitch(TildSwitchEntity):
     """Manage the auxiliary programming week-end mode"""
@@ -222,8 +196,6 @@ class TildAuxiliaryProgrammingWeekEndModeSwitch(TildSwitchEntity):
     _attr_icon = "mdi:calendar-weekend"
 
     _sensor_data_key = AUX_PROG_WEEK_END_MODE_ENABLED
-
-    _client_toggle_method = "toggle_aux_prog_week_end_mode_status"
 
 
 class TildAuxiliaryProgrammingFirstRangeSwitch(TildSwitchEntity):
@@ -235,8 +207,6 @@ class TildAuxiliaryProgrammingFirstRangeSwitch(TildSwitchEntity):
 
     _sensor_data_key = AUX_PROG_FIRST_RANGE_ENABLED
 
-    _client_toggle_method = "toggle_aux_prog_first_range_status"
-
 
 class TildAuxiliaryProgrammingSecondRangeSwitch(TildSwitchEntity):
     """Manage the auxiliary programming second range"""
@@ -246,8 +216,6 @@ class TildAuxiliaryProgrammingSecondRangeSwitch(TildSwitchEntity):
     _attr_icon = "mdi:calendar-clock"
 
     _sensor_data_key = AUX_PROG_SECOND_RANGE_ENABLED
-
-    _client_toggle_method = "toggle_aux_prog_second_range_status"
 
 
 class TildAuxiliaryProgrammingThirdRangeSwitch(TildSwitchEntity):
@@ -259,8 +227,6 @@ class TildAuxiliaryProgrammingThirdRangeSwitch(TildSwitchEntity):
 
     _sensor_data_key = AUX_PROG_THIRD_RANGE_ENABLED
 
-    _client_toggle_method = "toggle_aux_prog_third_range_status"
-
 
 class TildAuxiliaryProgrammingWeekEndFirstRangeSwitch(TildSwitchEntity):
     """Manage the auxiliary programming week-end first range"""
@@ -270,8 +236,6 @@ class TildAuxiliaryProgrammingWeekEndFirstRangeSwitch(TildSwitchEntity):
     _attr_icon = "mdi:calendar-clock"
 
     _sensor_data_key = AUX_PROG_WEEK_END_FIRST_RANGE_ENABLED
-
-    _client_toggle_method = "toggle_aux_prog_week_end_first_range_status"
 
 
 class TildAuxiliaryProgrammingWeekEndSecondRangeSwitch(TildSwitchEntity):
@@ -283,8 +247,6 @@ class TildAuxiliaryProgrammingWeekEndSecondRangeSwitch(TildSwitchEntity):
 
     _sensor_data_key = AUX_PROG_WEEK_END_SECOND_RANGE_ENABLED
 
-    _client_toggle_method = "toggle_aux_prog_week_end_second_range_status"
-
 
 class TildAuxiliaryProgrammingWeekEndThirdRangeSwitch(TildSwitchEntity):
     """Manage the auxiliary programming week-end third range"""
@@ -294,5 +256,3 @@ class TildAuxiliaryProgrammingWeekEndThirdRangeSwitch(TildSwitchEntity):
     _attr_icon = "mdi:calendar-clock"
 
     _sensor_data_key = AUX_PROG_WEEK_END_THIRD_RANGE_ENABLED
-
-    _client_toggle_method = "toggle_aux_prog_week_end_third_range_status"

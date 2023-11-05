@@ -12,6 +12,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import CLIENT, DOMAIN, LAST_REFRESH, MANUFACTER, NAME, OFF, ON, SENSORS_DATA
+from .tild import PROPERTIES_CODES
 
 LOGGER = logging.getLogger(__name__)
 
@@ -21,6 +22,8 @@ class TildEntity(CoordinatorEntity):
 
     _attr_id_key = None
     _entity_id_format = None
+    _sensor_data_key = None
+    _sensor_data_code_key = None
     _sensor_data_extra_keys = {}
 
     def __init__(self, coordinator, config_entry, hass):
@@ -39,6 +42,10 @@ class TildEntity(CoordinatorEntity):
             self.entity_id = self._entity_id_format.format(
                 self._attr_id_key if self._attr_id_key else f"tild_{self._sensor_data_key}"
             )
+        if self._sensor_data_code_key and self._sensor_data_code_key in PROPERTIES_CODES:
+            self._attr_options = [
+                str(value) for value in PROPERTIES_CODES[self._sensor_data_code_key].values()
+            ]
 
     @property
     def sensor_data(self):
@@ -65,6 +72,10 @@ class TildEntity(CoordinatorEntity):
         attrs = {
             "last_refresh": self.coordinator.data[LAST_REFRESH],
         }
+        if self._sensor_data_code_key:
+            attrs["status_code"] = self.coordinator.data[SENSORS_DATA].get(
+                self._sensor_data_code_key
+            )
         for attr, key in self._sensor_data_extra_keys.items():
             attrs[attr] = self.coordinator.data[SENSORS_DATA].get(key)
         return attrs
@@ -88,8 +99,6 @@ class TildToggleableEntity(TildEntity):
     #coordinated-single-api-poll-for-data-for-all-entities
     """
 
-    _client_toggle_method = None
-
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
@@ -99,15 +108,11 @@ class TildToggleableEntity(TildEntity):
 
     async def async_turn_on(self, **kwargs):
         """Turn the toggleable on."""
-        if self._client_toggle_method is None:
-            raise NotImplementedError()
-        return await getattr(self.hass.data[DOMAIN][CLIENT], self._client_toggle_method)(ON)
+        return await self.hass.data[DOMAIN][CLIENT].set_property_state(self._sensor_data_key, ON)
 
     async def async_turn_off(self, **kwargs):
         """Turn the toggleable on."""
-        if self._client_toggle_method is None:
-            raise NotImplementedError()
-        return await getattr(self.hass.data[DOMAIN][CLIENT], self._client_toggle_method)(OFF)
+        return await self.hass.data[DOMAIN][CLIENT].set_property_state(self._sensor_data_key, OFF)
 
 
 class TildLightEntity(TildToggleableEntity, LightEntity):
@@ -127,7 +132,6 @@ class TildSelectEntity(TildEntity, SelectEntity):
 
     _entity_id_format = SELECT_ENTITY_ID_FORMAT
 
-    _client_set_method = None
     _sensor_data_type = None
 
     @property
@@ -137,8 +141,8 @@ class TildSelectEntity(TildEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        if self._client_set_method is None:
-            raise NotImplementedError()
         if self._sensor_data_type is not None:
             option = self._sensor_data_type(option)
-        return await getattr(self.hass.data[DOMAIN][CLIENT], self._client_set_method)(option)
+        return await self.hass.data[DOMAIN][CLIENT].set_property_state(
+            self._sensor_data_code_key, option
+        )

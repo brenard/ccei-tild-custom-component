@@ -28,58 +28,50 @@ from .const import (
     AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
     COORDINATOR,
     DOMAIN,
-    DURATION_CODES,
-    FILTRATION_PROG_FIRST_RANGE_END_HOUR,
-    FILTRATION_PROG_FIRST_RANGE_END_HOUR_CODE,
-    FILTRATION_PROG_FIRST_RANGE_START_HOUR,
-    FILTRATION_PROG_FIRST_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_SECOND_RANGE_END_HOUR,
-    FILTRATION_PROG_SECOND_RANGE_END_HOUR_CODE,
-    FILTRATION_PROG_SECOND_RANGE_START_HOUR,
-    FILTRATION_PROG_SECOND_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_THIRD_RANGE_END_HOUR,
-    FILTRATION_PROG_THIRD_RANGE_END_HOUR_CODE,
-    FILTRATION_PROG_THIRD_RANGE_START_HOUR,
-    FILTRATION_PROG_THIRD_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR,
-    FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
-    FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR,
-    FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR,
-    FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
-    FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR,
-    FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
-    FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR,
-    FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
-    FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR,
-    FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
-    HOUR_CODES,
+    FIL_PROG_FIRST_RANGE_END_HOUR,
+    FIL_PROG_FIRST_RANGE_END_HOUR_CODE,
+    FIL_PROG_FIRST_RANGE_START_HOUR,
+    FIL_PROG_FIRST_RANGE_START_HOUR_CODE,
+    FIL_PROG_SECOND_RANGE_END_HOUR,
+    FIL_PROG_SECOND_RANGE_END_HOUR_CODE,
+    FIL_PROG_SECOND_RANGE_START_HOUR,
+    FIL_PROG_SECOND_RANGE_START_HOUR_CODE,
+    FIL_PROG_THIRD_RANGE_END_HOUR,
+    FIL_PROG_THIRD_RANGE_END_HOUR_CODE,
+    FIL_PROG_THIRD_RANGE_START_HOUR,
+    FIL_PROG_THIRD_RANGE_START_HOUR_CODE,
+    FIL_PROG_WEEK_END_FIRST_RANGE_END_HOUR,
+    FIL_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
+    FIL_PROG_WEEK_END_FIRST_RANGE_START_HOUR,
+    FIL_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
+    FIL_PROG_WEEK_END_SECOND_RANGE_END_HOUR,
+    FIL_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
+    FIL_PROG_WEEK_END_SECOND_RANGE_START_HOUR,
+    FIL_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
+    FIL_PROG_WEEK_END_THIRD_RANGE_END_HOUR,
+    FIL_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
+    FIL_PROG_WEEK_END_THIRD_RANGE_START_HOUR,
+    FIL_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
     LIGHT_COLOR,
     LIGHT_COLOR_CODE,
-    LIGHT_COLORS_CODES,
     LIGHT_INTENSITY,
     LIGHT_INTENSITY_CODE,
-    LIGHT_INTENSITY_CODES,
     LIGHT_PROG_DURATION,
     LIGHT_PROG_DURATION_CODE,
     LIGHT_PROG_START_HOUR,
     LIGHT_PROG_START_HOUR_CODE,
     LIGHT_PROG_STATUS,
     LIGHT_PROG_STATUS_CODE,
-    LIGHT_PROG_STATUS_CODES,
     LIGHT_PROG_WEEK_END_DURATION,
     LIGHT_PROG_WEEK_END_DURATION_CODE,
     LIGHT_PROG_WEEK_END_START_HOUR,
     LIGHT_PROG_WEEK_END_START_HOUR_CODE,
     LIGHT_SEQUENCE_SPEED,
     LIGHT_SEQUENCE_SPEED_CODE,
-    LIGHT_SEQUENCE_SPEED_CODES,
     LIGHT_TIMER_DURATION,
     LIGHT_TIMER_DURATION_CODE,
-    PROG_RANGE_DURATION_WITH_OFF_CODES,
     WATER_TEMPERATURE_OFFSET,
     WATER_TEMPERATURE_OFFSET_CODE,
-    WATER_TEMPERATURE_OFFSET_CODES,
 )
 from .entity import TildSelectEntity
 
@@ -134,14 +126,8 @@ class TildLightIntensitySelect(TildSelectEntity):
     _attr_icon = "mdi:brightness-percent"
 
     _sensor_data_key = LIGHT_INTENSITY
+    _sensor_data_code_key = LIGHT_INTENSITY_CODE
     _sensor_data_type = int
-    _sensor_data_extra_keys = {
-        "raw_intensity_code": LIGHT_INTENSITY_CODE,
-    }
-
-    _attr_options = [str(intensity) for intensity in LIGHT_INTENSITY_CODES.values()]
-
-    _client_set_method = "set_light_intensity"
 
 
 class TildLightColorSelect(TildSelectEntity):
@@ -151,13 +137,7 @@ class TildLightColorSelect(TildSelectEntity):
     _attr_icon = "mdi:palette"
 
     _sensor_data_key = LIGHT_COLOR
-    _sensor_data_extra_keys = {
-        "raw_color_code": LIGHT_COLOR_CODE,
-    }
-
-    _attr_options = list(LIGHT_COLORS_CODES.values())
-
-    _client_set_method = "set_light_color"
+    _sensor_data_code_key = LIGHT_COLOR_CODE
 
 
 class TildLightTimerDurationSelect(TildSelectEntity):
@@ -167,13 +147,7 @@ class TildLightTimerDurationSelect(TildSelectEntity):
     _attr_icon = "mdi:timer-cog-outline"
 
     _sensor_data_key = LIGHT_TIMER_DURATION
-    _sensor_data_extra_keys = {
-        "raw_duration_code": LIGHT_TIMER_DURATION_CODE,
-    }
-
-    _attr_options = list(DURATION_CODES.values())
-
-    _client_set_method = "set_light_timer_duration"
+    _sensor_data_code_key = LIGHT_TIMER_DURATION_CODE
 
 
 class TildWaterTemperatureOffsetSelect(TildSelectEntity):
@@ -184,14 +158,8 @@ class TildWaterTemperatureOffsetSelect(TildSelectEntity):
     _attr_icon = "mdi:thermometer-water"
 
     _sensor_data_key = WATER_TEMPERATURE_OFFSET
+    _sensor_data_code_key = WATER_TEMPERATURE_OFFSET_CODE
     _sensor_data_type = int
-    _sensor_data_extra_keys = {
-        "raw_offset_code": WATER_TEMPERATURE_OFFSET_CODE,
-    }
-
-    _attr_options = [str(offset) for offset in WATER_TEMPERATURE_OFFSET_CODES.values()]
-
-    _client_set_method = "set_water_temperature_offset"
 
 
 class TildLightProgrammingStatusSelect(TildSelectEntity):
@@ -201,13 +169,7 @@ class TildLightProgrammingStatusSelect(TildSelectEntity):
     _attr_icon = "mdi:home-lightbulb-outline"
 
     _sensor_data_key = LIGHT_PROG_STATUS
-    _sensor_data_extra_keys = {
-        "raw_status_code": LIGHT_PROG_STATUS_CODE,
-    }
-
-    _attr_options = list(LIGHT_PROG_STATUS_CODES.values())
-
-    _client_set_method = "set_light_prog_status"
+    _sensor_data_code_key = LIGHT_PROG_STATUS_CODE
 
 
 class TildLightProgrammingStartHourSelect(TildSelectEntity):
@@ -217,13 +179,7 @@ class TildLightProgrammingStartHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = LIGHT_PROG_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": LIGHT_PROG_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_light_prog_start_hour"
+    _sensor_data_code_key = LIGHT_PROG_START_HOUR_CODE
 
 
 class TildLightProgrammingDurationSelect(TildSelectEntity):
@@ -233,13 +189,7 @@ class TildLightProgrammingDurationSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-time-eight-outline"
 
     _sensor_data_key = LIGHT_PROG_DURATION
-    _sensor_data_extra_keys = {
-        "raw_duration_code": LIGHT_PROG_DURATION_CODE,
-    }
-
-    _attr_options = list(PROG_RANGE_DURATION_WITH_OFF_CODES.values())
-
-    _client_set_method = "set_light_prog_duration"
+    _sensor_data_code_key = LIGHT_PROG_DURATION_CODE
 
 
 class TildLightProgrammingWeekEndStartHourSelect(TildSelectEntity):
@@ -249,13 +199,7 @@ class TildLightProgrammingWeekEndStartHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = LIGHT_PROG_WEEK_END_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": LIGHT_PROG_WEEK_END_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_light_prog_week_end_start_hour"
+    _sensor_data_code_key = LIGHT_PROG_WEEK_END_START_HOUR_CODE
 
 
 class TildLightProgrammingWeekEndDurationSelect(TildSelectEntity):
@@ -265,13 +209,7 @@ class TildLightProgrammingWeekEndDurationSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-time-eight-outline"
 
     _sensor_data_key = LIGHT_PROG_WEEK_END_DURATION
-    _sensor_data_extra_keys = {
-        "raw_duration_code": LIGHT_PROG_WEEK_END_DURATION_CODE,
-    }
-
-    _attr_options = list(PROG_RANGE_DURATION_WITH_OFF_CODES.values())
-
-    _client_set_method = "set_light_prog_week_end_duration"
+    _sensor_data_code_key = LIGHT_PROG_WEEK_END_DURATION_CODE
 
 
 class TildLightSequenceSpeedSelect(TildSelectEntity):
@@ -281,13 +219,8 @@ class TildLightSequenceSpeedSelect(TildSelectEntity):
     _attr_icon = "mdi:speedometer"
 
     _sensor_data_key = LIGHT_SEQUENCE_SPEED
-    _sensor_data_extra_keys = {
-        "raw_duration_code": LIGHT_SEQUENCE_SPEED_CODE,
-    }
-
-    _attr_options = list(LIGHT_SEQUENCE_SPEED_CODES.values())
-
-    _client_set_method = "set_light_sequence_speed"
+    _sensor_data_code_key = LIGHT_SEQUENCE_SPEED_CODE
+    _sensor_data_type = int
 
 
 class TildFiltrationProgrammingFirstRangeStartHourSelect(TildSelectEntity):
@@ -296,14 +229,8 @@ class TildFiltrationProgrammingFirstRangeStartHourSelect(TildSelectEntity):
     _attr_name = "Filtration programming first range start hour"
     _attr_icon = "mdi:clock-start"
 
-    _sensor_data_key = FILTRATION_PROG_FIRST_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_FIRST_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_first_range_start_hour"
+    _sensor_data_key = FIL_PROG_FIRST_RANGE_START_HOUR
+    _sensor_data_code_key = FIL_PROG_FIRST_RANGE_START_HOUR_CODE
 
 
 class TildFiltrationProgrammingFirstRangeEndHourSelect(TildSelectEntity):
@@ -312,14 +239,8 @@ class TildFiltrationProgrammingFirstRangeEndHourSelect(TildSelectEntity):
     _attr_name = "Filtration programming first range end hour"
     _attr_icon = "mdi:clock-end"
 
-    _sensor_data_key = FILTRATION_PROG_FIRST_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_FIRST_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_first_range_end_hour"
+    _sensor_data_key = FIL_PROG_FIRST_RANGE_END_HOUR
+    _sensor_data_code_key = FIL_PROG_FIRST_RANGE_END_HOUR_CODE
 
 
 class TildFiltrationProgrammingSecondRangeStartHourSelect(TildSelectEntity):
@@ -328,14 +249,8 @@ class TildFiltrationProgrammingSecondRangeStartHourSelect(TildSelectEntity):
     _attr_name = "Filtration programming second range start hour"
     _attr_icon = "mdi:clock-start"
 
-    _sensor_data_key = FILTRATION_PROG_SECOND_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_SECOND_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_second_range_start_hour"
+    _sensor_data_key = FIL_PROG_SECOND_RANGE_START_HOUR
+    _sensor_data_code_key = FIL_PROG_SECOND_RANGE_START_HOUR_CODE
 
 
 class TildFiltrationProgrammingSecondRangeEndHourSelect(TildSelectEntity):
@@ -344,14 +259,11 @@ class TildFiltrationProgrammingSecondRangeEndHourSelect(TildSelectEntity):
     _attr_name = "Filtration programming second range end hour"
     _attr_icon = "mdi:clock-end"
 
-    _sensor_data_key = FILTRATION_PROG_SECOND_RANGE_END_HOUR
+    _sensor_data_key = FIL_PROG_SECOND_RANGE_END_HOUR
+    _sensor_data_code_key = FIL_PROG_SECOND_RANGE_END_HOUR_CODE
     _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_SECOND_RANGE_END_HOUR_CODE,
+        "raw_hour_code": FIL_PROG_SECOND_RANGE_END_HOUR_CODE,
     }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_second_range_end_hour"
 
 
 class TildFiltrationProgrammingThirdRangeStartHourSelect(TildSelectEntity):
@@ -360,14 +272,11 @@ class TildFiltrationProgrammingThirdRangeStartHourSelect(TildSelectEntity):
     _attr_name = "Filtration programming third range start hour"
     _attr_icon = "mdi:clock-start"
 
-    _sensor_data_key = FILTRATION_PROG_THIRD_RANGE_START_HOUR
+    _sensor_data_key = FIL_PROG_THIRD_RANGE_START_HOUR
+    _sensor_data_code_key = FIL_PROG_THIRD_RANGE_START_HOUR_CODE
     _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_THIRD_RANGE_START_HOUR_CODE,
+        "raw_hour_code": FIL_PROG_THIRD_RANGE_START_HOUR_CODE,
     }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_third_range_start_hour"
 
 
 class TildFiltrationProgrammingThirdRangeEndHourSelect(TildSelectEntity):
@@ -376,14 +285,8 @@ class TildFiltrationProgrammingThirdRangeEndHourSelect(TildSelectEntity):
     _attr_name = "Filtration programming third range end hour"
     _attr_icon = "mdi:clock-end"
 
-    _sensor_data_key = FILTRATION_PROG_THIRD_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_THIRD_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_third_range_end_hour"
+    _sensor_data_key = FIL_PROG_THIRD_RANGE_END_HOUR
+    _sensor_data_code_key = FIL_PROG_THIRD_RANGE_END_HOUR_CODE
 
 
 class TildFiltrationProgrammingWeekEndFirstRangeStartHourSelect(TildSelectEntity):
@@ -392,14 +295,8 @@ class TildFiltrationProgrammingWeekEndFirstRangeStartHourSelect(TildSelectEntity
     _attr_name = "Filtration programming week-end first range start hour"
     _attr_icon = "mdi:clock-start"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_week_end_first_range_start_hour"
+    _sensor_data_key = FIL_PROG_WEEK_END_FIRST_RANGE_START_HOUR
+    _sensor_data_code_key = FIL_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE
 
 
 class TildFiltrationProgrammingWeekEndFirstRangeEndHourSelect(TildSelectEntity):
@@ -408,14 +305,8 @@ class TildFiltrationProgrammingWeekEndFirstRangeEndHourSelect(TildSelectEntity):
     _attr_name = "Filtration programming week-end first range end hour"
     _attr_icon = "mdi:clock-end"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_week_end_first_range_end_hour"
+    _sensor_data_key = FIL_PROG_WEEK_END_FIRST_RANGE_END_HOUR
+    _sensor_data_code_key = FIL_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE
 
 
 class TildFiltrationProgrammingWeekEndSecondRangeStartHourSelect(TildSelectEntity):
@@ -424,14 +315,8 @@ class TildFiltrationProgrammingWeekEndSecondRangeStartHourSelect(TildSelectEntit
     _attr_name = "Filtration programming week-end second range start hour"
     _attr_icon = "mdi:clock-start"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_week_end_second_range_start_hour"
+    _sensor_data_key = FIL_PROG_WEEK_END_SECOND_RANGE_START_HOUR
+    _sensor_data_code_key = FIL_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE
 
 
 class TildFiltrationProgrammingWeekEndSecondRangeEndHourSelect(TildSelectEntity):
@@ -440,14 +325,8 @@ class TildFiltrationProgrammingWeekEndSecondRangeEndHourSelect(TildSelectEntity)
     _attr_name = "Filtration programming week-end second range end hour"
     _attr_icon = "mdi:clock-end"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_week_end_second_range_end_hour"
+    _sensor_data_key = FIL_PROG_WEEK_END_SECOND_RANGE_END_HOUR
+    _sensor_data_code_key = FIL_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE
 
 
 class TildFiltrationProgrammingWeekEndThirdRangeStartHourSelect(TildSelectEntity):
@@ -456,14 +335,8 @@ class TildFiltrationProgrammingWeekEndThirdRangeStartHourSelect(TildSelectEntity
     _attr_name = "Filtration programming week-end third range start hour"
     _attr_icon = "mdi:clock-start"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_week_end_third_range_start_hour"
+    _sensor_data_key = FIL_PROG_WEEK_END_THIRD_RANGE_START_HOUR
+    _sensor_data_code_key = FIL_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE
 
 
 class TildFiltrationProgrammingWeekEndThirdRangeEndHourSelect(TildSelectEntity):
@@ -472,14 +345,8 @@ class TildFiltrationProgrammingWeekEndThirdRangeEndHourSelect(TildSelectEntity):
     _attr_name = "Filtration programming week-end third range end hour"
     _attr_icon = "mdi:clock-end"
 
-    _sensor_data_key = FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": FILTRATION_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_filtration_prog_week_end_third_range_end_hour"
+    _sensor_data_key = FIL_PROG_WEEK_END_THIRD_RANGE_END_HOUR
+    _sensor_data_code_key = FIL_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingFirstRangeStartHourSelect(TildSelectEntity):
@@ -489,13 +356,7 @@ class TildAuxiliaryProgrammingFirstRangeStartHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_FIRST_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_FIRST_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_first_range_start_hour"
+    _sensor_data_code_key = AUX_PROG_FIRST_RANGE_START_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingFirstRangeEndHourSelect(TildSelectEntity):
@@ -505,13 +366,7 @@ class TildAuxiliaryProgrammingFirstRangeEndHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_FIRST_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_FIRST_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_first_range_end_hour"
+    _sensor_data_code_key = AUX_PROG_FIRST_RANGE_END_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingSecondRangeStartHourSelect(TildSelectEntity):
@@ -521,13 +376,7 @@ class TildAuxiliaryProgrammingSecondRangeStartHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_SECOND_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_SECOND_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_second_range_start_hour"
+    _sensor_data_code_key = AUX_PROG_SECOND_RANGE_START_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingSecondRangeEndHourSelect(TildSelectEntity):
@@ -537,13 +386,7 @@ class TildAuxiliaryProgrammingSecondRangeEndHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_SECOND_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_SECOND_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_second_range_end_hour"
+    _sensor_data_code_key = AUX_PROG_SECOND_RANGE_END_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingThirdRangeStartHourSelect(TildSelectEntity):
@@ -553,13 +396,7 @@ class TildAuxiliaryProgrammingThirdRangeStartHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_THIRD_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_THIRD_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_third_range_start_hour"
+    _sensor_data_code_key = AUX_PROG_THIRD_RANGE_START_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingThirdRangeEndHourSelect(TildSelectEntity):
@@ -569,13 +406,7 @@ class TildAuxiliaryProgrammingThirdRangeEndHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_THIRD_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_THIRD_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_third_range_end_hour"
+    _sensor_data_code_key = AUX_PROG_THIRD_RANGE_END_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingWeekEndFirstRangeStartHourSelect(TildSelectEntity):
@@ -585,13 +416,7 @@ class TildAuxiliaryProgrammingWeekEndFirstRangeStartHourSelect(TildSelectEntity)
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_week_end_first_range_start_hour"
+    _sensor_data_code_key = AUX_PROG_WEEK_END_FIRST_RANGE_START_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingWeekEndFirstRangeEndHourSelect(TildSelectEntity):
@@ -601,13 +426,7 @@ class TildAuxiliaryProgrammingWeekEndFirstRangeEndHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_week_end_first_range_end_hour"
+    _sensor_data_code_key = AUX_PROG_WEEK_END_FIRST_RANGE_END_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingWeekEndSecondRangeStartHourSelect(TildSelectEntity):
@@ -617,13 +436,7 @@ class TildAuxiliaryProgrammingWeekEndSecondRangeStartHourSelect(TildSelectEntity
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_week_end_second_range_start_hour"
+    _sensor_data_code_key = AUX_PROG_WEEK_END_SECOND_RANGE_START_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingWeekEndSecondRangeEndHourSelect(TildSelectEntity):
@@ -633,13 +446,7 @@ class TildAuxiliaryProgrammingWeekEndSecondRangeEndHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_week_end_second_range_end_hour"
+    _sensor_data_code_key = AUX_PROG_WEEK_END_SECOND_RANGE_END_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingWeekEndThirdRangeStartHourSelect(TildSelectEntity):
@@ -649,13 +456,7 @@ class TildAuxiliaryProgrammingWeekEndThirdRangeStartHourSelect(TildSelectEntity)
     _attr_icon = "mdi:clock-start"
 
     _sensor_data_key = AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_week_end_third_range_start_hour"
+    _sensor_data_code_key = AUX_PROG_WEEK_END_THIRD_RANGE_START_HOUR_CODE
 
 
 class TildAuxiliaryProgrammingWeekEndThirdRangeEndHourSelect(TildSelectEntity):
@@ -665,10 +466,4 @@ class TildAuxiliaryProgrammingWeekEndThirdRangeEndHourSelect(TildSelectEntity):
     _attr_icon = "mdi:clock-end"
 
     _sensor_data_key = AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR
-    _sensor_data_extra_keys = {
-        "raw_hour_code": AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
-    }
-
-    _attr_options = list(HOUR_CODES.values())
-
-    _client_set_method = "set_aux_prog_week_end_third_range_end_hour"
+    _sensor_data_code_key = AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE
