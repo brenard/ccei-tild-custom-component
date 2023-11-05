@@ -51,9 +51,8 @@ class TildEntity(CoordinatorEntity):
     def sensor_data(self):
         """Return the sensor data"""
         return (
-            self.coordinator.data[SENSORS_DATA][self._sensor_data_key]
+            self.coordinator.data[SENSORS_DATA].get(self._sensor_data_key)
             if self.coordinator.data[SENSORS_DATA]
-            and self._sensor_data_key in self.coordinator.data[SENSORS_DATA]
             else None
         )
 
@@ -73,11 +72,18 @@ class TildEntity(CoordinatorEntity):
             "last_refresh": self.coordinator.data[LAST_REFRESH],
         }
         if self._sensor_data_code_key:
-            attrs["status_code"] = self.coordinator.data[SENSORS_DATA].get(
-                self._sensor_data_code_key
+            attrs["status_code"] = (
+                self.coordinator.data[SENSORS_DATA].get(self._sensor_data_code_key)
+                if self.coordinator.data[SENSORS_DATA]
+                else None
             )
+
         for attr, key in self._sensor_data_extra_keys.items():
-            attrs[attr] = self.coordinator.data[SENSORS_DATA].get(key)
+            attrs[attr] = (
+                self.coordinator.data[SENSORS_DATA].get(key)
+                if self.coordinator.data[SENSORS_DATA]
+                else None
+            )
         return attrs
 
 

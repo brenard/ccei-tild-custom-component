@@ -78,5 +78,6 @@ class TildRawStatusDataSensor(TildSensorEntity):
     def extra_state_attributes(self):
         """Return the state attributes."""
         attrs = super().extra_state_attributes
-        attrs.update(self.coordinator.data[SENSORS_DATA])
+        if self.coordinator.data[SENSORS_DATA]:
+            attrs.update(self.coordinator.data[SENSORS_DATA])
         return attrs
