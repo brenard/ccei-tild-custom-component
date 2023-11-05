@@ -376,8 +376,6 @@ DEDUCED_PROPERTIES = {
     AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR: AUX_PROG_WEEK_END_THIRD_RANGE_END_HOUR_CODE,
 }
 
-PROPERTIES_CODES_TO_SEND = {}
-
 PROPERTIES_RAW_VALUE = [
     SYSTEM_DATE_YEAR,
     SYSTEM_DATE_MONTH,
@@ -667,14 +665,7 @@ class CceiTildClient:
             assert state in PROPERTIES_CODES[prop].values(), f"Invalid {prop} '{state}'"
             idx = list(PROPERTIES_CODES[prop].values()).index(state)
             code = list(PROPERTIES_CODES[prop].keys())[idx]
-        if prop in PROPERTIES_CODES_TO_SEND:
-            assert (
-                state in PROPERTIES_CODES_TO_SEND[prop]
-            ), f"Unknown code to send for state '{state}' of {prop}"
-            code_to_send = PROPERTIES_CODES_TO_SEND[prop][state]
-        else:
-            code_to_send = code
-        await self._call_tild({PROPERTIES_MESSAGE_KEY[prop]: code_to_send})
+        await self._call_tild({PROPERTIES_MESSAGE_KEY[prop]: code})
         await asyncio.sleep(1)
         sensors_data = await self.get_sensors_data()
         if not sensors_data:
@@ -799,41 +790,9 @@ class FakeTildBox:
 
         return "".join(data)
 
-    def handle_set_toogleable_request(self, connection, address, code, prop):
-        """Handle a request to set an Tild toogleable item"""
-        print(f"Handle set {prop} request to '{code}' from {address[0]}:{address[1]}")
-        if code not in ON_OFF_CODES:
-            print(f"Invalid {prop} state '{code}'")
-            connection.send(b"ERROR: Invalid state")
-        else:
-            self.properties_state[prop] = code
-            print(f"{prop} turned {'on' if code else 'off'}")
-            connection.send(self.get_state_data().encode("utf8"))
-
     def handle_set_property_request(self, connection, address, code, prop):
         """Handle a request to set an Tild property"""
         print(f"Handle set {prop} request to '{code}' from {address[0]}:{address[1]}")
-        if prop in PROPERTIES_CODES_TO_SEND:
-            state = [s for s, c in PROPERTIES_CODES_TO_SEND[prop].items() if c == code]
-            if not state:
-                print(f"Invalid {prop} code '{code}' (not in codes to send mapping)")
-                connection.send(
-                    f"ERROR: Invalid {prop} code '{code}' (not in codes to send "
-                    "mapping)".encode()
-                )
-                return
-            state = state[0]
-            sent_code = code
-            code = [c for c, s in PROPERTIES_CODES[prop].items() if s == state]
-            if not code:
-                print(f"No corresponding code found for sent code '{sent_code}' of {prop}")
-                connection.send(
-                    f"ERROR: No corresponding code found for sent code '{sent_code}' of "
-                    f"{prop}".encode()
-                )
-                return
-            code = code[0]
-            print(f"{prop}: map sent code '{sent_code}' to '{code}' ({state})")
         if code not in PROPERTIES_CODES[prop]:
             print(f"Invalid {prop} code '{code}'")
             connection.send(f"ERROR: Invalid {prop} code '{code}'".encode())
@@ -874,11 +833,9 @@ class FakeTildBox:
 
                 for key, value in message.items():
                     if key in self.message_key_to_property:
-                        prop = self.message_key_to_property[key]
-                        if PROPERTIES_CODES[prop] == ON_OFF_CODES:
-                            self.handle_set_toogleable_request(connection, address, value, prop)
-                        else:
-                            self.handle_set_property_request(connection, address, value, prop)
+                        self.handle_set_property_request(
+                            connection, address, value, self.message_key_to_property[key]
+                        )
                     else:
                         print(
                             f"Handle unknown JSON message key '{key}' => '{value}' request from "
