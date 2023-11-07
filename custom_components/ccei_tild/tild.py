@@ -605,6 +605,8 @@ class CceiTildClient:
             data = data.decode(self.encoding)
             LOGGER.debug("Answer received: %s", data)
             return data
+        except (OSError, ConnectionRefusedError):
+            LOGGER.exception("Error occured calling Tild host %s (message=%s)", self.host, message)
         finally:
             writer.close()
         return False
