@@ -1,7 +1,12 @@
 # CCEI Tild integration for Home Assistant
 
-The repository provide a Home Assistant integration for CCEI Tild pool box. It's based on
-[Ricky_D](https://forum.hacf.fr/u/Ricky_D) [works](https://forum.hacf.fr/t/tild-piscine/22627).
+The repository provide a Home Assistant integration for CCEI Tild pool box. It's initialy based on
+[Ricky_D](https://forum.hacf.fr/u/Ricky_D) works to reverse the protocol used between the
+[smartphone app](https://play.google.com/store/apps/details?id=com.ccei.tild) and the device before
+I taked care about this project to make it a real and complete Home-Assistant integration. Thank's
+to him !
+
+**Note:** This integration is borned on [the HACF forum](https://forum.hacf.fr/t/tild-piscine/22627).
 
 ## Installation
 
@@ -24,14 +29,15 @@ Start by create the container by running the command `./manage create` and start
 Assistant instance.
 
 A fake Tild server is also provide to emulate a Tild box. You can start it by running the command
-`./manage fake-tild`. This fake server is listening on your computer IP address (`0.0.0.0:30302`)
-and you can add the integration by providing the IP address to Home Assistant configuration dialog.
+`./manage fake-tild`. This fake server is running and listening inside the Home-Assistant container
+(`0.0.0.0:30302`) and you can add the integration by providing the `127.0.0.1` IP address (or
+`localhost`) to Home Assistant configuration dialog.
 
 Futhermore, the `manage analyse-tild-state-data` command is provided to help to analyse raw status
 data retrieved from Tild box:
 
 ```
-usage: manage analyse-tild-state-data [-h] [-M] [-F] data [data ...]
+usage: analyse-tild-state-data [-h] [-M] [-F] data [data ...]
 
 positional arguments:
   data
@@ -54,5 +60,7 @@ logger:
     custom_components.ccei_tild: debug
 ```
 
-Don't forget to restart Home Assistant after and you will be able to follow docker container logs by
-running `./manage logs` command.
+Don't forget to restart Home Assistant after.
+
+**Note:** In development environment and you will be able to follow docker container logs by running
+the `./manage logs` command.
