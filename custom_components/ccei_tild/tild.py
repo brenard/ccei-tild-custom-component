@@ -2,7 +2,9 @@
 import asyncio
 import json
 import logging
+import queue
 import random
+import select
 import socket
 from datetime import datetime
 
@@ -548,6 +550,26 @@ def log_sensors_data_diff(ref_raw_data, *other_raw_data):
     )
 
 
+def discover_host():
+    """Try to discover host"""
+    sock_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock_udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock_udp.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    sock_udp.settimeout(5)
+
+    server = None
+    name = None
+    try:
+        sock_udp.sendto(b"D", ("255.255.255.255", 30303))
+        data, server = sock_udp.recvfrom(256)
+        name = data.decode("UTF-8")
+    except Exception:  # pylint: disable=broad-exception-caught
+        LOGGER.debug("No reply on our discover request")
+    finally:
+        sock_udp.close()
+    return (str(server[0]) if server else None, name if name else None)
+
+
 class CceiTildClient:
     """CCEI Tild client"""
 
@@ -562,24 +584,6 @@ class CceiTildClient:
         self.host = host
         self.port = int(port) if port else 30302
         LOGGER.debug("Instanciate Tild client on %s:%d", self.host, self.port)
-
-    @staticmethod
-    def discover_host():
-        """Try to discover host"""
-        sock_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock_udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock_udp.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sock_udp.settimeout(10)
-
-        server = None
-        name = None
-        try:
-            sock_udp.sendto(b"D", ("255.255.255.255", 30303))
-            data, server = sock_udp.recvfrom(256)
-            name = data.decode("UTF-8")
-        finally:
-            sock_udp.close()
-        return (str(server[0]) if server else None, name if name else None)
 
     async def _call_tild(self, message, awaiting_answser=True):
         """Call tild"""
@@ -674,18 +678,26 @@ class FakeTildBox:
 
     host = "0.0.0.0"
     port = 30302
+    discover_port = 30303
     sock = None
 
     message_key_to_property = {
         message_key: prop for prop, message_key in PROPERTIES_MESSAGE_KEY.items()
     }
 
-    def __init__(self, host=None, port=None):
+    def __init__(self, host=None, port=None, discover_port=None):
         if host:
             self.host = host
         if port:
-            self.port = port if port is int else int(port)
-        print(f"Start fake Tild service on {self.host}:{self.port}")
+            self.port = port if isinstance(port, int) else int(port)
+        if discover_port:
+            self.discover_port = (
+                discover_port if isinstance(discover_port, int) else int(discover_port)
+            )
+        print(
+            f"Start fake Tild service on {self.host}:{self.port} and discovering service on "
+            f"{self.host}:{self.discover_port}"
+        )
 
         # Initialize properties state
         self.properties_state = {
@@ -754,16 +766,16 @@ class FakeTildBox:
 
         return "".join(data)
 
-    def handle_set_property_request(self, connection, address, code, prop):
+    def handle_set_property_request(self, connection, code, prop):
         """Handle a request to set an Tild property"""
-        print(f"Handle set {prop} request to '{code}' from {address[0]}:{address[1]}")
+        print(f"Handle set {prop} request to '{code}'")
         if code not in PROPERTIES_CODES[prop]:
             print(f"Invalid {prop} code '{code}'")
-            connection.send(f"ERROR: Invalid {prop} code '{code}'".encode())
+            self.reply(connection, f"ERROR: Invalid {prop} code '{code}'")
         else:
             print(f"{prop} set to {PROPERTIES_CODES[prop][code]} ({code})")
             self.properties_state[prop] = code
-            connection.send(self.get_state_data().encode("utf8"))
+            self.reply(connection, self.get_state_data())
 
     def run(self):
         """Run service"""
@@ -773,42 +785,107 @@ class FakeTildBox:
         self.sock.bind((self.host, self.port))
         self.sock.listen(5)
 
-        while True:
-            connection, address = self.sock.accept()
-            message = connection.recv(1024).decode("utf-8").strip()
-            if message == GET_SENSORS_DATA_MESSAGE:
-                print(f"Handle a {GET_SENSORS_DATA_MESSAGE} request from {address[0]}:{address[1]}")
-                connection.send(self.get_state_data().encode("utf8"))
-            else:
-                try:
-                    message = json.loads(message)
-                    if not isinstance(message, dict):
-                        raise ValueError("Unexpected JSON message, must be a dict")
-                except json.decoder.JSONDecodeError:
-                    print(f"Fail to decode JSON message '{message}' from {address[0]}:{address[1]}")
-                    connection.send(b"ERROR: fail to decode JSON message")
-                    connection.close()
-                    continue
-                except ValueError:
-                    print(f"Unexpected JSON message '{message}' from {address[0]}:{address[1]}")
-                    connection.send(b"ERROR: unexcepected JSON message")
-                    connection.close()
-                    continue
+        self.discover_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.discover_sock.bind((self.host, self.discover_port))
 
-                for key, value in message.items():
-                    if key in self.message_key_to_property:
-                        self.handle_set_property_request(
-                            connection, address, value, self.message_key_to_property[key]
-                        )
-                    else:
-                        print(
-                            f"Handle unknown JSON message key '{key}' => '{value}' request from "
-                            f"{address[0]}:{address[1]}: '{message}'"
-                        )
-                        connection.send(
-                            f"ERROR: unknown JSON message key '{key}' => '{value}' request".encode()
-                        )
+        print(
+            f"Fake Tild service on {self.host}:{self.port} and discovering service on "
+            f"{self.host}:{self.discover_port} are running"
+        )
 
-                    connection.send(b"ERROR: unknown JSON request")
-            print(f"Close connection from {address[0]}:{address[1]}")
-            connection.close()
+        self.inputs = [self.sock, self.discover_sock]
+        self.outputs = []
+        self.message_queues = {}
+
+        while self.inputs:
+            readable, writable, exceptional = select.select(self.inputs, self.outputs, self.inputs)
+            for s in readable:
+                if s is self.sock:
+                    # for new connections
+                    connection, client_address = s.accept()
+                    connection.setblocking(0)
+                    self.inputs.append(connection)
+                    print(
+                        f"Received connection request from {client_address[0]}:{client_address[1]}"
+                    )
+                    # creating a message queue for each connection
+                    self.message_queues[connection] = queue.Queue()
+
+                elif s is self.discover_sock:
+                    # if data received on discover UDP service
+                    self.handle_discover_request(s)
+
+                else:
+                    # if some data has been received on TCP connection
+                    message = s.recv(1024)
+                    if message:
+                        self.handle_request(s, message)
+
+            for s in writable:
+                # If something has to be sent - send it. Else, remove connection from output queue
+                if not self.message_queues[s].empty():
+                    # if some item is present - send it
+                    next_msg = self.message_queues[s].get()
+                    s.send(next_msg)
+                else:
+                    # indicate that server has nothing to send
+                    self.outputs.remove(s)
+
+            for s in exceptional:
+                # remove this connection and all its existences
+                self.inputs.remove(s)
+                if s in self.outputs:
+                    self.outputs.remove(s)
+                s.close()
+                del self.message_queues[s]
+
+    def handle_discover_request(self, connection):
+        """Handle request on discover service"""
+        message, remote = connection.recvfrom(1024)
+        print(
+            f"Message received on discover service: '{message.decode()}' from "
+            f"{remote[0]}:{remote[1]}"
+        )
+        connection.sendto(f"Fake Tild Box {self.host}".encode(), remote)
+
+    def handle_request(self, connection, message):
+        """Handle Tild request"""
+        message = message.decode("utf-8").strip()
+        if message == GET_SENSORS_DATA_MESSAGE:
+            print(f"Handle a {GET_SENSORS_DATA_MESSAGE} request")
+            self.reply(connection, self.get_state_data())
+        else:
+            try:
+                message = json.loads(message)
+                if not isinstance(message, dict):
+                    self.reply(connection, "ERROR: Unexpected JSON message, must be a dict")
+                    return
+            except json.decoder.JSONDecodeError:
+                print(f"Fail to decode JSON message '{message}'")
+                self.reply(connection, "ERROR: fail to decode JSON message")
+                return
+            except ValueError:
+                print(f"Unexpected JSON message '{message}'")
+                self.reply(connection, "ERROR: fail to decode JSON message")
+                return
+
+            for key, value in message.items():
+                if key in self.message_key_to_property:
+                    self.handle_set_property_request(
+                        connection, value, self.message_key_to_property[key]
+                    )
+                else:
+                    print(
+                        connection, f"Handle unknown JSON message key '{key}' => '{value}' request"
+                    )
+                    self.reply(
+                        connection, f"ERROR: unknown JSON message key '{key}' => '{value}' request"
+                    )
+
+                self.reply(connection, "ERROR: unknown JSON request")
+
+    def reply(self, connection, message):
+        """Schedule to send a message on client connection"""
+        self.message_queues[connection].put(message.encode("utf8"))
+        if connection not in self.outputs:
+            self.outputs.append(connection)

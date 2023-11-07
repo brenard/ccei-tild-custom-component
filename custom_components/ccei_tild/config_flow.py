@@ -6,7 +6,7 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 
 from .const import CONF_HOST, CONF_REFRESH_RATE, CONF_REFRESH_RATE_DEFAULT, DOMAIN
-from .tild import CceiTildClient
+from .tild import CceiTildClient, discover_host
 
 LOGGER = logging.getLogger(__name__)
 
@@ -42,7 +42,13 @@ class CceiTildBaseConfigFlowHandler:
         """Get configuration schema"""
         if not defaults:
             defaults = {CONF_REFRESH_RATE: CONF_REFRESH_RATE_DEFAULT}
-        LOGGER.debug("defaults=%s", defaults)
+            LOGGER.debug("Try to discover Tild host...")
+            host, name = discover_host()
+            if host:
+                LOGGER.debug("Tild host %s discovered as '%s'", host, name)
+                defaults[CONF_HOST] = host
+            else:
+                LOGGER.debug("No Tild host discovered")
         return vol.Schema(
             {
                 vol.Required(CONF_HOST, default=defaults.get(CONF_HOST)): str,
