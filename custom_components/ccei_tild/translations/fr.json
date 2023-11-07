@@ -246,5 +246,11 @@
         "name": "Données d'état brutes"
       }
     }
+  },
+  "services": {
+    "refresh": {
+      "name": "Rafraîchir les données des capteurs",
+      "description": "Forcer le rafraîchissement des données des capteurs immédiatement."
+    }
   }
 }

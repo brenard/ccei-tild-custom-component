@@ -225,5 +225,11 @@
         "name": "Raw status data"
       }
     }
+  },
+  "services": {
+    "refresh": {
+      "name": "Refresh sensors data",
+      "description": "Force sensor data to be refreshed immediately."
+    }
   }
 }

@@ -10,7 +10,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Config, HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import CLIENT, CONF_HOST, CONF_REFRESH_RATE, COORDINATOR, DOMAIN, PLATFORMS
+from .const import CLIENT, CONF_HOST, CONF_REFRESH_RATE, COORDINATOR, DOMAIN, PLATFORMS, SERVICE
+from .service import CceiTildService
 from .tild import CceiTildClient
 from .update_coordinator import CceiTildDataUpdateCoordinator
 
@@ -51,6 +52,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     entry.async_on_unload(entry.add_update_listener(update_listener))
 
     await coordinator.async_refresh()
+
+    hass.data[DOMAIN][SERVICE] = CceiTildService(hass)
 
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady

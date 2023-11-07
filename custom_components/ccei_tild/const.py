@@ -14,9 +14,11 @@ CONF_REFRESH_RATE = "refresh_rate"
 CONF_REFRESH_RATE_DEFAULT = 5
 COORDINATOR = "coordinator"
 CLIENT = "client"
+SERVICE = "service"
 
 SENSORS_DATA = "sensors_data"
 LAST_REFRESH = "last_refresh"
+REFRESH_SERVICE_NAME = "refresh"
 
 SYSTEM_HOST = "system_host"
 SYSTEM_DATE = "system_date"
