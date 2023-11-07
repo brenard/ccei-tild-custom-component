@@ -6,50 +6,58 @@ NAME=homeassistant
 
 case $1 in
 
-	create)
-		CONFIG_DIR="$SRC_DIR/config"
-		[ ! -d $CONFIG_DIR ] && mkdir "$CONFIG_DIR"
-		/usr/bin/docker create \
-			--name $NAME \
-			--privileged --restart=unless-stopped \
-			-e TZ=$( cat /etc/timezone ) \
-			-v "$CONFIG_DIR:/config" \
-			-v $SRC_DIR/custom_components:/config/custom_components \
-			-v $SRC_DIR/bin:/root/bin \
-			-v /run/dbus:/run/dbus:ro \
-			--network=host \
-			ghcr.io/home-assistant/home-assistant
-		;;
+  create)
+    CONFIG_DIR="$SRC_DIR/config"
+    [ ! -d $CONFIG_DIR ] && mkdir "$CONFIG_DIR"
+    /usr/bin/docker create \
+      --name $NAME \
+      --privileged --restart=unless-stopped \
+      -e TZ=$( cat /etc/timezone ) \
+      -v "$CONFIG_DIR:/config" \
+      -v $SRC_DIR/custom_components:/config/custom_components \
+      -v $SRC_DIR/bin:/root/bin \
+      -v /run/dbus:/run/dbus:ro \
+      --network=host \
+      ghcr.io/home-assistant/home-assistant
+    ;;
 
-	remove)
-		/usr/bin/docker remove $NAME || /usr/bin/docker rm $NAME
-		;;
+  remove)
+    /usr/bin/docker remove $NAME || /usr/bin/docker rm $NAME
+    ;;
 
-	start|stop|restart)
-		/usr/bin/docker $1 $NAME
-		;;
+  start|stop|restart)
+    /usr/bin/docker $1 $NAME
+    ;;
 
-	recreate)
-		$0 remove
-		$0 create
-		;;
+  recreate)
+    $0 remove
+    $0 create
+    ;;
 
-	logs)
-		/usr/bin/docker logs -f $NAME
-		;;
+  logs)
+    /usr/bin/docker logs -f $NAME
+    ;;
 
-	fake-tild|analyse-tild-state-data)
-		/usr/bin/docker exec -t $NAME /root/bin/$@
-		;;
-	*)
-		echo "Usage: $0 [create|remove|recreate|start|stop|restart|logs|fake-tild]"
-		echo "  create     Create docker container"
-		echo "  remove     Remove docker container"
-		echo "  recreate   Recreate docker container"
-		echo "  start      Start docker container"
-		echo "  stop       Stop docker container"
-		echo "  restart    Restart docker container"
-		echo "  logs       Show (and follow) docker container logs"
-		echo "  fake-tild  Run fake Tild server"
-		echo "  analyse-tild-state-data  Analyse raw Tild server state data"
+  logs)
+    sudo truncate -s 0 $(/usr/bin/docker inspect --format='{{.LogPath}}' $NAME)
+    ;;
+
+  fake-tild|analyse-tild-state-data)
+    /usr/bin/docker exec -t $NAME /root/bin/$@
+    ;;
+  *)
+    cat << EOF
+Usage: $0 [command]
+  Available commands:
+    create                     Create docker container
+    remove                     Remove docker container
+    recreate                   Recreate docker container
+    start                      Start docker container
+    stop                       Stop docker container
+    restart                    Restart docker container
+    logs                       Show (and follow) docker container logs
+    truncate-logs              Truncate docker container logs
+    fake-tild                  Run fake Tild server
+    analyse-tild-state-data    Analyse raw Tild server state data
+EOF
 esac
