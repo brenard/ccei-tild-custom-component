@@ -9,6 +9,11 @@
           "refresh_rate": "Fréquence de rafraîchissement (en minutes)"
         }
       }
+    },
+    "error": {
+      "invalid_tild_data": "Les données récupérées depuis votre boitier CCEI Tild semblent invalides. Il n'est peut-être pas compatible. Merci d'ouvrir un rapport de bug en spécifiant le modèle et sa version.",
+      "connection_failed": "Impossible de se connecter au boitier CCEI Tild. Merci de vérifier l'adresse fournie.",
+      "invalid_refresh_rate": "Fréquence de rafraîchissement invalide. Elle doit être supérieur à zéro."
     }
   },
   "options": {
@@ -20,6 +25,10 @@
           "refresh_rate": "Fréquence de rafraîchissement (en minutes)"
         }
       }
+    },
+    "error": {
+      "connection_failed": "Impossible de se connecter au boitier CCEI Tild. Merci de vérifier l'adresse fournie.",
+      "invalid_refresh_rate": "Fréquence de rafraîchissement invalide. Elle doit être supérieur à zéro."
     }
   },
   "entity": {

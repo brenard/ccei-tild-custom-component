@@ -3,12 +3,32 @@
   "config": {
     "step": {
       "init": {
+        "description": "Please configure the connection with your CCEI Tild box.",
+        "data": {
+          "host": "Tild box IP address (or hostname)",
+          "refresh_rate": "Refresh rate (in minutes)"
+        }
+      }
+    },
+    "error": {
+      "invalid_tild_data": "Invalid data retrieved from your CCEI Tild box. It may be not compatible. Please open a bug request with your Tild box model and version.",
+      "connection_failed": "Fail to connect on CCEI Tild box. Please check the given host address.",
+      "invalid_refresh_rate": "Invalid refresh rate. It must be greater than zero."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
         "description": "Please reconfigure the connection with your CCEI Tild box.",
         "data": {
           "host": "Tild box IP address (or hostname)",
           "refresh_rate": "Refresh rate (in minutes)"
         }
       }
+    },
+    "error": {
+      "connection_failed": "Fail to connect on CCEI Tild box. Please check the given host address.",
+      "invalid_refresh_rate": "Invalid refresh rate. It must be greater than zero."
     }
   },
   "entity": {

@@ -557,7 +557,7 @@ class CceiTildClient:
 
     last_sensors_data = None
 
-    def __init__(self, hass, host, port=None):
+    def __init__(self, host, port=None, hass=None):
         self.hass = hass
         self.host = host
         self.port = int(port) if port else 30302
@@ -657,7 +657,8 @@ class CceiTildClient:
             return False
         # Log new sensors data and update it in coordinator data
         self.log_sensors_data_diff(sensors_data)
-        self.hass.data[DOMAIN][COORDINATOR].async_set_updated_sensors_data(sensors_data)
+        if self.hass:
+            self.hass.data[DOMAIN][COORDINATOR].async_set_updated_sensors_data(sensors_data)
         return True
         # pylint: disable=unreachable
         if (prop_is_state and sensors_data[prop] == state) or (

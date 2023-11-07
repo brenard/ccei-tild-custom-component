@@ -30,7 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     host = entry.data.get(CONF_HOST)
     refresh_rate = entry.data.get(CONF_REFRESH_RATE)
 
-    hass.data[DOMAIN][CLIENT] = CceiTildClient(hass, host)
+    hass.data[DOMAIN][CLIENT] = CceiTildClient(host, hass=hass)
 
     coordinator = CceiTildDataUpdateCoordinator(hass, LOGGER, refresh_rate=refresh_rate)
     hass.data[DOMAIN][COORDINATOR] = coordinator
@@ -41,7 +41,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         refresh_rate = entry.options.get(CONF_REFRESH_RATE)
         LOGGER.debug("Options updated: host=%s / refresh rate=%d", host, refresh_rate)
 
-        hass.data[DOMAIN][CLIENT] = CceiTildClient(hass, host)
+        hass.data[DOMAIN][CLIENT] = CceiTildClient(host, hass=hass)
 
         LOGGER.debug("Update coordinator refresh interval (%d minutes)", refresh_rate)
         hass.data[DOMAIN][COORDINATOR].set_refresh_rate(refresh_rate)
