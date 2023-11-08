@@ -5,7 +5,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 
-from .const import CONF_HOST, CONF_REFRESH_RATE, CONF_REFRESH_RATE_DEFAULT, DOMAIN
+from .const import CONF_HOST, CONF_NAME, CONF_REFRESH_RATE, CONF_REFRESH_RATE_DEFAULT, DOMAIN
 from .tild import CceiTildClient, discover_host
 
 LOGGER = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class CceiTildBaseConfigFlowHandler:
             await self.check_tild_connection(user_input[CONF_HOST])
 
     @staticmethod
-    def _get_config_schema(defaults=None):
+    def _get_config_schema(defaults=None, ask_for_name=False):
         """Get configuration schema"""
         if not defaults:
             defaults = {CONF_REFRESH_RATE: CONF_REFRESH_RATE_DEFAULT}
@@ -47,14 +47,19 @@ class CceiTildBaseConfigFlowHandler:
             if host:
                 LOGGER.debug("Tild host %s discovered as '%s'", host, name)
                 defaults[CONF_HOST] = host
+                defaults[CONF_NAME] = name
             else:
                 LOGGER.debug("No Tild host discovered")
-        return vol.Schema(
+        fields = {}
+        if ask_for_name:
+            fields = {vol.Required(CONF_NAME, default=defaults.get(CONF_NAME)): str}
+        fields.update(
             {
                 vol.Required(CONF_HOST, default=defaults.get(CONF_HOST)): str,
                 vol.Required(CONF_REFRESH_RATE, default=defaults.get(CONF_REFRESH_RATE)): int,
             }
         )
+        return vol.Schema(fields)
 
 
 class CceiTildFlowHandler(CceiTildBaseConfigFlowHandler, config_entries.ConfigFlow, domain=DOMAIN):
@@ -70,9 +75,13 @@ class CceiTildFlowHandler(CceiTildBaseConfigFlowHandler, config_entries.ConfigFl
         if user_input is not None:
             await self.check_user_input(user_input)
             if not self._errors:
-                return self.async_create_entry(title=user_input[CONF_HOST], data=user_input)
+                # Do not keep the device name as entity options
+                title = user_input.pop(CONF_NAME)
+                return self.async_create_entry(title=title, data=user_input)
 
-        return self.async_show_form(step_id="user", data_schema=self._get_config_schema(user_input))
+        return self.async_show_form(
+            step_id="user", data_schema=self._get_config_schema(user_input, ask_for_name=True)
+        )
 
     @staticmethod
     @callback

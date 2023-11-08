@@ -5,6 +5,7 @@
       "init": {
         "description": "Please configure the connection with your CCEI Tild box.",
         "data": {
+          "name": "Tild box name",
           "host": "Tild box IP address (or hostname)",
           "refresh_rate": "Refresh rate (in minutes)"
         }

@@ -5,6 +5,7 @@
       "user": {
         "description": "Merci de configurer la connexion à votre boitier CCEI Tild.",
         "data": {
+          "name": "Nom de votre boitier Tild",
           "host": "Adresse IP (ou nom d'hôte) de votre boitier Tild",
           "refresh_rate": "Fréquence de rafraîchissement (en minutes)"
         }

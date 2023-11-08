@@ -701,6 +701,9 @@ class FakeTildBox:
             f"{self.host}:{self.discover_port}"
         )
 
+        self.name = f"TILD{random.randrange(1000,9999):04}"
+        print(f"Tild device name: {self.name}")
+
         # Initialize properties state
         self.properties_state = {
             prop: random.choice(list(codes.keys())) for prop, codes in PROPERTIES_CODES.items()
@@ -848,7 +851,7 @@ class FakeTildBox:
             f"Message received on discover service: '{message.decode()}' from "
             f"{remote[0]}:{remote[1]}"
         )
-        connection.sendto(f"Fake Tild Box {self.host}".encode(), remote)
+        connection.sendto(self.name.encode(), remote)
 
     def handle_request(self, connection, message):
         """Handle Tild request"""
