@@ -6,15 +6,34 @@ https://github.com/brenard/ccei-tild-custom-component
 """
 import logging
 
+import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Config, HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import CLIENT, CONF_HOST, CONF_REFRESH_RATE, COORDINATOR, DOMAIN, PLATFORMS, SERVICE
+from .const import (
+    CLIENT,
+    CONF_HOST,
+    CONF_REFRESH_RATE,
+    CONF_REFRESH_RATE_DEFAULT,
+    COORDINATOR,
+    DOMAIN,
+    PLATFORMS,
+    SERVICE,
+)
 from .service import CceiTildService
 from .tild import CceiTildClient
 from .update_coordinator import CceiTildDataUpdateCoordinator
 
+CONFIG_SCHEMA = vol.Schema(
+    {
+        DOMAIN: {
+            vol.Required(CONF_HOST): str,
+            vol.Required(CONF_REFRESH_RATE, default=CONF_REFRESH_RATE_DEFAULT): int,
+        }
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 LOGGER = logging.getLogger(__name__)
 
 
