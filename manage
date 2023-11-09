@@ -9,7 +9,7 @@ case $1 in
   create)
     CONFIG_DIR="$SRC_DIR/config"
     [ ! -d $CONFIG_DIR ] && mkdir "$CONFIG_DIR"
-    /usr/bin/docker create \
+    docker create \
       --name $NAME \
       --privileged --restart=unless-stopped \
       -e TZ=$( cat /etc/timezone ) \
@@ -22,11 +22,11 @@ case $1 in
     ;;
 
   remove)
-    /usr/bin/docker remove $NAME || /usr/bin/docker rm $NAME
+    docker rm $NAME
     ;;
 
   start|stop|restart)
-    /usr/bin/docker $1 $NAME
+    docker $1 $NAME
     ;;
 
   recreate)
@@ -35,15 +35,15 @@ case $1 in
     ;;
 
   logs)
-    /usr/bin/docker logs -f $NAME
+    docker logs -f $NAME
     ;;
 
   logs)
-    sudo truncate -s 0 $(/usr/bin/docker inspect --format='{{.LogPath}}' $NAME)
+    sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' $NAME)
     ;;
 
   fake-tild|analyse-tild-state-data)
-    /usr/bin/docker exec -t $NAME /root/bin/$@
+    docker exec -t $NAME /root/bin/$@
     ;;
   *)
     cat << EOF
