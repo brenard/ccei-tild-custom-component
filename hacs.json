@@ -1,0 +1,7 @@
+{
+  "name": "CCEI Tild pool box",
+  "hacs": "2023.11.0",
+  "domains": ["light", "select", "sensor", "switch"],
+  "iot_class": "Cloud Polling",
+  "homeassistant": "2023.10.1"
+}

@@ -1,10 +1,14 @@
 # CCEI Tild integration for Home Assistant
 
-The repository provide a Home Assistant integration for CCEI Tild pool box. It's initialy based on
-[Ricky_D](https://forum.hacf.fr/u/Ricky_D) works to reverse the protocol used between the
-[smartphone app](https://play.google.com/store/apps/details?id=com.ccei.tild) and the device before
-I taked care about this project to make it a real and complete Home-Assistant integration. Thank's
-to him !
+The repository provide a Home Assistant integration for CCEI Tild pool box. It's allow to retrieve
+the current state of the Tild box (water temperature, light, filtration, ...), act on it (turn on/off
+the filtration/auxiliary/light, change it color/intensity, ...) and edit it configuration
+(light/filtration/auxiliary programming).
+
+It's initialy based on [Ricky_D](https://forum.hacf.fr/u/Ricky_D) works to reverse the protocol used
+between the [smartphone app](https://play.google.com/store/apps/details?id=com.ccei.tild) and the
+device before I taked care about this project to make it a real and complete Home-Assistant
+integration. Thank's to him !
 
 **Note:** This integration is borned on [the HACF forum](https://forum.hacf.fr/t/tild-piscine/22627).
 
