@@ -6,7 +6,7 @@ import sys
 sys.path.append("/config/custom_components")
 
 # pylint: disable=wrong-import-position
-from ccei_tild.tild import FakeTildBox  # noqa: E402
+from ccei_tild.fake_tild import FakeTildBox  # noqa: E402
 
 fake_tild = FakeTildBox(*sys.argv[1:])  # pylint: disable=too-many-function-args
 fake_tild.run()
