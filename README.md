@@ -14,6 +14,22 @@ integration. Thank's to him !
 
 ## Installation
 
+### Using HACS
+
+Firstly, you have to add the following custom repository :
+
+  * Repository : `https://github.com/brenard/ccei-tild-custom-component`
+  * Category : _Integration_
+
+After, click on _Explore & download repositories_, search and install _CCEI Tild pool box_
+integration. Finally, go to _Settings_, _Devices & services_, click on _+ Add integration_ button
+and search for _CCEI Tild_.
+
+_Note:_ A [request](https://github.com/hacs/default/pull/2160) for integration as default repository
+in HACS is currently pending.
+
+### Manually
+
 Put the `custom_components/ccei_tild` directory in your Home Assistant `custom_components` directory
 and restart Home Assistant. You can now add this integration (look for _"CCEI Tild"_) and provide the
 IP address (or hostname) of your Tild box.
