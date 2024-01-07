@@ -42,15 +42,17 @@ A development environment is provided with this integration if you want to contr
 script at the root of the repository permit to create and start a Home Assistant docker container
 with a pre-installation of this integration (linked to sources).
 
-Start by create the container by running the command `./manage create` and start it by running
-`./manage start` command. You can now access to Home Assistant web interface on
-[http://localhost:8123](http://localhost:8123) and follow the initialization process of the Home
-Assistant instance.
+To create and start the container, just run the command `./manage start`. The container logs will
+be show on console and you can access to Home Assistant web interface on
+[http://localhost:8123](http://localhost:8123). On first start, you need to follow the
+initialization process of the Home Assistant instance as on a regular installation.
 
-A fake Tild server is also provide to emulate a Tild box. You can start it by running the command
-`./manage fake-tild`. This fake server is running and listening inside the Home-Assistant container
-(`0.0.0.0:30302`) and you can add the integration by providing the `127.0.0.1` IP address (or
-`localhost`) to Home Assistant configuration dialog.
+A fake Tild server is also provide to emulate a Tild box. This fake server is running and listening
+inside the Home-Assistant container (`0.0.0.0:30302`). As a regular Tild box, it's could be
+automatically discovered when you add the integration, or you could enter the `127.0.0.1` IP address
+(or `localhost`) in the configuration dialog.
+
+__Note:__ you could disable it by setting the `USE_FAKE_TILD` variable to zero inside the `manage` script.
 
 Futhermore, the `manage analyse-tild-state-data` command is provided to help to analyse raw status
 data retrieved from Tild box:
@@ -80,6 +82,3 @@ logger:
 ```
 
 Don't forget to restart Home Assistant after.
-
-**Note:** In development environment and you will be able to follow docker container logs by running
-the `./manage logs` command.
