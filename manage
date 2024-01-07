@@ -1,10 +1,14 @@
 #!/bin/bash
 
 SRC_DIR=$( dirname "$(realpath $0)" )
+NAME=$(basename $SRC_DIR)
+USE_FAKE_TILD=1
+TRUNCATE_LOGS_BEFORE_EACH_START=1
 
-NAME=homeassistant
+ACTION="$1"
+[ "$2" == "-x" ] && set -x
 
-case $1 in
+case $ACTION in
 
   create)
     CONFIG_DIR="$SRC_DIR/config"
@@ -22,11 +26,55 @@ case $1 in
     ;;
 
   remove)
+    if [ -z "$( docker ps -aq -f name=$NAME 2>/dev/null )" ]
+    then
+        echo "Container $NAME does not exists"
+        exit 0
+    fi
+    echo -n "Are-you sure you want to delete the container $NAME [Y/n]? "
+    read r
+    [ -n "$r" -a "$r" != "y" ] && exit 0
+    if [ -n "$( docker ps -aq -f status=running -f name=$NAME 2>/dev/null )" ]
+    then
+        $0 stop
+    fi
     docker rm $NAME
     ;;
 
   start|stop|restart)
-    docker $1 $NAME
+    if [ "$ACTION" != "stop" ]
+    then
+        if [ -z "$( docker ps -aq -f name=$NAME 2>/dev/null )" ]
+        then
+            $0 create
+        elif [ $TRUNCATE_LOGS_BEFORE_EACH_START -eq 1 ]
+        then
+            $0 truncate-logs
+        fi
+    fi
+
+    docker $ACTION $NAME
+
+    if [ "$ACTION" != "stop" ]
+    then
+        if [ $USE_FAKE_TILD -eq 1 ]
+        then
+            $0 fake-tild &
+        fi
+        $0 logs
+    fi
+    ;;
+
+  status)
+    if [ -n "$( docker ps -aq -f status=running -f name=$NAME 2>/dev/null )" ]
+    then
+        docker stats $NAME --all --no-trunc
+    elif [ -n "$( docker ps -aq -f status=exited -f name=$NAME 2>/dev/null )" ]
+    then
+        echo "Container $NAME is not running."
+    else
+        echo "Container $NAME does not exists."
+    fi
     ;;
 
   recreate)
@@ -38,11 +86,16 @@ case $1 in
     docker logs -f $NAME
     ;;
 
-  logs)
+  truncate-logs)
     sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' $NAME)
     ;;
 
   fake-tild|analyse-tild-state-data)
+    if [ -n "$( docker ps -aq -f status=exited -f name=$NAME 2>/dev/null )" ]
+    then
+        >&2 echo "Container $NAME is not running. Please start it before retrying"
+        exit 1
+    fi
     docker exec -t $NAME /root/bin/$@
     ;;
   *)
@@ -52,12 +105,13 @@ Usage: $0 [command]
     create                     Create docker container
     remove                     Remove docker container
     recreate                   Recreate docker container
-    start                      Start docker container
+    start                      Start docker container and run fake-tild (if enabled)
+    status                     Show docker container status
     stop                       Stop docker container
-    restart                    Restart docker container
+    restart                    Restart docker container and run fake-tild (if enabled)
     logs                       Show (and follow) docker container logs
     truncate-logs              Truncate docker container logs
-    fake-tild                  Run fake Tild server
-    analyse-tild-state-data    Analyse raw Tild server state data
+    fake-tild                  Run fake Tild server (inside docker container)
+    analyse-tild-state-data    Analyse raw Tild server state data (inside docker container)
 EOF
 esac
