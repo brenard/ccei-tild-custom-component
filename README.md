@@ -16,14 +16,13 @@ integration. Thank's to him !
 
 ### Using HACS
 
-Firstly, you have to add the following custom repository :
+Add CCEI Tild integration via HACS:
 
-  * Repository : `https://github.com/brenard/ccei-tild-custom-component`
-  * Category : _Integration_
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=brenard&repository=ccei-tild-custom-component&category=integration)
 
-After, click on _Explore & download repositories_, search and install _CCEI Tild pool box_
-integration. Finally, go to _Settings_, _Devices & services_, click on _+ Add integration_ button
-and search for _CCEI Tild_.
+Add your CCEI Tild pool box via the Integration menu:
+
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=ccei_tild)
 
 _Note:_ A [request](https://github.com/hacs/default/pull/2160) for integration as default repository
 in HACS is currently pending.
