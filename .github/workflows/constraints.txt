@@ -3,4 +3,4 @@ pre-commit==3.7.1
 black==24.4.2
 flake8==7.1.0
 reorder-python-imports==3.13.0
-pylint==3.2.5
+pylint==3.2.6
