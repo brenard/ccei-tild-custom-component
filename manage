@@ -4,6 +4,7 @@ SRC_DIR=$( dirname "$(realpath $0)" )
 NAME=$(basename $SRC_DIR)
 USE_FAKE_TILD=1
 TRUNCATE_LOGS_BEFORE_EACH_START=1
+DOCKER_IMAGE=ghcr.io/home-assistant/home-assistant:stable
 
 ACTION="$1"
 [ "$2" == "-x" ] && set -x
@@ -22,8 +23,13 @@ case $ACTION in
       -v $SRC_DIR/bin:/root/bin \
       -v /run/dbus:/run/dbus:ro \
       --network=host \
-      ghcr.io/home-assistant/home-assistant
+      $DOCKER_IMAGE
     ;;
+
+  upgrade)
+    docker pull $DOCKER_IMAGE
+    $0 recreate
+  ;;
 
   remove)
     if [ -z "$( docker ps -aq -f name=$NAME 2>/dev/null )" ]
@@ -103,6 +109,7 @@ case $ACTION in
 Usage: $0 [command]
   Available commands:
     create                     Create docker container
+    upgrade                    Upgrade (and recreate) docker container
     remove                     Remove docker container
     recreate                   Recreate docker container
     start                      Start docker container and run fake-tild (if enabled)
