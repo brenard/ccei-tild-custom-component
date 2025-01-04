@@ -1,5 +1,5 @@
 """Select platform"""
-from homeassistant.const import PERCENTAGE, TEMP_CELSIUS
+from homeassistant.const import PERCENTAGE, UnitOfTemperature
 
 from .const import (
     AUX_PROG_FIRST_RANGE_END_HOUR,
@@ -150,7 +150,7 @@ class TildLightTimerDurationSelect(TildSelectEntity):
 class TildWaterTemperatureOffsetSelect(TildSelectEntity):
     """Select the water temperature offset"""
 
-    _attr_unit_of_measurement = TEMP_CELSIUS
+    _attr_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_icon = "mdi:thermometer-water"
 
     _sensor_data_key = WATER_TEMPERATURE_OFFSET

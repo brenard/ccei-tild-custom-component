@@ -1,5 +1,5 @@
 """Sensor platform"""
-from homeassistant.const import TEMP_CELSIUS
+from homeassistant.const import UnitOfTemperature
 
 from .const import (
     COORDINATOR,
@@ -46,7 +46,7 @@ class TildSystemDateSensor(TildSensorEntity):
 class TildWaterTemperatureSensor(TildSensorEntity):
     """Monitors the water temperature"""
 
-    _attr_unit_of_measurement = TEMP_CELSIUS
+    _attr_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_icon = "mdi:pool-thermometer"
 
     _sensor_data_key = WATER_TEMPERATURE
@@ -55,7 +55,7 @@ class TildWaterTemperatureSensor(TildSensorEntity):
 class TildWaterRawTemperatureSensor(TildSensorEntity):
     """Monitors the water raw temperature"""
 
-    _attr_unit_of_measurement = TEMP_CELSIUS
+    _attr_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_icon = "mdi:pool-thermometer"
 
     _sensor_data_key = WATER_RAW_TEMPERATURE
