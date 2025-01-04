@@ -1,4 +1,7 @@
 """Sensor platform"""
+
+from homeassistant.components.light import ColorMode
+
 from .const import COORDINATOR, DOMAIN, LIGHT_ENABLED
 from .entity import TildLightEntity
 
@@ -19,3 +22,5 @@ class TildLight(TildLightEntity):
     _attr_icon = "mdi:light-flood-up"
 
     _sensor_data_key = LIGHT_ENABLED
+
+    supported_color_modes = [ColorMode.ONOFF]

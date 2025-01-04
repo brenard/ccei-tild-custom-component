@@ -8,7 +8,8 @@ import logging
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import Config, HomeAssistant
+from homeassistant.core import HomeAssistant
+from homeassistant.core_config import Config
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import (
@@ -77,7 +78,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady
 
-    for platform in PLATFORMS:
-        hass.async_add_job(hass.config_entries.async_forward_entry_setup(entry, platform))
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
